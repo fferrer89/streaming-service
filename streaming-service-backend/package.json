@@ -1,0 +1,38 @@
+{
+  "name": "streaming_service",
+  "version": "1.0.0",
+  "description": "CS554 Project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "seed": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fferrer89/streaming-service.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fferrer89/streaming-service/issues"
+  },
+  "homepage": "https://github.com/fferrer89/streaming-service#readme",
+  "type": "module",
+  "dependencies": {
+    "@apollo/server": "^4.10.0",
+    "axios": "^1.5.1",
+    "bcryptjs": "^2.4.3",
+    "date-fns": "^3.3.1",
+    "dotenv": "^16.3.1",
+    "graphql": "^16.8.1",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "mongodb": "^6.3.0",
+    "mongoose": "^7.6.3",
+    "nodemon": "^3.0.2",
+    "redis": "^4.6.13",
+    "validator": "^13.11.0"
+  }
+}
