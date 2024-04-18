@@ -118,7 +118,7 @@ artistSchema.methods.isPasswordCorrect = async function (
   return await bcrypt.compare(candidatePassword, artistPassword);
 };
 
-userSchema.methods.changedAfter = function (JWTTimestamp) {
+artistSchema.methods.changedAfter = function (JWTTimestamp) {
   if (this.password_changed_date) {
     const passwordChangedAtTimestamp = parseInt(
       this.password_changed_date.getTime() / 1000,

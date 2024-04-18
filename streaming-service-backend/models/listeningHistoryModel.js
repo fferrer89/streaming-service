@@ -21,5 +21,8 @@ const listeningHistorySchema = new mongoose.Schema({
   ],
 });
 
-const ListeningHistory = mongoose.model("ListeningHistory", songSchema);
+const ListeningHistory = mongoose.model(
+  "ListeningHistory",
+  listeningHistorySchema
+);
 export default ListeningHistory;
