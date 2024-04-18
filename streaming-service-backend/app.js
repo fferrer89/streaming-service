@@ -9,7 +9,7 @@ import { userResolvers } from "./graphql/userResolvers.js";
 import { artistResolvers } from "./graphql/artistResolvers.js";
 import { albumResolvers } from "./graphql/albumResolvers.js";
 import { songResolvers } from "./graphql/songResolvers.js";
-import { playlistResolvers } from "./graphql/playListResolvers.js";
+import { playlistResolvers } from "./graphql/playlistResolvers.js";
 import redis from "redis";
 const client = redis.createClient();
 
