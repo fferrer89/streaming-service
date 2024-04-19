@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
+import environment from './config/config.js';
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 import mongoose from "mongoose";
@@ -24,9 +25,12 @@ const server = new ApolloServer({
   ),
 });
 
+const env = process.env.NODE_ENV || "development";
+const mongoUrl = environment[env].mongoUrl;
+
 try {
   const connection = await mongoose.connect(
-    "mongodb://127.0.0.1:27017/streaming-service",
+    mongoUrl,
     {
       useNewUrlParser: true,
     }
