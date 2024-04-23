@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
-
+import {Genders} from '../utils/helpers.js'
 const userSchema = new mongoose.Schema({
   first_name: {
     type: String,
@@ -64,7 +64,7 @@ const userSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ["male", "female", "other"],
+    enum: Genders,
   },
   following: {
     users: [
