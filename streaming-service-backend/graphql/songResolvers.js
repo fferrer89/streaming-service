@@ -380,9 +380,8 @@ getNewlyReleasedSongs:async(_, args, context)=>{
       return songExist;
     },
     toggleLikeSong: async(args)=>{
-
+      
     }
-
   },
 
 
