@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
-import {AlbumTypes, MusicGenres, Visibilities} from '../utils/helpers.js'
 
 const albumSchema = new mongoose.Schema({
   album_type: {
     type: String,
     required: [true, "Please provide an album type"],
     enum: {
-      values: AlbumTypes,
+      values: ["album", "single", "compilation", "appears_on"],
       message: "Invalid album type",
     },
   },
@@ -57,10 +56,6 @@ const albumSchema = new mongoose.Schema({
   genres: {
     type: [String],
     required: [true, "Please provide genres"],
-    enum: {
-      values: MusicGenres,
-      message: "Invalid music genre",
-    },
   },
   likes: {
     type: Number,
@@ -74,7 +69,7 @@ const albumSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide an album visibility"],
     enum: {
-      values: Visibilities,
+      values: ["public", "private"],
       message: "Invalid album visibility type",
     },
   },
