@@ -40,7 +40,7 @@ export const userResolvers = {
         const savedUser = await newUser.save();
 
         const token = generateToken(savedUser._id);
-
+        console.log(token);
         return { user: savedUser, token };
       } catch (error) {
         throw new GraphQLError(`Error Registering user: ${error.message}`, {

@@ -39,7 +39,7 @@ export const typeDefs = `#graphql
   getTrendingSongs: [Song]
   getUserLikedSongs(userId: String!): [Song]
   getRecommendedSongs(userId: ID!): [Song]
-  getMostLikedSongsOfArtist: [Song]
+  getMostLikedSongsOfArtist(artistId: ID!): [Song]
 
   playlists: [Playlist]
   getPlaylistById(_id: ID!): Playlist
@@ -48,9 +48,6 @@ export const typeDefs = `#graphql
   getPlaylistsByVisibility(visibility: String!): [Playlist]
   getMostLikedPlaylists: [Playlist]
   getUserLikedPlaylists(userId: String!): [Playlist]
-
-
-  
   
 }
 
@@ -78,7 +75,7 @@ type Mutation {
       password: String!,
       profile_image_url: String!,
       genres: [String!]!
-    ): RegisterArtistResponse!
+    ): RegisterArtistResponse
 
   loginArtist(email: String!, password: String!): RegisterArtistResponse!
   
@@ -131,18 +128,22 @@ type Mutation {
     producers: [String!]!,
     genre: String!,
     release_date: Date!,
+    artists:[ID!]!,
+    lyrics:String,
+    album: ID,
   ): Song!
 
-  editSong(_id: ID!, title: String,
+  editSong(songId: ID!, title: String,
     duration: Int,
     song_url: String,
     cover_image_url: String,
     writtenBy: String,
     producers: [String!],
     genre: String,
-    release_date: Date): Song
+    release_date: Date, 
+    artists:[ID!],): Song
 
-  removeSong(_id: ID!): Song
+  removeSong(songId: ID!): Song
 
   createPlaylist(description: String!,
       title: String!,
@@ -402,5 +403,4 @@ enum PlaylistVisibility {
 }
 
 scalar Date
-
 `;
