@@ -11,6 +11,9 @@ import { albumResolvers } from "./graphql/albumResolvers.js";
 import { songResolvers } from "./graphql/songResolvers.js";
 import { playlistResolvers } from "./graphql/playlistResolvers.js";
 import redis from "redis";
+import jwt from "jsonwebtoken";
+import { GraphQLError } from "graphql";
+
 const client = redis.createClient();
 
 const server = new ApolloServer({
@@ -22,6 +25,7 @@ const server = new ApolloServer({
     songResolvers,
     playlistResolvers
   ),
+  // includeStacktraceInErrorResponses: false,
 });
 
 try {
@@ -40,6 +44,29 @@ try {
   if (connection) {
     const { url } = await startStandaloneServer(server, {
       listen: { port: 4000 },
+      context: async ({ req, res }) => {
+        if(req.body.operationName != "registerUser" &&  req.body.operationName != "loginUser"){
+          const token = req.headers.authorization || '';
+          try {
+            var decoded = jwt.verify(token,  process.env.JWT_SECRET);
+            if(decoded.exp<=Math.floor(Date.now() / 1000)){
+              throw new GraphQLError('You are not authorized. Please login or sign up', {
+                extensions: {
+                  code: 'FORBIDDEN',
+                },
+              }); 
+            }
+          } catch(error) {
+            throw new GraphQLError('You are not authorized. Please login or sign up', {
+              extensions: {
+                code: 'FORBIDDEN',
+              },
+            });      
+          }
+          return {decoded};
+        }
+       
+      },
     });
     console.log("");
     console.log("-------------------------------------------------");
