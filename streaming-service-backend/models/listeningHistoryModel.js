@@ -1,8 +1,7 @@
 import mongoose from "mongoose";
 
 const listeningHistorySchema = new mongoose.Schema({
-  history: [
-    {
+  history: {
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
@@ -17,8 +16,12 @@ const listeningHistorySchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
       },
+      deleted:{
+        type: Boolean,
+        default: false,
+      }
     },
-  ],
+
 });
 
 const ListeningHistory = mongoose.model(

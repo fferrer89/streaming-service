@@ -28,6 +28,7 @@ const server = new ApolloServer({
         songResolvers,
         playlistResolvers
     ),
+
 });
 
 const env = process.env.NODE_ENV || "development";
@@ -60,6 +61,7 @@ try {
     } else {
         throw new Error(`Failed connecting to MongoDB`);
     }
+
 } catch (error) {
     console.log("");
     console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
