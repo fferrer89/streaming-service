@@ -12,21 +12,21 @@ type Query {
     getArtistByName(name: String!): Artist
 #    FIXME how to calculate this? Artists cannot be "liked" according to the DB schema
     getMostLikedArtists: [Artist]
-    getArtistsByAlbumId(albumId: String!): [Artist]
+    getArtistsByAlbumId(albumId: ID!): [Artist]
  #    FIXME we need artists with followers in the DB schema
-    getUserFollowedArtists(userId: String!): [Artist]
+    getUserFollowedArtists(userId: ID!): [Artist]
 
     albums: [Album]
     getAlbumById(_id: ID!): Album
-    getAlbumsByTitle(searchTerm: String!): [Album]
-    getAlbumsByVisibility(visibility: String!): [Album]
+    getAlbumsByTitle(title: String!): [Album]
+    getAlbumsByVisibility(visibility: Visibility!): [Album]
     getAlbumsByReleasedYear(year: Int!): [Album]
-    getAlbumsByGenre(genre: String!): [Album]
+    getAlbumsByGenre(genre: MusicGenre!): [Album]
     getNewlyReleasedAlbums: [Album]
-    getMostLikedAlbums: [Album]
-    getUserLikedAlbums(userId: String!): [Album]
-    getAlbumsByArtist(artistId: String!): [Album]
-
+    getMostLikedAlbums(limit: Int): [Album]
+#    FIXME albums cannot be liked by users according to the DB schema
+    getUserLikedAlbums(userId: ID!): [Album]
+    getAlbumsByArtist(artistId: ID!): [Album]
 
     songs: [Song]
     getSongById(_id: ID!): Song
@@ -35,7 +35,7 @@ type Query {
     getSongsByArtistID(artistId: String!): [Song]
     getSongsByWriter(searchTerm: String!): [Song]
     getSongsByProducer(searchTerm: String!): [Song]
-    getSongsByGenre(genre: String!): [Song]
+    getSongsByGenre(genre: MusicGenre!): [Song]
     getNewlyReleasedSongs: [Song]
     getMostLikedSongs: [Song]
     getTrendingSongs: [Song]
@@ -47,7 +47,7 @@ type Query {
     getPlaylistById(_id: ID!): Playlist
     getPlaylistsByTitle(searchTerm: String!): [Playlist]
     getPlaylistsByOwner(userId: String!): [Playlist]
-    getPlaylistsByVisibility(visibility: String!): [Playlist]
+    getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
     getMostLikedPlaylists: [Playlist]
     getUserLikedPlaylists(userId: String!): [Playlist]
 
@@ -74,7 +74,7 @@ type Mutation {
         email: String!,
         password: String!,
         profile_image_url: String!,
-        genres: [String!]!
+        genres: [MusicGenre!]!
     ): RegisterArtistResponse!
 
     loginArtist(email: String!, password: String!): RegisterArtistResponse!
@@ -87,7 +87,7 @@ type Mutation {
         email: String,
         password: String,
         profile_image_url: String,
-        genres: [String]
+        genres: [MusicGenre]
     ): Artist
 
     addAlbum(
@@ -99,11 +99,12 @@ type Mutation {
         release_date: Date!,
         artists: [ID!]!,
         songs: [ID!]!,
-        genres: [String!]!,
-        visibility: String!
+        genres: [MusicGenre!]!,
+        visibility: Visibility!
     ): Album
 
-    editAlbum(_id: ID!, album_type: String,
+    editAlbum(_id: ID!, 
+        album_type: String,
         total_songs: Int,
         cover_image_url: String,
         title: String,
@@ -111,9 +112,10 @@ type Mutation {
         release_date: Date,
         artists: [ID!],
         songs: [ID!],
-        genres: [String!],
-        visibility: String): Album
+        genres: [MusicGenre!],
+        visibility: Visibility): Album
 
+#    FIXME what is the intended behavior of this operation?
     toggleSongToAlbum(_id: ID!, songId: ID!): Album
 
     removeAlbum(_id: ID!): Album
@@ -125,7 +127,7 @@ type Mutation {
         cover_image_url: String!,
         writtenBy: String!,
         producers: [String!]!,
-        genre: String!,
+        genre: MusicGenre!,
         release_date: Date!,
     ): Song!
 
@@ -135,14 +137,14 @@ type Mutation {
         cover_image_url: String,
         writtenBy: String,
         producers: [String!],
-        genre: String,
+        genre: MusicGenre,
         release_date: Date): Song
 
     removeSong(_id: ID!): Song
 
     createPlaylist(description: String!,
         title: String!,
-        visibility: String!): Playlist!
+        visibility: Visibility!): Playlist!
 
     toggleSongToPlaylist(_id: ID!, songId: ID!): Playlist
     removePlaylist(_id: ID!): Playlist
@@ -190,7 +192,7 @@ type Artist {
     following: Following
     followers: Followers
     profile_image_url: String!
-    genres: [String!]!
+    genres: [MusicGenre!]!
 }
 
 type Following {
@@ -220,10 +222,10 @@ type Album {
     last_updated: Date!
     artists: [Artist!]!
     songs: [Song!]!
-    genres: [String!]!
+    genres: [MusicGenre!]!
     likes: Int
     total_duration: Int
-    visibility: PlaylistVisibility!
+    visibility: Visibility!
 }
 
 type Song {
@@ -248,7 +250,7 @@ type Playlist {
     _id: ID!
     description: String!
     title: String!
-    visibility: PlaylistVisibility!
+    visibility: Visibility!
     owner: User!
     songs: [Song]
     created_date: Date!
@@ -389,9 +391,15 @@ enum MusicGenre {
 }
 
 
-enum PlaylistVisibility {
+enum Visibility {
     PUBLIC
     PRIVATE
+}
+enum AlbumType {
+    ALBUM
+    SINGLE
+    COMPILATION
+    APPEARS_ON
 }
 
 scalar Date
