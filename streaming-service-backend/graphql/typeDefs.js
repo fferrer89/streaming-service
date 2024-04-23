@@ -403,5 +403,4 @@ enum AlbumType {
 }
 
 scalar Date
-
 `;
