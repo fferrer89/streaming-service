@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {Visibilities} from '../utils/helpers.js'
+
 const playlistSchema = new mongoose.Schema({
   description: {
     type: String,
@@ -37,7 +37,7 @@ const playlistSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide an playlist visibility"],
     enum: {
-      values: Visibilities,
+      values: ["public", "private"],
       message: "Invalid playlist visibility type",
     },
   },
