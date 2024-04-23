@@ -65,7 +65,6 @@ try {
           }
           return {decoded};
         }
-       
       },
     });
     console.log("");
