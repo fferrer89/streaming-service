@@ -39,23 +39,26 @@ export const userResolvers = {
 
                 const savedUser = await newUser.save();
 
-                const token = generateToken(savedUser._id);
 
-                return {user: savedUser, token};
-            } catch (error) {
-                throw new GraphQLError(`Error Registering user: ${error.message}`, {
-                    extensions: {code: "INTERNAL_SERVER_ERROR"},
-                });
-            }
-        },
-        loginUser: async (_, args) => {
-            try {
-                const user = await User.findOne({email: args.email}).select(
-                    "+password"
-                );
-                if (!user) {
-                    throw new Error("Invalid email or password.");
-                }
+        const token = generateToken(savedUser._id);
+        console.log(token);
+        return { user: savedUser, token };
+      } catch (error) {
+        throw new GraphQLError(`Error Registering user: ${error.message}`, {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        });
+      }
+    },
+
+    loginUser: async (_, args) => {
+      try {
+        const user = await User.findOne({ email: args.email }).select(
+          "+password"
+        );
+        if (!user) {
+          throw new Error("Invalid email or password.");
+        }
+
 
                 const isPasswordCorrect = await user.isPasswordCorrect(
                     args.password,
