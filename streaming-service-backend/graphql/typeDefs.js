@@ -1,4 +1,5 @@
 export const typeDefs = `#graphql
+
 type Query {
 
     users: [User]
@@ -76,6 +77,7 @@ type Mutation {
         profile_image_url: String!,
         genres: [MusicGenre!]!
     ): RegisterArtistResponse!
+
 
     loginArtist(email: String!, password: String!): RegisterArtistResponse!
 
@@ -403,5 +405,4 @@ enum AlbumType {
 }
 
 scalar Date
-
 `;

@@ -14,7 +14,6 @@ import {albumResolvers} from "./graphql/albumResolvers.js";
 import {songResolvers} from "./graphql/songResolvers.js";
 import {playlistResolvers} from "./graphql/playlistResolvers.js";
 import redis from "redis";
-
 // TODO: uncomment line below to start Redis server
 // const client = redis.createClient();
 
@@ -28,6 +27,7 @@ const server = new ApolloServer({
         songResolvers,
         playlistResolvers
     ),
+
 });
 
 const env = process.env.NODE_ENV || "development";

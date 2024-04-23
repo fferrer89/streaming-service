@@ -39,6 +39,7 @@ export const userResolvers = {
 
                 const savedUser = await newUser.save();
 
+
                 const token = generateToken(savedUser._id);
 
                 return {user: savedUser, token};
@@ -56,6 +57,7 @@ export const userResolvers = {
                 if (!user) {
                     throw new Error("Invalid email or password.");
                 }
+
 
                 const isPasswordCorrect = await user.isPasswordCorrect(
                     args.password,
