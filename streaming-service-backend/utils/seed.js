@@ -20,7 +20,7 @@ const users = [
     email: "john@example.com",
     password: "Password123$",
     date_of_birth: "01/01/1990",
-    gender: "male",
+    gender: "MALE",
     profile_image_url: "https://example.com/johndoe.jpg",
   },
   {
@@ -30,7 +30,7 @@ const users = [
     email: "jane@example.com",
     password: "Password456$",
     date_of_birth: "01/01/1995",
-    gender: "female",
+    gender: "FEMALE",
     profile_image_url: "https://example.com/janedoe.jpg",
   },
 ];
@@ -43,9 +43,9 @@ const artists = [
     email: "bob@example.com",
     password: "Password456#",
     date_of_birth: "01/01/1940",
-    gender: "male",
+    gender: "MALE",
     profile_image_url: "https://example.com/bobmarley.jpg",
-    genres: ["reggae"],
+    genres: ["REGGAE"],
   },
   {
     first_name: "Adele",
@@ -54,15 +54,15 @@ const artists = [
     email: "adele@example.com",
     password: "Password456@",
     date_of_birth: "01/01/1980",
-    gender: "female",
+    gender: "FEMALE",
     profile_image_url: "https://example.com/adele.jpg",
-    genres: ["pop", "soul"],
+    genres: ["POP", "SOUL"],
   },
 ];
 
 const albums = [
   {
-    album_type: "album",
+    album_type: "ALBUM",
     total_songs: 10,
     cover_image_url: "https://example.com/album1.jpg",
     title: "Greatest Hits",
@@ -70,13 +70,13 @@ const albums = [
     release_date: new Date("2020-01-01"),
     artists: [],
     songs: [],
-    genres: ["pop", "rock"],
+    genres: ["POP", "ROCK"],
     likes: 100,
     total_duration: 3600,
-    visibility: "public",
+    visibility: "PUBLIC",
   },
   {
-    album_type: "single",
+    album_type: "SINGLE",
     total_songs: 1,
     cover_image_url: "https://example.com/album2.jpg",
     title: "Single Track",
@@ -84,10 +84,10 @@ const albums = [
     release_date: new Date("2021-05-01"),
     artists: [],
     songs: [],
-    genres: ["pop"],
+    genres: ["POP"],
     likes: 50,
     total_duration: 180,
-    visibility: "public",
+    visibility: "PUBLIC",
   },
 ];
 
@@ -103,7 +103,7 @@ const songs = [
     writtenBy: "Songwriter 1",
     producers: ["Producer 1", "Producer 2"],
     language: "English",
-    genre: "pop",
+    genre: "POP",
     lyrics: "Lyrics for song 1",
     release_date: new Date("2020-01-01"),
   },
@@ -118,7 +118,7 @@ const songs = [
     writtenBy: "Songwriter 2",
     producers: ["Producer 3"],
     language: "English",
-    genre: "rock",
+    genre: "ROCK",
     lyrics: "Lyrics for song 2",
     release_date: new Date("2021-01-01"),
   },
@@ -144,7 +144,7 @@ const playlists = [
     title: "Playlist 1",
     owner: null,
     songs: [],
-    visibility: "public",
+    visibility: "PUBLIC",
   },
   {
     description: "Playlist 2",
@@ -152,7 +152,7 @@ const playlists = [
     title: "Playlist 2",
     owner: null,
     songs: [],
-    visibility: "private",
+    visibility: "PRIVATE",
   },
 ];
 
@@ -221,4 +221,4 @@ async function seed() {
   }
 }
 
-seed();
+await seed();
