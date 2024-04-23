@@ -12,7 +12,9 @@ import { albumResolvers } from "./graphql/albumResolvers.js";
 import { songResolvers } from "./graphql/songResolvers.js";
 import { playlistResolvers } from "./graphql/playlistResolvers.js";
 import redis from "redis";
-const client = redis.createClient();
+
+// TODO: uncomment line below to start Redis server
+// const client = redis.createClient();
 
 const server = new ApolloServer({
   typeDefs,
@@ -35,12 +37,15 @@ try {
       useNewUrlParser: true,
     }
   );
-  await client
-    .connect()
-    .then(() => {})
-    .catch((error) => {
-      throw new Error(`Redis Client failed to connect`);
-    });
+
+  // TODO: uncomment lines below to start Redis server
+  // await client
+  //   .connect()
+  //   .then(() => {})
+  //   .catch((error) => {
+  //     throw new Error(`Redis Client failed to connect`);
+  //   });
+
   if (connection) {
     const { url } = await startStandaloneServer(server, {
       listen: { port: 4000 },
