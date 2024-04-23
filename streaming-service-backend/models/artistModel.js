@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
+import {Genders, MusicGenres} from '../utils/helpers.js'
 
 const artistSchema = new mongoose.Schema({
   first_name: {
@@ -64,7 +65,10 @@ const artistSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ["male", "female", "other"],
+    enum: {
+      values: Genders,
+      message: "Invalid gender",
+    },
   },
   following: {
     users: [
@@ -101,6 +105,10 @@ const artistSchema = new mongoose.Schema({
   genres: {
     type: [String],
     required: [true, "Please provide genres for artist"],
+    enum: {
+      values: MusicGenres,
+      message: "Invalid gender",
+    },
   },
 });
 
