@@ -11,9 +11,9 @@ export const typeDefs = `#graphql
   artists: [Artist]
   getArtistById(_id: ID!): Artist
 #FIXME returns the first artist found by a given first_name
-  getArtistByName(name: String!): Artist
+  getArtistsByName(name: String!): [Artist]
 #FIXME how to calculate this? Artists cannot be "liked" according to the DB schema
-  getMostLikedArtists: [Artist]
+  getMostFollowedArtists: [Artist]
   getArtistsByAlbumId(albumId: ID!): [Artist]
 #FIXME we need artists with followers in the DB schema
   getUserFollowedArtists(userId: ID!): [Artist]
@@ -123,7 +123,8 @@ type Mutation {
 
 
 #    FIXME what is the intended behavior of this operation?
-    toggleSongToAlbum(_id: ID!, songId: ID!): Album
+    addSongToAlbum(_id: ID!, songId: ID!): Album
+    removeSongFromAlbum(_id: ID!, songId: ID!): Album
 
   removeAlbum(_id: ID!): Album
 
@@ -159,7 +160,8 @@ type Mutation {
 
 
   
-  toggleSongToPlaylist(_id: ID!, songId: ID!): Playlist
+  addSongToPlaylist(_id: ID!, songId: ID!): Playlist
+  removeSongFromPlaylist(_id: ID!, songId: ID!): Playlist
   removePlaylist(_id: ID!): Playlist
 
   toggleLikeSong(_id: ID!, songId: ID!): Song

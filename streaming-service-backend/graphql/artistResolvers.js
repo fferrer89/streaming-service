@@ -1,14 +1,9 @@
-import Artist from "../models/artistModel.js";
-import {GraphQLError} from "graphql";
-import jwt from "jsonwebtoken";
-import Album from "../models/albumModel.js";
-import User from "../models/userModel.js";
-
-const generateToken = (artistId) => {
-  return jwt.sign({id: artistId}, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRATION_TIME,
-  });
-};
+import Artist from '../models/artistModel.js';
+import { GraphQLError } from 'graphql';
+import jwt from 'jsonwebtoken';
+import Album from '../models/albumModel.js';
+import User from '../models/userModel.js';
+import { generateToken } from '../utils/helpers.js';
 export const artistResolvers = {
   Query: {
     artists: async () => {
@@ -27,10 +22,10 @@ export const artistResolvers = {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
       }
     },
-    getArtistByName: async (_, args, contextValue) => {
+    getArtistsByName: async (_, args, contextValue) => {
       try {
-        const artist = await Artist.findOne({ first_name: args.name});
-        return artist;
+        const artists = await Artist.find({ first_name: args.name });
+        return artists;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
       }
@@ -53,7 +48,7 @@ export const artistResolvers = {
     },
     getUserFollowedArtists: async (_, args, contextValue) => {
       // TODO
-    }
+    },
   },
   Mutation: {
     registerArtist: async (_, args) => {
@@ -63,7 +58,7 @@ export const artistResolvers = {
         //    - Validate email format, password strength, etc. (you'll need additional libraries / functions for this)
 
         // 2. Check if an artist with the email already exists:
-        const existingArtist = await User.findOne({email: args.email});
+        const existingArtist = await User.findOne({ email: args.email });
         if (existingArtist) {
           throw new Error(`Artist already exists with this email.`);
         }
@@ -77,37 +72,41 @@ export const artistResolvers = {
           genres: args.genres,
         });
         const savedArtist = await newArtist.save();
-        const token = generateToken(savedArtist._id);
-        return {artist: savedArtist, token};
+        const token = generateToken(
+          savedArtist._id,
+          'ARTIST',
+          savedArtist.first_name
+        );
+        return { artist: savedArtist, token };
       } catch (error) {
         throw new GraphQLError(`Error Registering Artist: ${error.message}`, {
-          extensions: {code: "INTERNAL_SERVER_ERROR"},
+          extensions: { code: 'INTERNAL_SERVER_ERROR' },
         });
       }
     },
     loginArtist: async (_, args) => {
       try {
-        const artist = await Artist.findOne({email: args.email}).select(
-            "+password"
+        const artist = await Artist.findOne({ email: args.email }).select(
+          '+password'
         );
         if (!artist) {
-          throw new Error("Invalid email or password.");
+          throw new Error('Invalid email or password.');
         }
         const isPasswordCorrect = await artist.isPasswordCorrect(
-            args.password,
-            artist.password
+          args.password,
+          artist.password
         );
         if (!isPasswordCorrect) {
-          throw new Error("Invalid email or password.");
+          throw new Error('Invalid email or password.');
         }
-        const token = generateToken(artist._id);
-        return {artist, token};
+        const token = generateToken(artist._id, 'ARTIST', artist.first_name);
+        return { artist, token };
       } catch (error) {
         return {
           artist: null,
           token: null,
           error: {
-            message: "Error logging in artist",
+            message: 'Error logging in artist',
             details: error.message,
           },
         };

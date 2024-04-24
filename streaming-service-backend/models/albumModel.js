@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {AlbumTypes, MusicGenres, Visibilities} from '../utils/helpers.js'
+import { AlbumTypes, MusicGenres, Visibilities } from "../utils/helpers.js";
 
 const albumSchema = new mongoose.Schema({
   album_type: {
@@ -65,6 +65,20 @@ const albumSchema = new mongoose.Schema({
   likes: {
     type: Number,
     required: false,
+  },
+  liked_by: {
+    users: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
+    artists: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Artist",
+      },
+    ],
   },
   total_duration: {
     type: Number,

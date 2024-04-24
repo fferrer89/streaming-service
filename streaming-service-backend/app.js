@@ -1,21 +1,21 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
-dotenv.config({ path: "./.env" });
-import environment from "./config/config.js";
-import { ApolloServer } from "@apollo/server";
-import { startStandaloneServer } from "@apollo/server/standalone";
-import mongoose from "mongoose";
-import lodash from "lodash";
-import { typeDefs } from "./graphql/typeDefs.js";
+dotenv.config({ path: './.env' });
+import environment from './config/config.js';
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import mongoose from 'mongoose';
+import lodash from 'lodash';
+import { typeDefs } from './graphql/typeDefs.js';
 // import {enumResolvers} from "./graphql/enumResolvers.js";
-import { userResolvers } from "./graphql/userResolvers.js";
-import { artistResolvers } from "./graphql/artistResolvers.js";
-import { albumResolvers } from "./graphql/albumResolvers.js";
-import { songResolvers } from "./graphql/songResolvers.js";
-import { playlistResolvers } from "./graphql/playlistResolvers.js";
-import redis from "redis";
-import jwt from "jsonwebtoken";
-import { GraphQLError } from "graphql";
+import { userResolvers } from './graphql/userResolvers.js';
+import { artistResolvers } from './graphql/artistResolvers.js';
+import { albumResolvers } from './graphql/albumResolvers.js';
+import { songResolvers } from './graphql/songResolvers.js';
+import { playlistResolvers } from './graphql/playlistResolvers.js';
+import redis from 'redis';
+import jwt from 'jsonwebtoken';
+import { GraphQLError } from 'graphql';
 
 const client = redis.createClient();
 
@@ -31,21 +31,13 @@ const server = new ApolloServer({
   // includeStacktraceInErrorResponses: false,
 });
 
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 const mongoUrl = environment[env].mongoUrl;
 
 try {
   const connection = await mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
   });
-
-  // TODO: uncomment lines below to start Redis server
-  // await client
-  //   .connect()
-  //   .then(() => {})
-  //   .catch((error) => {
-  //     throw new Error(`Redis Client failed to connect`);
-  //   });
 
   await client
     .connect()
@@ -57,29 +49,40 @@ try {
     const { url } = await startStandaloneServer(server, {
       listen: { port: 4000 },
       context: async ({ req, res }) => {
+        if (req.body.operationName !== 'IntrospectionQuery') {
+          console.log(
+            `${new Date()} -- Operation = ${
+              req.body.operationName
+            } -- Status = ${res.statusCode}`
+          );
+        }
+        // will bypass authentication middelware for login, register and playground
         if (
-          req.body.operationName != "registerUser" &&
-          req.body.operationName != "loginUser"
+          req.body.operationName !== 'IntrospectionQuery' &&
+          req.body.operationName !== 'registerUser' &&
+          req.body.operationName !== 'registerArtist' &&
+          req.body.operationName !== 'loginUser' &&
+          req.body.operationName !== 'loginArtist'
         ) {
-          const token = req.headers.authorization || "";
+          const token = req.headers.authorization || '';
           try {
             var decoded = jwt.verify(token, process.env.JWT_SECRET);
             if (decoded.exp <= Math.floor(Date.now() / 1000)) {
               throw new GraphQLError(
-                "You are not authorized. Please login or sign up",
+                'You are not authorized. Please login or sign up',
                 {
                   extensions: {
-                    code: "FORBIDDEN",
+                    code: 'FORBIDDEN',
                   },
                 }
               );
             }
           } catch (error) {
             throw new GraphQLError(
-              "You are not authorized. Please login or sign up",
+              'You are not authorized. Please login or sign up',
               {
                 extensions: {
-                  code: "FORBIDDEN",
+                  code: 'FORBIDDEN',
                 },
               }
             );
@@ -88,17 +91,17 @@ try {
         }
       },
     });
-    console.log("");
-    console.log("-------------------------------------------------");
+    console.log('');
+    console.log('-------------------------------------------------');
     console.log(`🚀  Server ready at: ${url}`);
-    console.log("-------------------------------------------------");
+    console.log('-------------------------------------------------');
   } else {
     throw new Error(`Failed connecting to MongoDB`);
   }
 } catch (error) {
-  console.log("");
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  console.log('');
+  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   console.log(error.message);
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+  console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
   process.exit(1);
 }
