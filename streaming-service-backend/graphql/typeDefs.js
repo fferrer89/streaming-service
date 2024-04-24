@@ -44,7 +44,7 @@ export const typeDefs = `#graphql
   getTrendingSongs: [Song]
   getUserLikedSongs(userId: String!): [Song]
   getRecommendedSongs(userId: ID!): [Song]
-  getMostLikedSongsOfArtist: [Song]
+  getMostLikedSongsOfArtist(artistId: ID!): [Song]
 
   playlists: [Playlist]
   getPlaylistById(_id: ID!): Playlist

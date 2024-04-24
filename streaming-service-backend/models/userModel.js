@@ -1,47 +1,47 @@
-import mongoose from "mongoose";
-import validator from "validator";
-import bcrypt from "bcryptjs";
-import {Genders} from '../utils/helpers.js'
+import mongoose from 'mongoose';
+import validator from 'validator';
+import bcrypt from 'bcryptjs';
+import { Genders } from '../utils/helpers.js';
 const userSchema = new mongoose.Schema({
   first_name: {
     type: String,
-    required: [true, "Please enter your first name"],
+    required: [true, 'Please enter your first name'],
     trim: true,
     validate: [
       validator.isAlpha,
-      "Please enter a valid first name, user name can only contain letters",
+      'Please enter a valid first name, user name can only contain letters',
     ],
-    minLength: [2, "First name must be at least 2 characters long"],
-    maxLength: [20, "First name must be less than 20 characters long"],
+    minLength: [2, 'First name must be at least 2 characters long'],
+    maxLength: [20, 'First name must be less than 20 characters long'],
   },
   last_name: {
     type: String,
-    required: [true, "Please enter your last name"],
+    required: [true, 'Please enter your last name'],
     trim: true,
     validate: [
       validator.isAlpha,
-      "Please enter a valid last name,last name can only contain letters",
+      'Please enter a valid last name,last name can only contain letters',
     ],
-    minLength: [2, "Last name must be at least 2 characters long"],
-    maxLength: [20, "Last name must be less than 20 characters long"],
+    minLength: [2, 'Last name must be at least 2 characters long'],
+    maxLength: [20, 'Last name must be less than 20 characters long'],
   },
   display_name: {
     type: String,
-    required: [true, "Please enter your display name"],
+    required: [true, 'Please enter your display name'],
     trim: true,
     validate: [
       validator.isAlphanumeric,
-      "Please enter a valid display name,display name can only contain letters and numbers",
+      'Please enter a valid display name,display name can only contain letters and numbers',
     ],
-    minLength: [2, "Last name must be at least 2 characters long"],
-    maxLength: [20, "Last name must be less than 20 characters long"],
+    minLength: [2, 'Last name must be at least 2 characters long'],
+    maxLength: [20, 'Last name must be less than 20 characters long'],
   },
   email: {
     type: String,
-    required: [true, "Please enter your email"],
+    required: [true, 'Please enter your email'],
     trim: true,
     unique: true,
-    validate: [validator.isEmail, "Please enter a valid email"],
+    validate: [validator.isEmail, 'Please enter a valid email'],
   },
   created_date: {
     type: Date,
@@ -49,10 +49,10 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, "Please enter your password"],
+    required: [true, 'Please enter your password'],
     trim: true,
-    minLength: [8, "Password must be at least 8 characters long"],
-    maxLength: [25, "Password must be less than 25 characters long"],
+    minLength: [8, 'Password must be at least 8 characters long'],
+    maxLength: [25, 'Password must be less than 25 characters long'],
     select: false,
   },
   password_changed_date: {
@@ -70,13 +70,13 @@ const userSchema = new mongoose.Schema({
     users: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     artists: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "Artist",
+        ref: 'Artist',
       },
     ],
   },
@@ -84,25 +84,25 @@ const userSchema = new mongoose.Schema({
     users: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
     artists: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "Artist",
+        ref: 'Artist',
       },
     ],
   },
   profile_image_url: {
     type: String,
-    required: [true, "Please provide user profile image url"],
+    required: [true, 'Please provide user profile image url'],
   },
   liked_songs: [
     {
       songId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Song",
+        ref: 'Song',
       },
       liked_date: {
         type: Date,
@@ -112,8 +112,8 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
 
   next();
@@ -137,5 +137,5 @@ userSchema.methods.changedAfter = function (JWTTimestamp) {
   return false;
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 export default User;

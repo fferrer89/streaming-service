@@ -1,5 +1,5 @@
-import { GraphQLError } from "graphql";
-import Album from "../models/albumModel.js";
+import { GraphQLError } from 'graphql';
+import Album from '../models/albumModel.js';
 
 export const albumResolvers = {
   Query: {
@@ -87,7 +87,7 @@ export const albumResolvers = {
         return savedAlbum;
       } catch (error) {
         throw new GraphQLError(`Error creating album: ${error.message}`, {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: 'INTERNAL_SERVER_ERROR' },
         });
       }
     },
@@ -100,7 +100,7 @@ export const albumResolvers = {
           { new: true } // Return the updated document
         );
         if (!updatedAlbum) {
-          throw new Error("Album not found");
+          throw new Error('Album not found');
         }
         return updatedAlbum;
       } catch (error) {
@@ -119,7 +119,7 @@ export const albumResolvers = {
       try {
         const deletedAlbum = await Album.findByIdAndDelete(_id);
         if (!deletedAlbum) {
-          throw new Error("Album not found");
+          throw new Error('Album not found');
         }
         return deletedAlbum;
       } catch (error) {
