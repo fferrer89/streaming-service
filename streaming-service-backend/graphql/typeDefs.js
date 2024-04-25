@@ -59,8 +59,6 @@ export const typeDefs = `#graphql
 type Mutation {
   registerUser(first_name: String!, last_name: String!, display_name: String!, email: String!, password: String!, profile_image_url: String!): RegisterUserResponse!
   
-  
- 
   loginUser(email: String!, password: String!): RegisterUserResponse!
 
   editUser(
@@ -73,44 +71,44 @@ type Mutation {
   ): User
 
   registerArtist(
-      first_name: String!,
-      last_name: String!,
-      display_name: String!,
-      email: String!,
-      password: String!,
-      profile_image_url: String!,
-      genres: [String!]!
-    ): RegisterArtistResponse
+    first_name: String!,
+    last_name: String!,
+    display_name: String!,
+    email: String!,
+    password: String!,
+    profile_image_url: String!,
+    genres: [String!]!
+  ): RegisterArtistResponse
 
+  loginArtist(email: String!, password: String!): RegisterArtistResponse!
 
-    loginArtist(email: String!, password: String!): RegisterArtistResponse!
+  editArtist(
+    artistId: ID!,
+    first_name: String,
+    last_name: String,
+    display_name: String,
+    email: String,
+    password: String,
+    profile_image_url: String,
+    genres: [MusicGenre]
+  ): Artist
 
-    editArtist(
-        artistId: ID!,
-        first_name: String,
-        last_name: String,
-        display_name: String,
-        email: String,
-        password: String,
-        profile_image_url: String,
-        genres: [MusicGenre]
-    ): Artist
+  addAlbum(
+    album_type: String!,
+    total_songs: Int!,
+    cover_image_url: String!,
+    title: String!,
+    description: String!,
+    release_date: Date!,
+    artists: [ID!]!,
+    songs: [ID!]!,
+    genres: [MusicGenre!]!,
+    visibility: Visibility!
+  ): Album
 
-    addAlbum(
-        album_type: String!,
-        total_songs: Int!,
-        cover_image_url: String!,
-        title: String!,
-        description: String!,
-        release_date: Date!,
-        artists: [ID!]!,
-        songs: [ID!]!,
-        genres: [MusicGenre!]!,
-        visibility: Visibility!
-    ): Album
-
-
-  editAlbum(_id: ID!, album_type: String,
+  editAlbum(
+    _id: ID!, 
+    album_type: String,
     total_songs: Int,
     cover_image_url: String,
     title: String,
@@ -119,12 +117,12 @@ type Mutation {
     artists: [ID!],
     songs: [ID!],
     genres: [String!],
-    visibility: String): Album
-
+    visibility: String
+  ): Album
 
 #    FIXME what is the intended behavior of this operation?
-    addSongToAlbum(_id: ID!, songId: ID!): Album
-    removeSongFromAlbum(_id: ID!, songId: ID!): Album
+  addSongToAlbum(_id: ID!, songId: ID!): Album
+  removeSongFromAlbum(_id: ID!, songId: ID!): Album
 
   removeAlbum(_id: ID!): Album
 
@@ -142,7 +140,9 @@ type Mutation {
     album: ID,
   ): Song!
 
-  editSong(songId: ID!, title: String,
+  editSong(
+    songId: ID!, 
+    title: String,
     duration: Int,
     song_url: String,
     cover_image_url: String,
@@ -150,16 +150,17 @@ type Mutation {
     producers: [String!],
     genre: String,
     release_date: Date, 
-    artists:[ID!],): Song
+    artists:[ID!]
+  ): Song
 
   removeSong(songId: ID!): Song
 
-  createPlaylist(description: String!,
-      title: String!,
-      visibility: String!): Playlist!
+  createPlaylist(
+    description: String!,
+    title: String!,
+    visibility: String!
+  ): Playlist!
 
-
-  
   addSongToPlaylist(_id: ID!, songId: ID!): Playlist
   removeSongFromPlaylist(_id: ID!, songId: ID!): Playlist
   removePlaylist(_id: ID!): Playlist
@@ -168,254 +169,252 @@ type Mutation {
   toggleLikeArtist(_id: ID!, artistId: ID!): Artist
   toggleLikePlaylist(_id: ID!, playlistId: ID!): Playlist
   toggleLikeAlbum(_id: ID!, albumId: ID!): Album
-
 }
 
 type RegisterUserResponse {
-    user: User!
-    token: String!
+  user: User!
+  token: String!
 }
 
 type User {
-    _id: ID!
-    first_name: String!
-    last_name: String!
-    display_name: String!
-    email: String!
-    created_date: Date!
-    password_changed_date: Date
-    date_of_birth: String
-    gender: String
-    profile_image_url: String!
-    liked_songs: [LikedSong]!
+  _id: ID!
+  first_name: String!
+  last_name: String!
+  display_name: String!
+  email: String!
+  created_date: Date!
+  password_changed_date: Date
+  date_of_birth: String
+  gender: String
+  profile_image_url: String!
+  liked_songs: [LikedSong]!
 }
 
 type LikedSong {
-    songId: ID!
-    liked_date: String!
+  songId: ID!
+  liked_date: String!
 }
 
 type Artist {
-    _id: ID!
-    first_name: String!
-    last_name: String!
-    display_name: String!
-    email: String!
-    created_date: Date!
-    password_changed_date: Date
-    date_of_birth: String
-    gender: String
-    following: Following
-    followers: Followers
-    profile_image_url: String!
-    genres: [MusicGenre!]!
+  _id: ID!
+  first_name: String!
+  last_name: String!
+  display_name: String!
+  email: String!
+  created_date: Date!
+  password_changed_date: Date
+  date_of_birth: String
+  gender: String
+  following: Following
+  followers: Followers
+  profile_image_url: String!
+  genres: [MusicGenre!]!
 }
 
 type Following {
-    users: [User]
-    artists: [Artist]
+  users: [User]
+  artists: [Artist]
 }
 
 type Followers {
-    users: [User]
-    artists: [Artist]
+  users: [User]
+  artists: [Artist]
 }
 
 type RegisterArtistResponse {
-    artist: Artist
-    token: String!
+  artist: Artist
+  token: String!
 }
 
 type Album {
-    _id: ID!
-    album_type: String!
-    total_songs: Int!
-    cover_image_url: String!
-    title: String!
-    description: String!
-    release_date: Date!
-    created_date: Date!
-    last_updated: Date!
-    artists: [Artist!]!
-    songs: [Song!]!
-    genres: [MusicGenre!]!
-    likes: Int
-    total_duration: Int
-    visibility: Visibility!
+  _id: ID!
+  album_type: String!
+  total_songs: Int!
+  cover_image_url: String!
+  title: String!
+  description: String!
+  release_date: Date!
+  created_date: Date!
+  last_updated: Date!
+  artists: [Artist!]!
+  songs: [Song!]!
+  genres: [MusicGenre!]!
+  likes: Int
+  total_duration: Int
+  visibility: Visibility!
 }
 
 type Song {
-    _id: ID!
-    album: Album
-    artists: [Artist!]!
-    duration: Int!
-    title: String!
-    likes: Int
-    song_url: String!
-    cover_image_url: String!
-    writtenBy: String!
-    producers: [String!]!
-    language: String
-    genre: MusicGenre!
-    lyrics: String
-    release_date: Date!
+  _id: ID!
+  album: Album
+  artists: [Artist!]!
+  duration: Int!
+  title: String!
+  likes: Int
+  song_url: String!
+  cover_image_url: String!
+  writtenBy: String!
+  producers: [String!]!
+  language: String
+  genre: MusicGenre!
+  lyrics: String
+  release_date: Date!
 }
 
-
 type Playlist {
-    _id: ID!
-    description: String!
-    title: String!
-    visibility: Visibility!
-    owner: User!
-    songs: [Song]
-    created_date: Date!
+  _id: ID!
+  description: String!
+  title: String!
+  visibility: Visibility!
+  owner: User!
+  songs: [Song]
+  created_date: Date!
 }
 
 type LikedUser {
-    userId: ID!
-    likedDate: Date!
+  userId: ID!
+  likedDate: Date!
 }
 
 enum MusicGenre {
-    ACOUSTIC
-    AFROBEAT
-    ALT_ROCK
-    ALTERNATIVE
-    AMBIENT
-    ANIME
-    BLACK_METAL
-    BLUEGRASS
-    BLUES
-    BOSSANOVA
-    BRAZIL
-    BREAKBEAT
-    BRITISH
-    CANTOPOP
-    CHICAGO_HOUSE
-    CHILDREN
-    CHILL
-    CLASSICAL
-    CLUB
-    COMEDY
-    COUNTRY
-    DANCE
-    DANCEHALL
-    DEATH_METAL
-    DEEP_HOUSE
-    DETROIT_TECHNO
-    DISCO
-    DISNEY
-    DRUM_AND_BASS
-    DUB
-    DUBSTEP
-    EDM
-    ELECTRO
-    ELECTRONIC
-    EMO
-    FOLK
-    FORRO
-    FRENCH
-    FUNK
-    GARAGE
-    GERMAN
-    GOSPEL
-    GOTH
-    GRINDCORE
-    GROOVE
-    GRUNGE
-    GUITAR
-    HAPPY
-    HARD_ROCK
-    HARDCORE
-    HARDSTYLE
-    HEAVY_METAL
-    HIP_HOP
-    HOLIDAYS
-    HONKY_TONK
-    HOUSE
-    IDM
-    INDIAN
-    INDIE
-    INDIE_POP
-    INDUSTRIAL
-    IRANIAN
-    J_DANCE
-    J_IDOL
-    J_POP
-    J_ROCK
-    JAZZ
-    K_POP
-    KIDS
-    LATIN
-    LATINO
-    MALAY
-    MANDOPOP
-    METAL
-    METAL_MISC
-    METALCORE
-    MINIMAL_TECHNO
-    MOVIES
-    MPB
-    NEW_AGE
-    NEW_RELEASE
-    OPERA
-    PAGODE
-    PARTY
-    PHILIPPINES_OPM
-    PIANO
-    POP
-    POP_FILM
-    POST_DUBSTEP
-    POWER_POP
-    PROGRESSIVE_HOUSE
-    PSYCH_ROCK
-    PUNK
-    PUNK_ROCK
-    R_N_B
-    RAINY_DAY
-    REGGAE
-    REGGAETON
-    ROAD_TRIP
-    ROCK
-    ROCK_N_ROLL
-    ROCKABILLY
-    ROMANCE
-    SAD
-    SALSA
-    SAMBA
-    SERTANEJO
-    SHOW_TUNES
-    SINGER_SONGWRITER
-    SKA
-    SLEEP
-    SONGWRITER
-    SOUL
-    SOUNDTRACKS
-    SPANISH
-    STUDY
-    SUMMER
-    SWEDISH
-    SYNTH_POP
-    TANGO
-    TECHNO
-    TRANCE
-    TRIP_HOP
-    TURKISH
-    WORK_OUT
-    WORLD_MUSIC
+  ACOUSTIC
+  AFROBEAT
+  ALT_ROCK
+  ALTERNATIVE
+  AMBIENT
+  ANIME
+  BLACK_METAL
+  BLUEGRASS
+  BLUES
+  BOSSANOVA
+  BRAZIL
+  BREAKBEAT
+  BRITISH
+  CANTOPOP
+  CHICAGO_HOUSE
+  CHILDREN
+  CHILL
+  CLASSICAL
+  CLUB
+  COMEDY
+  COUNTRY
+  DANCE
+  DANCEHALL
+  DEATH_METAL
+  DEEP_HOUSE
+  DETROIT_TECHNO
+  DISCO
+  DISNEY
+  DRUM_AND_BASS
+  DUB
+  DUBSTEP
+  EDM
+  ELECTRO
+  ELECTRONIC
+  EMO
+  FOLK
+  FORRO
+  FRENCH
+  FUNK
+  GARAGE
+  GERMAN
+  GOSPEL
+  GOTH
+  GRINDCORE
+  GROOVE
+  GRUNGE
+  GUITAR
+  HAPPY
+  HARD_ROCK
+  HARDCORE
+  HARDSTYLE
+  HEAVY_METAL
+  HIP_HOP
+  HOLIDAYS
+  HONKY_TONK
+  HOUSE
+  IDM
+  INDIAN
+  INDIE
+  INDIE_POP
+  INDUSTRIAL
+  IRANIAN
+  J_DANCE
+  J_IDOL
+  J_POP
+  J_ROCK
+  JAZZ
+  K_POP
+  KIDS
+  LATIN
+  LATINO
+  MALAY
+  MANDOPOP
+  METAL
+  METAL_MISC
+  METALCORE
+  MINIMAL_TECHNO
+  MOVIES
+  MPB
+  NEW_AGE
+  NEW_RELEASE
+  OPERA
+  PAGODE
+  PARTY
+  PHILIPPINES_OPM
+  PIANO
+  POP
+  POP_FILM
+  POST_DUBSTEP
+  POWER_POP
+  PROGRESSIVE_HOUSE
+  PSYCH_ROCK
+  PUNK
+  PUNK_ROCK
+  R_N_B
+  RAINY_DAY
+  REGGAE
+  REGGAETON
+  ROAD_TRIP
+  ROCK
+  ROCK_N_ROLL
+  ROCKABILLY
+  ROMANCE
+  SAD
+  SALSA
+  SAMBA
+  SERTANEJO
+  SHOW_TUNES
+  SINGER_SONGWRITER
+  SKA
+  SLEEP
+  SONGWRITER
+  SOUL
+  SOUNDTRACKS
+  SPANISH
+  STUDY
+  SUMMER
+  SWEDISH
+  SYNTH_POP
+  TANGO
+  TECHNO
+  TRANCE
+  TRIP_HOP
+  TURKISH
+  WORK_OUT
+  WORLD_MUSIC
 }
-
 
 enum Visibility {
-    PUBLIC
-    PRIVATE
+  PUBLIC
+  PRIVATE
 }
+
 enum AlbumType {
-    ALBUM
-    SINGLE
-    COMPILATION
-    APPEARS_ON
+  ALBUM
+  SINGLE
+  COMPILATION
+  APPEARS_ON
 }
 
 scalar Date
