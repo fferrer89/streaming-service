@@ -53,6 +53,8 @@ export const typeDefs = `#graphql
   getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
   getMostLikedPlaylists: [Playlist]
   getUserLikedPlaylists(userId: String!): [Playlist]
+
+  streamSong(trackID: ID!): Stream
   
 }
 
@@ -168,6 +170,9 @@ type Mutation {
   toggleLikeArtist(_id: ID!, artistId: ID!): Artist
   toggleLikePlaylist(_id: ID!, playlistId: ID!): Playlist
   toggleLikeAlbum(_id: ID!, albumId: ID!): Album
+
+
+  uploadSongFile(file: Upload!): ID
 
 }
 
@@ -419,4 +424,8 @@ enum AlbumType {
 }
 
 scalar Date
+
+scalar Upload
+
+scalar Stream
 `;

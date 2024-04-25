@@ -5,6 +5,10 @@ import User from '../models/userModel.js';
 import { Types } from 'mongoose';
 import Artist from '../models/artistModel.js';
 import Album from '../models/albumModel.js';
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
+import { GridFSBucket } from 'mongodb';
+import SongFile from '../models/songFileModel.js';
+import mongoose from 'mongoose';
 
 export const songResolvers = {
   Query: {
@@ -160,6 +164,20 @@ export const songResolvers = {
 
       return songHelper.ObjectIdtoString(songs);
     },
+    streamSong: async (_, { songID }, { db }) => {
+      // this does not work, we are using express to steram song file
+      try {
+        var objectId = new Types.ObjectId(songID);
+      } catch (err) {
+        throw new Error('Invalid songID. Must be a valid MongoDB ObjectID.');
+      }
+
+      let bucket = new GridFSBucket(mongoose.connection.db);
+
+      let downloadStream = bucket.openDownloadStream(objectId);
+
+      return downloadStream;
+    },
   },
 
   Song: {
@@ -207,7 +225,7 @@ export const songResolvers = {
       });
     },
   },
-
+  Upload: GraphQLUpload,
   Mutation: {
     addSong: async (_, args, context) => {
       let {
@@ -459,5 +477,31 @@ export const songResolvers = {
       return songExist;
     },
     toggleLikeSong: async (args) => {},
+    uploadSongFile: async (_, args) => {
+      try {
+        const { filename, mimetype, encoding, createReadStream } =
+          await args.file;
+
+        const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+
+        const uploadStream = bucket.openUploadStream(filename, {
+          contentType: mimetype,
+          metadata: { originalName: filename },
+        });
+        createReadStream().pipe(uploadStream);
+
+        uploadStream.on('finish', async () => {
+          const file = new SongFile({
+            filename,
+            mimetype,
+            fileId: uploadStream.id,
+          });
+          await file.save();
+        });
+        return uploadStream.id;
+      } catch (error) {
+        throw new Error('Failed to upload file');
+      }
+    },
   },
 };
