@@ -70,6 +70,8 @@ type Mutation {
     profile_image_url: String
   ): User
 
+  removeUser(userId: ID!): User
+
   registerArtist(
     first_name: String!,
     last_name: String!,
@@ -92,6 +94,8 @@ type Mutation {
     profile_image_url: String,
     genres: [MusicGenre]
   ): Artist
+
+  removeArtist(artistId: ID!): Artist
 
   addAlbum(
     album_type: String!,
