@@ -53,11 +53,17 @@ export const typeDefs = `#graphql
   getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
   getMostLikedPlaylists: [Playlist]
   getUserLikedPlaylists(userId: String!): [Playlist]
-  
 }
 
 type Mutation {
-  registerUser(first_name: String!, last_name: String!, display_name: String!, email: String!, password: String!, profile_image_url: String!): RegisterUserResponse!
+  registerUser(
+    first_name: String!,
+    last_name: String!,
+    display_name: String!,
+    email: String!,
+    password: String!,
+    profile_image_url: String!
+  ): RegisterUserResponse!
   
   loginUser(email: String!, password: String!): RegisterUserResponse!
 
@@ -173,6 +179,13 @@ type Mutation {
   toggleLikeArtist(_id: ID!, artistId: ID!): Artist
   toggleLikePlaylist(_id: ID!, playlistId: ID!): Playlist
   toggleLikeAlbum(_id: ID!, albumId: ID!): Album
+}
+
+type Admin {
+  _id: ID!
+  first_name: String!
+  last_name: String!
+  email: String!
 }
 
 type RegisterUserResponse {
