@@ -56,6 +56,8 @@ export const typeDefs = `#graphql
 }
 
 type Mutation {
+  loginAdmin(email: String!, password: String!): RegisterAdminResponse
+
   registerUser(
     first_name: String!,
     last_name: String!,
@@ -179,6 +181,11 @@ type Mutation {
   toggleLikeArtist(_id: ID!, artistId: ID!): Artist
   toggleLikePlaylist(_id: ID!, playlistId: ID!): Playlist
   toggleLikeAlbum(_id: ID!, albumId: ID!): Album
+}
+
+type RegisterAdminResponse {
+  admin: Admin!
+  token: String!
 }
 
 type Admin {
