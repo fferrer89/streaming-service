@@ -49,10 +49,10 @@ export const typeDefs = `#graphql
   playlists: [Playlist]
   getPlaylistById(_id: ID!): Playlist
   getPlaylistsByTitle(searchTerm: String!): [Playlist]
-  getPlaylistsByOwner(userId: String!): [Playlist]
+  getPlaylistsByOwner(userId: ID!): [Playlist]
   getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
   getMostLikedPlaylists: [Playlist]
-  getUserLikedPlaylists(userId: String!): [Playlist]
+  getUserLikedPlaylists(userId: ID!): [Playlist]
   
 }
 
