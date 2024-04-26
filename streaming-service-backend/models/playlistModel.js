@@ -41,6 +41,10 @@ const playlistSchema = new mongoose.Schema({
       message: 'Invalid playlist visibility type',
     },
   },
+  likes: {
+    type: Number,
+    required: false,
+  },
   created_date: {
     type: Date,
     default: Date.now,
