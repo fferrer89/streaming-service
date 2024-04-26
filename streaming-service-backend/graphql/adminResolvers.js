@@ -11,7 +11,7 @@ export const adminResolvers = {
   Query: {
     getUserCount: async () => {
       try {
-        const users = await User.find().toArray();
+        const users = await User.find();
         return users.length;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch users: ${error.message}`);
@@ -19,7 +19,7 @@ export const adminResolvers = {
     },
     getArtistCount: async () => {
       try {
-        const artists = await Artist.find().toArray();
+        const artists = await Artist.find();
         return artists.length;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch artists: ${error.message}`);
@@ -27,7 +27,7 @@ export const adminResolvers = {
     },
     getAlbumCount: async () => {
       try {
-        const albums = await Album.find().toArray();
+        const albums = await Album.find();
         return albums.length;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch albums: ${error.message}`);
@@ -35,7 +35,7 @@ export const adminResolvers = {
     },
     getSongCount: async () => {
       try {
-        const songs = await Song.find().toArray();
+        const songs = await Song.find();
         return songs.length;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch songs: ${error.message}`);
@@ -43,7 +43,7 @@ export const adminResolvers = {
     },
     getPlaylistCount: async () => {
       try {
-        const playlists = await Playlist.find().toArray();
+        const playlists = await Playlist.find();
         return playlists.length;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch playlists: ${error.message}`);
