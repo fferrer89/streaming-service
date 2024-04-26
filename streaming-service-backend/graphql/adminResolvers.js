@@ -1,9 +1,54 @@
-import Admin from '../models/adminModel.js';
+import { GraphQLError } from 'graphql';
 import { generateToken } from '../utils/helpers.js';
+import Admin from '../models/adminModel.js';
+import User from '../models/userModel.js';
+import Artist from '../models/artistModel.js';
+import Album from '../models/albumModel.js';
+import Song from '../models/songModel.js';
+import Playlist from '../models/playlistModel.js';
 
-export const adminResolver = {
+export const adminResolvers = {
   Query: {
-
+    getUserCount: async () => {
+      try {
+        const users = await User.find().toArray();
+        return users.length;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch users: ${error.message}`);
+      }
+    },
+    getArtistCount: async () => {
+      try {
+        const artists = await Artist.find().toArray();
+        return artists.length;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch artists: ${error.message}`);
+      }
+    },
+    getAlbumCount: async () => {
+      try {
+        const albums = await Album.find().toArray();
+        return albums.length;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch albums: ${error.message}`);
+      }
+    },
+    getSongCount: async () => {
+      try {
+        const songs = await Song.find().toArray();
+        return songs.length;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch songs: ${error.message}`);
+      }
+    },
+    getPlaylistCount: async () => {
+      try {
+        const playlists = await Playlist.find().toArray();
+        return playlists.length;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch playlists: ${error.message}`);
+      }
+    }
   },
   Mutation: {
     loginAdmin: async (_, args) => {
