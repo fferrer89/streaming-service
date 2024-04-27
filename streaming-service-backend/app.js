@@ -2,7 +2,8 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: './.env' });
 import environment from './config/config.js';
-import { ApolloServer } from '@apollo/server';
+import { ApolloServer } from 'apollo-server-express';
+import streamRoutes from './routes/index.js';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import mongoose from 'mongoose';
 import lodash from 'lodash';
@@ -16,6 +17,8 @@ import { playlistResolvers } from './graphql/playlistResolvers.js';
 import redis from 'redis';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
+import express from 'express';
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 
 const client = redis.createClient();
 
@@ -28,6 +31,53 @@ const server = new ApolloServer({
     songResolvers,
     playlistResolvers
   ),
+  context: async ({ req, res }) => {
+    if (req.body.operationName !== 'IntrospectionQuery') {
+      console.log(
+        `${new Date()} -- Operation = ${req.body.operationName} -- Status = ${
+          res.statusCode
+        }`
+      );
+    }
+    // will bypass authentication middelware for login, register and playground
+    if (
+      /*
+      // Uncomment this part to disable authentication on all queries and mutations
+      req.body.operationName.toLowerCase() !== 'mutation' &&
+      req.body.operationName.toLowerCase() !== 'query' &&
+      */
+      req.body.operationName !== 'IntrospectionQuery' &&
+      req.body.operationName !== 'registerUser' &&
+      req.body.operationName !== 'registerArtist' &&
+      req.body.operationName !== 'loginUser' &&
+      req.body.operationName !== 'loginArtist'
+    ) {
+      const token = req.headers.authorization || '';
+      try {
+        var decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded.exp <= Math.floor(Date.now() / 1000)) {
+          throw new GraphQLError(
+            'You are not authorized. Please login or sign up',
+            {
+              extensions: {
+                code: 'FORBIDDEN',
+              },
+            }
+          );
+        }
+      } catch (error) {
+        throw new GraphQLError(
+          'You are not authorized. Please login or sign up',
+          {
+            extensions: {
+              code: 'FORBIDDEN',
+            },
+          }
+        );
+      }
+      return { decoded };
+    }
+  },
   // includeStacktraceInErrorResponses: false,
 });
 
@@ -46,55 +96,27 @@ try {
       throw new Error(`Redis Client failed to connect`);
     });
   if (connection) {
-    const { url } = await startStandaloneServer(server, {
-      listen: { port: 4000 },
-      context: async ({ req, res }) => {
-        if (req.body.operationName !== 'IntrospectionQuery') {
-          console.log(
-            `${new Date()} -- Operation = ${
-              req.body.operationName
-            } -- Status = ${res.statusCode}`
-          );
-        }
-        // will bypass authentication middelware for login, register and playground
-        if (
-          req.body.operationName !== 'IntrospectionQuery' &&
-          req.body.operationName !== 'registerUser' &&
-          req.body.operationName !== 'registerArtist' &&
-          req.body.operationName !== 'loginUser' &&
-          req.body.operationName !== 'loginArtist'
-        ) {
-          const token = req.headers.authorization || '';
-          try {
-            var decoded = jwt.verify(token, process.env.JWT_SECRET);
-            if (decoded.exp <= Math.floor(Date.now() / 1000)) {
-              throw new GraphQLError(
-                'You are not authorized. Please login or sign up',
-                {
-                  extensions: {
-                    code: 'FORBIDDEN',
-                  },
-                }
-              );
-            }
-          } catch (error) {
-            throw new GraphQLError(
-              'You are not authorized. Please login or sign up',
-              {
-                extensions: {
-                  code: 'FORBIDDEN',
-                },
-              }
-            );
-          }
-          return { decoded };
-        }
-      },
-    });
+    await server.start();
+
+    //TODO need to add auth middleware for express
+    const app = express();
+    app.use('/stream', streamRoutes);
+    app.use(graphqlUploadExpress());
+
+    server.applyMiddleware({ app });
+
+    await new Promise((r) => app.listen({ port: 4000 }, r));
+
     console.log('');
     console.log('-------------------------------------------------');
-    console.log(`🚀  Server ready at: ${url}`);
+    console.log(
+      `🚀 Server ready at http://localhost:4000${server.graphqlPath}`
+    );
     console.log('-------------------------------------------------');
+    // console.log('');
+    // console.log('-------------------------------------------------');
+    // console.log(`🚀  Server ready at: ${url}`);
+    // console.log('-------------------------------------------------');
   } else {
     throw new Error(`Failed connecting to MongoDB`);
   }

@@ -33,7 +33,6 @@ export const typeDefs = `#graphql
     getUserLikedAlbums(userId: String!): [Album]
     getAlbumsByArtist(artistId: String!): [Album]
 
-
     songs: [Song]
     getSongById(_id: ID!): Song
     getSongsByTitle(searchTerm: String!): [Song]
@@ -52,10 +51,12 @@ export const typeDefs = `#graphql
     playlists: [Playlist]
     getPlaylistById(_id: ID!): Playlist
     getPlaylistsByTitle(searchTerm: String!): [Playlist]
-    getPlaylistsByOwner(userId: String!): [Playlist]
+    getPlaylistsByOwner(userId: ID!): [Playlist]
     getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
     getMostLikedPlaylists: [Playlist]
     getUserLikedPlaylists(userId: String!): [Playlist]
+    
+    streamSong(trackID: ID!): Stream
   }
 
   type Mutation {
@@ -90,7 +91,7 @@ export const typeDefs = `#graphql
       email: String!,
       password: String!,
       profile_image_url: String!,
-      genres: [String!]!
+      genres: [MusicGenre!]!
     ): RegisterArtistResponse
 
     loginArtist(email: String!, password: String!): RegisterArtistResponse!
@@ -176,14 +177,16 @@ export const typeDefs = `#graphql
       visibility: String!
     ): Playlist!
 
-    addSongToPlaylist(_id: ID!, songId: ID!): Playlist
-    removeSongFromPlaylist(_id: ID!, songId: ID!): Playlist
-    removePlaylist(_id: ID!): Playlist
+    addSongToPlaylist(playlistId: ID!, songId: ID!): Playlist
+    removeSongFromPlaylist(playlistId: ID!, songId: ID!): Playlist
+    removePlaylist(playlistId: ID!): Playlist
 
     toggleLikeSong(_id: ID!, songId: ID!): Song
     toggleLikeArtist(_id: ID!, artistId: ID!): Artist
-    toggleLikePlaylist(_id: ID!, playlistId: ID!): Playlist
+    toggleLikePlaylist(playlistId: ID!): Playlist
     toggleLikeAlbum(_id: ID!, albumId: ID!): Album
+    
+    uploadSongFile(file: Upload!): ID
   }
 
   type RegisterAdminResponse {
@@ -296,6 +299,7 @@ export const typeDefs = `#graphql
     owner: User!
     songs: [Song]
     created_date: Date!
+    likes: Int!
   }
 
   type LikedUser {
@@ -445,4 +449,8 @@ export const typeDefs = `#graphql
   }
 
   scalar Date
+
+  scalar Upload
+
+  scalar Stream
 `;

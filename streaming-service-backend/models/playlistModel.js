@@ -7,6 +7,7 @@ const playlistSchema = new mongoose.Schema({
   },
   liked_users: [
     {
+      _id:false, 
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -27,10 +28,8 @@ const playlistSchema = new mongoose.Schema({
   },
   songs: [
     {
-      songId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Song',
-      },
     },
   ],
   visibility: {
@@ -40,6 +39,10 @@ const playlistSchema = new mongoose.Schema({
       values: Visibilities,
       message: 'Invalid playlist visibility type',
     },
+  },
+  likes: {
+    type: Number,
+    required: false,
   },
   created_date: {
     type: Date,
