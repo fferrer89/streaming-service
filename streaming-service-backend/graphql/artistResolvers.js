@@ -5,7 +5,7 @@ import Album from '../models/albumModel.js';
 import User from '../models/userModel.js';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
-import { songResolvers } from './songResolvers.js';
+
 export const artistResolvers = {
   Query: {
     artists: async () => {

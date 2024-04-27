@@ -2,7 +2,8 @@ import User from '../models/userModel.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
-import { generateToken } from '../utils/helpers.js';
+import { generateToken, validateMogoObjID } from '../utils/helpers.js';
+import songHelper from '../utils/songsHelpers.js';
 
 export const userResolvers = {
   Query: {
@@ -11,7 +12,16 @@ export const userResolvers = {
         const allUsers = await User.find();
         return allUsers;
       } catch (error) {
-        throw new Error(`Failed to fetch users: ${error.message}`);
+        throw new GraphQLError(`Failed to fetch users: ${error.message}`);
+      }
+    },
+    getUserById: async (_, args, contextValue) => {
+      try {
+        validateMogoObjID(args._id, '_id');
+        const user = await User.findById(args._id);
+        return user;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch user: ${error.message}`);
       }
     },
   },
@@ -20,7 +30,7 @@ export const userResolvers = {
       try {
         const existingUser = await User.findOne({ email: args.email });
         if (existingUser) {
-          throw new Error('User already exists with this email.');
+          throw new GraphQLError('User already exists with this email.');
         }
 
         const newUser = new User({
@@ -31,6 +41,12 @@ export const userResolvers = {
           password: args.password,
           profile_image_url: args.profile_image_url,
         });
+
+        const validationErrors = newUser.validateSync();
+
+        if (validationErrors) {
+          songHelper.badUserInputWrapper(validationErrors);
+        }
 
         const savedUser = await newUser.save();
 
@@ -63,20 +79,12 @@ export const userResolvers = {
         if (!isPasswordCorrect) {
           throw new GraphQLError('Invalid email or password.');
         }
-        console.log(user);
+
         const token = generateToken(user._id, 'USER', user.first_name);
 
         return { user, token };
       } catch (error) {
-        console.log(error);
-        return {
-          user: null,
-          token: null,
-          error: {
-            message: 'Error logging in user',
-            details: error.message,
-          },
-        };
+        throw error;
       }
     },
   },
