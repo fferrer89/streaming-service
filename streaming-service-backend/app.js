@@ -20,7 +20,7 @@ import { GraphQLError } from 'graphql';
 import express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 
-const client = redis.createClient();
+const redisClient = redis.createClient();
 
 const server = new ApolloServer({
   typeDefs,
@@ -41,11 +41,9 @@ const server = new ApolloServer({
     }
     // will bypass authentication middelware for login, register and playground
     if (
-      /*
       // Uncomment this part to disable authentication on all queries and mutations
       req.body.operationName.toLowerCase() !== 'mutation' &&
       req.body.operationName.toLowerCase() !== 'query' &&
-      */
       req.body.operationName !== 'IntrospectionQuery' &&
       req.body.operationName !== 'registerUser' &&
       req.body.operationName !== 'registerArtist' &&
@@ -75,7 +73,9 @@ const server = new ApolloServer({
           }
         );
       }
-      return { decoded };
+      return { decoded, redisClient };
+    } else {
+      return { redisClient };
     }
   },
   // includeStacktraceInErrorResponses: false,
@@ -89,7 +89,7 @@ try {
     useNewUrlParser: true,
   });
 
-  await client
+  await redisClient
     .connect()
     .then(() => {})
     .catch((error) => {

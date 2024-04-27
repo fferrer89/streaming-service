@@ -7,18 +7,39 @@ import songHelper from '../utils/songsHelpers.js';
 
 export const userResolvers = {
   Query: {
-    users: async () => {
+    users: async (_, args, context) => {
       try {
+        const cachedUsers = await context.redisClient.json.get('users');
+        if (cachedUsers) {
+          return cachedUsers;
+        }
         const allUsers = await User.find();
-        return allUsers;
+        if (allUsers && allUsers.length !== 0) {
+          await context.redisClient.json.set('users', '$', allUsers);
+          await context.redisClient.EXPIRE('users', 1800);
+          return allUsers;
+        } else {
+          return [];
+        }
       } catch (error) {
         throw new GraphQLError(`Failed to fetch users: ${error.message}`);
       }
     },
-    getUserById: async (_, args, contextValue) => {
+    getUserById: async (_, args, context) => {
       try {
         validateMogoObjID(args._id, '_id');
+        const cachedUser = await context.redisClient.json.get(
+          `user:${args._id}`
+        );
+        if (cachedUser) {
+          return cachedUser;
+        }
         const user = await User.findById(args._id);
+        if (!user) {
+          songHelper.notFoundWrapper('Uer not found');
+        }
+        await context.redisClient.json.set(`user:${args._id}`, '$', user);
+        await context.redisClient.EXPIRE(`user:${args._id}`, 1800);
         return user;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch user: ${error.message}`);
