@@ -79,7 +79,7 @@ type Mutation {
       email: String!,
       password: String!,
       profile_image_url: String!,
-      genres: [String!]!
+      genres: [MusicGenre!]!
     ): RegisterArtistResponse
 
 

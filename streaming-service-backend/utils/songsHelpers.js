@@ -53,7 +53,7 @@ const serverSideErrorWrapper = (msg = 'Something went wrong') => {
 };
 
 const unAuthorizedWrapper = (msg = 'You are not Authorized') => {
-  throw new GraphQLError('You are not authorized', {
+  throw new GraphQLError(msg, {
     extensions: {
       code: 'FORBIDDEN',
     },
