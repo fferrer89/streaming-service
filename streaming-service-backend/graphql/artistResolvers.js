@@ -3,7 +3,9 @@ import { GraphQLError } from 'graphql';
 import jwt from 'jsonwebtoken';
 import Album from '../models/albumModel.js';
 import User from '../models/userModel.js';
-import { generateToken } from '../utils/helpers.js';
+import { generateToken, validateMogoObjID } from '../utils/helpers.js';
+import songHelper from '../utils/songsHelpers.js';
+
 export const artistResolvers = {
   Query: {
     artists: async () => {
@@ -16,6 +18,7 @@ export const artistResolvers = {
     },
     getArtistById: async (_, args, contextValue) => {
       try {
+        validateMogoObjID(args._id, '_id');
         const artist = await Artist.findById(args._id);
         return artist;
       } catch (error) {
@@ -32,14 +35,12 @@ export const artistResolvers = {
     },
     getArtistsByAlbumId: async (_, args, contextValue) => {
       try {
-        // 1. Retrieve the album:
+        validateMogoObjID(args.albumId, 'albumId');
         const album = await Album.findById(args.albumId);
         if (!album) {
           throw Error(`Failed to fetch album with id (${args.albumId})`);
         }
-        // 2. Get artist IDs from the album
         const artistIds = album.artists;
-        // 3. Find all artists using the IDs
         const artists = await Artist.find({ _id: { $in: artistIds } });
         return artists;
       } catch (error) {
@@ -47,20 +48,56 @@ export const artistResolvers = {
       }
     },
     getUserFollowedArtists: async (_, args, contextValue) => {
-      // TODO
+      try {
+        const userId = args.userId;
+        validateMogoObjID(userId, 'userId');
+        const user = await User.findById(userId).populate('followers.artists');
+
+        if (!user) {
+          throw new GraphQLError('User not found');
+        }
+
+        const followedArtists = user.followers.artists;
+
+        return followedArtists;
+      } catch (err) {
+        throw new GraphQLError(
+          `Failed to get followed artists: ${err.message}`
+        );
+      }
+    },
+    getMostFollowedArtists: async (_, args, contextValue) => {
+      try {
+        const artists = await Artist.find().populate('followers');
+
+        let mostFollowedArtist = null;
+        let maxFollowers = 0;
+        artists.forEach((artist) => {
+          const followersCount =
+            artist.followers.artists.length + artist.followers.users.length;
+
+          if (followersCount > maxFollowers) {
+            mostFollowedArtist = artist;
+            maxFollowers = followersCount;
+          }
+        });
+
+        return mostFollowedArtist;
+      } catch (err) {
+        throw new GraphQLError(
+          `Failed to get followed artists: ${err.message}`
+        );
+      }
     },
   },
   Mutation: {
     registerArtist: async (_, args) => {
       try {
-        // 1. Input Validation:
-        //    - Check for required fields
-        //    - Validate email format, password strength, etc. (you'll need additional libraries / functions for this)
+        //No need to do manual validations, mongoose will handle everything, you just have to define proper schema for the model in mongoose
 
-        // 2. Check if an artist with the email already exists:
         const existingArtist = await User.findOne({ email: args.email });
         if (existingArtist) {
-          throw new Error(`Artist already exists with this email.`);
+          throw new GraphQLError(`Artist already exists with this email.`);
         }
         const newArtist = new Artist({
           first_name: args.first_name,
@@ -71,6 +108,11 @@ export const artistResolvers = {
           profile_image_url: args.profile_image_url,
           genres: args.genres,
         });
+        const validationErrors = newArtist.validateSync();
+
+        if (validationErrors) {
+          songHelper.badUserInputWrapper(validationErrors);
+        }
         const savedArtist = await newArtist.save();
         const token = generateToken(
           savedArtist._id,
@@ -89,31 +131,57 @@ export const artistResolvers = {
         const artist = await Artist.findOne({ email: args.email }).select(
           '+password'
         );
+
         if (!artist) {
-          throw new Error('Invalid email or password.');
+          songHelper.unAuthorizedWrapper('Invalid email or password.');
         }
         const isPasswordCorrect = await artist.isPasswordCorrect(
           args.password,
           artist.password
         );
         if (!isPasswordCorrect) {
-          throw new Error('Invalid email or password.');
+          songHelper.unAuthorizedWrapper('Invalid email or password.');
         }
-        const token = generateToken(artist._id, 'ARTIST', artist.first_name);
+        const token = generateToken(artist._id, 'artist', artist.first_name);
         return { artist, token };
       } catch (error) {
-        return {
-          artist: null,
-          token: null,
-          error: {
-            message: 'Error logging in artist',
-            details: error.message,
-          },
-        };
+        throw error;
       }
     },
-    editArtist: async (_, args) => {
-      // TODO
+    editArtist: async (_, args, context) => {
+      try {
+        const { artistId, ...updateData } = args;
+        validateMogoObjID(artistId, 'artistId');
+        let artist = await Artist.findById(artistId);
+        if (
+          !context &&
+          !context.decoded &&
+          artist._id.toString !== context.decoded.id &&
+          context.decoded.role !== 'admin'
+        ) {
+          songHelper.unAuthorizedWrapper();
+        }
+        if (!artist) {
+          songHelper.notFoundWrapper('Artist not found');
+        }
+
+        for (const key in updateData) {
+          if (updateData[key] !== undefined) {
+            artist[key] = updateData[key];
+          }
+        }
+
+        const validationErrors = artist.validateSync();
+
+        if (validationErrors) {
+          songHelper.badUserInputWrapper(validationErrors);
+        }
+        artist = await artist.save();
+
+        return artist;
+      } catch (err) {
+        throw err;
+      }
     },
   },
 };

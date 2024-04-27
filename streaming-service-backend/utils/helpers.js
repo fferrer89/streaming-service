@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-
+import { ObjectId } from 'mongodb';
+import { GraphQLError } from 'graphql';
 export const MusicGenres = [
   'ACOUSTIC',
   'AFROBEAT',
@@ -134,7 +135,18 @@ export const AlbumTypes = ['ALBUM', 'SINGLE', 'COMPILATION', 'APPEARS_ON'];
 export const Genders = ['MALE', 'FEMALE', 'OTHER'];
 
 export const generateToken = (userId, role, name) => {
+  console.log(userId, role, name, process.env.JWT_SECRET);
   return jwt.sign({ id: userId, role, name }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRATION_TIME,
   });
+};
+
+export const validateMogoObjID = (id, name) => {
+  if (!ObjectId.isValid(id)) {
+    throw new GraphQLError(`${name} is not a valid mongo object id`, {
+      extensions: {
+        code: 'BAD_USER_INPUT',
+      },
+    });
+  }
 };

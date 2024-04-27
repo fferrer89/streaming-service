@@ -49,12 +49,14 @@ export const typeDefs = `#graphql
   playlists: [Playlist]
   getPlaylistById(_id: ID!): Playlist
   getPlaylistsByTitle(searchTerm: String!): [Playlist]
-  getPlaylistsByOwner(userId: String!): [Playlist]
+  getPlaylistsByOwner(userId: ID!): [Playlist]
   getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
   getMostLikedPlaylists: [Playlist]
+
   getUserLikedPlaylists(userId: String!): [Playlist]
 
   streamSong(trackID: ID!): Stream
+
   
 }
 
@@ -81,7 +83,7 @@ type Mutation {
       email: String!,
       password: String!,
       profile_image_url: String!,
-      genres: [String!]!
+      genres: [MusicGenre!]!
     ): RegisterArtistResponse
 
 
@@ -162,13 +164,13 @@ type Mutation {
 
 
   
-  addSongToPlaylist(_id: ID!, songId: ID!): Playlist
-  removeSongFromPlaylist(_id: ID!, songId: ID!): Playlist
-  removePlaylist(_id: ID!): Playlist
+  addSongToPlaylist(playlistId: ID!, songId: ID!): Playlist
+  removeSongFromPlaylist(playlistId: ID!, songId: ID!): Playlist
+  removePlaylist(playlistId: ID!): Playlist
 
   toggleLikeSong(_id: ID!, songId: ID!): Song
   toggleLikeArtist(_id: ID!, artistId: ID!): Artist
-  toggleLikePlaylist(_id: ID!, playlistId: ID!): Playlist
+  toggleLikePlaylist(playlistId: ID!): Playlist
   toggleLikeAlbum(_id: ID!, albumId: ID!): Album
 
 
@@ -275,6 +277,7 @@ type Playlist {
     owner: User!
     songs: [Song]
     created_date: Date!
+    likes: Int!
 }
 
 type LikedUser {
