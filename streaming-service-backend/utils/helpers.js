@@ -150,3 +150,22 @@ export const validateMogoObjID = (id, name) => {
     });
   }
 };
+
+export const authenticateToken = (req, res, next) => {
+  const token = req.headers.authorization || '';
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized: Missing token' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.exp <= Math.floor(Date.now() / 1000)) {
+      throw new Error('Token expired');
+    }
+    req.decoded = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+  }
+};

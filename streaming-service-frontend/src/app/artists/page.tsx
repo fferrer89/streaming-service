@@ -3,7 +3,7 @@ import React from "react";
 import { gql, useQuery } from "@apollo/client";
 
 const GET_ARTISTS = gql`
-  query GetArtists {
+  query query {
     artists {
       _id
     }
