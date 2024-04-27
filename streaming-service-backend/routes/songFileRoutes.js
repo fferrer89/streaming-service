@@ -22,35 +22,22 @@ router.get('/song/stream/:songID', async (req, res) => {
     }
 
     const bucket = new GridFSBucket(mongoose.connection.db);
-
-    const options = {};
-    let start;
-    let end;
-    const range = req.headers.range;
-    if (range) {
-      const parts = range.replace(/bytes=/, '').split('-');
-      start = parseInt(parts[0], 10);
-      end = parts[1] ? parseInt(parts[1], 10) : undefined;
-      options.start = start;
-      options.end = end;
-      res.status(206);
-    }
-
-    res.set('content-type', 'audio/mp3');
-    res.set('accept-ranges', 'bytes');
-
-    const downloadStream = bucket.openDownloadStream(objectId, options);
-
-    downloadStream.on('data', (chunk) => {
-      res.write(chunk);
-    });
+    const downloadStream = bucket.openDownloadStream(objectId);
 
     downloadStream.on('error', () => {
       res.sendStatus(404);
     });
 
+    let songData = Buffer.alloc(0);
+
+    downloadStream.on('data', (chunk) => {
+      songData = Buffer.concat([songData, chunk]);
+    });
+
     downloadStream.on('end', () => {
-      res.end();
+      res.set('content-type', 'audio/mp3');
+      res.set('accept-ranges', 'bytes');
+      res.send(songData);
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });

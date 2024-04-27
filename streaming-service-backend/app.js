@@ -21,7 +21,7 @@ import express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { authenticateToken } from './utils/helpers.js';
 import morgan from 'morgan';
-
+import cors from 'cors';
 const redisClient = redis.createClient();
 
 const attachRedisClient = (req, res, next) => {
@@ -107,6 +107,7 @@ try {
     const app = express();
     app.use(express.json());
     app.use(morgan('dev'));
+    app.use(cors());
     //app.use(authenticateToken);
     app.use(attachRedisClient);
 
