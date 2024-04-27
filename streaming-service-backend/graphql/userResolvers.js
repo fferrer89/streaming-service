@@ -36,7 +36,7 @@ export const userResolvers = {
 
         const token = generateToken(
           savedUser._id,
-          'USER',
+          'user',
           savedUser.first_name
         );
         return { user: savedUser, token };
