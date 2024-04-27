@@ -66,6 +66,29 @@ export const artistResolvers = {
         );
       }
     },
+    getMostFollowedArtists: async (_, args, contextValue) => {
+      try {
+        const artists = await Artist.find().populate('followers');
+
+        let mostFollowedArtist = null;
+        let maxFollowers = 0;
+        artists.forEach((artist) => {
+          const followersCount =
+            artist.followers.artists.length + artist.followers.users.length;
+
+          if (followersCount > maxFollowers) {
+            mostFollowedArtist = artist;
+            maxFollowers = followersCount;
+          }
+        });
+
+        return mostFollowedArtist;
+      } catch (err) {
+        throw new GraphQLError(
+          `Failed to get followed artists: ${err.message}`
+        );
+      }
+    },
   },
   Mutation: {
     registerArtist: async (_, args) => {
