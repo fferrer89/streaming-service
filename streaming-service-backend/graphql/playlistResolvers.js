@@ -1,23 +1,41 @@
 import { Types } from "mongoose";
 import Playlists from "../models/playlistModel.js"
 import Song from "../models/songModel.js";
+import User from "../models/userModel.js";
 import songsHelpers from "../utils/songsHelpers.js";
 
 export const playlistResolvers = {
   Query: {
     // Playlist querys
-    playlists: async(_,args)=>{
+    playlists: async(_,args, context)=>{
       try {
           let response = await Playlists.find({});
-          return response;
+          let filteredPlaylist = response.filter((playlist)=>{ 
+            if(context.decoded && context.decoded.id && context.decoded.id === playlist.owner.toString()){ // if user is logged in then return playlist where ower id matches;
+                return true; 
+            }
+            else{
+              if(playlist.visibility == "PUBLIC"){ //if not logged in then return only public playlist
+                  return true;
+              }
+              return false;
+            }
+          });
+          return filteredPlaylist;
       } catch (error) {
         console.log(error);
       }
     },
-    getPlaylistById: async(_,args)=>{
-        let response = await Playlists.findById(args._id);
-        if(!response) songsHelpers.notFoundWrapper("Playlist not found"); // not found; 
-        return response;
+    getPlaylistById: async(_,args, context)=>{
+        let playlist = await Playlists.findById(args._id);
+        if(!playlist) songsHelpers.notFoundWrapper("Playlist not found");
+
+        if(playlist.visibility == "PRIVATE"){
+          if(context.decoded && context.decoded.id && playlist.owner != context.decoded.id ){
+            songsHelpers.notFoundWrapper("Playlist not found");
+          }
+        }
+        return playlist;
     },
 
     getPlaylistsByTitle: async(_, args, context)=>{
@@ -26,7 +44,7 @@ export const playlistResolvers = {
         searchTerm =  songsHelpers.emptyValidation(searchTerm, "Search Term");
 
         let playlists = await Playlists.find({
-          title: { $regex: new RegExp(term, 'i') }
+          title: { $regex: new RegExp(searchTerm, 'i') }
         });
 
         let filteredPlaylist = playlists.filter((playlist)=>{ //will give different playlist if user is logged in; 
@@ -48,7 +66,7 @@ export const playlistResolvers = {
     },
     getMostLikedPlaylists: async (_, { limit = 10 }, contextValue) => {
       try {
-        const mostLikedPlaylist= await Playlists.find()
+        const mostLikedPlaylist= await Playlists.find({visibility:"PUBLIC"})
           .sort({ likes: -1 }) 
           .limit(limit);
         return mostLikedPlaylist;
@@ -63,11 +81,27 @@ export const playlistResolvers = {
         return playlists;
     },
     
-    getUserLikedPlaylists: async(_, args)=>{
-      let {userId} = args;
-        userId = songsHelpers.validObjectId(userId, "User Id");
+    getUserLikedPlaylists: async(_, args, context)=>{
+      if(!context.decoded || !context.decoded.id){
+        songsHelpers.unAuthorizedWrapper("Please login to access the playlist you liked");
+      }
+      let userId = context.decoded.id;
+
+      // userId = songsHelpers.validObjectId(userId, "User Id");
         let playlists = await Playlists.find({"liked_users.userId": new Types.ObjectId(userId)});
-        return playlists;
+
+        let filteredPlaylist = playlists.filter((playlist)=>{ 
+          if(userId === playlist.owner.toString()){ // if owned by user
+              return true; 
+          }
+          else{
+            if(playlist.visibility == "PUBLIC"){ //not owned by user
+                return true;
+            }
+            return false;
+          }
+        });
+        return filteredPlaylist;
     },
 
     getPlaylistsByVisibility:async(_, args)=>{
@@ -75,19 +109,132 @@ export const playlistResolvers = {
       //TODO;
     },
   },
-  Playlists:{
+  Playlist:{
     songs: async(parent)=>{
       try {
-        let songIds = parent.artists.map((id) => new Types.ObjectId(id));
+        let songIds = parent.songs.map((id) => new Types.ObjectId(id));
         let songs = await Song.find({ _id: { $in: songIds }});
+        console.log(songIds);
         return songs;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    owner: async(parent)=>{
+      console.log(parent);
+      try {
+        let user = await User.findById(parent.owner);
+        return user;
       } catch (error) {
         console.log(error);
       }
     }
   },
 
-  Mutation: {
+  Mutation: { 
     // Playlist mutations
+    createPlaylist: async(_, args, context)=>{
+      if(!context.decoded && !context.decoded.id){
+        songsHelpers.unAuthorizedWrapper("Please login to create playlist");
+      }
+     let queryObject = { ...args, liked_users:[], songs:[], owner: new Types.ObjectId(context.decoded.id), likes: 0};
+      try {
+        let newPlaylist = new Playlists(queryObject);
+        const savedNewPlayist = await newPlaylist.save();
+        return savedNewPlayist;
+      } catch (error) {
+          songsHelpers.badUserInputWrapper(error);
+      }
+    },
+    addSongToPlaylist: async(_, args, context)=>{
+      if(!context.decoded && !context.decoded.id) songsHelpers.unAuthorizedWrapper("Please login to add song to playlist");
+      
+      let {playlistId, songId} = args;
+      let playlistExist = await Playlists.findById(playlistId);
+      if(!playlistExist) songsHelpers.notFoundWrapper("Playlist not found");
+
+      let songExist = await Song.findById(songId);
+      if(!songExist)  songsHelpers.notFoundWrapper("Song not found");
+
+      if(playlistExist.owner.toString() !=  context.decoded.id) songsHelpers.unAuthorizedWrapper("you are not authorised to update this playlist");
+
+      try {
+        console.log(playlistExist);
+        playlistExist.songs.push(new Types.ObjectId(songId));
+        let savedUpdatedPlaylist = await playlistExist.save();
+        return savedUpdatedPlaylist;
+      } catch (error) {
+        console.log(error);
+        songsHelpers.serverSideErrorWrapper("could not add song to playlist");
+      }
+
+    },
+
+    removeSongFromPlaylist: async(_, args, context)=>{
+      if(!context.decoded && !context.decoded.id) songsHelpers.unAuthorizedWrapper("Please login to remove song from playlist");
+
+      let {playlistId, songId} = args;
+      let playlistExist = await Playlists.findById(playlistId);
+      if(!playlistExist) songsHelpers.notFoundWrapper("Playlist not found");
+
+      let songExist = await Song.findById(songId);
+      if(!songExist)  songsHelpers.notFoundWrapper("Song not found");
+
+      if(playlistExist.owner.toString() !=  context.decoded.id) songsHelpers.unAuthorizedWrapper("you are not authorised to update this playlist");
+
+      try {
+        const newSongs = playlistExist.songs.filter((id)=> id.toString() != songId);
+        playlistExist.songs = newSongs;
+        let  songRemovedFromPlaylist=  playlistExist.save();
+        return songRemovedFromPlaylist;
+      } catch (error) {
+        console.log(error);
+        songsHelpers.serverSideErrorWrapper("could not remove song to playlist");
+      }
+    },
+
+    removePlaylist: async(_, args, context)=>{
+      if(!context.decoded && !context.decoded.id) songsHelpers.unAuthorizedWrapper("Please login to remove playlist");
+
+      let {playlistId} = args;
+      let playlistExist = await Playlists.findById(playlistId);
+      if(!playlistExist) songsHelpers.notFoundWrapper("Playlist not found");
+      if(playlistId.owner.toString() !=  context.decoded.id) songsHelpers.unAuthorizedWrapper("you are not authorised to remove this playlist");
+
+      try {
+        let playlistDel = await Playlists.deleteOne({_id: playlistExist._id});
+        return playlistExist;
+      } catch (error) {
+        songsHelpers.serverSideErrorWrapper("could not delete to playlist");
+      };
+    },
+
+    toggleLikePlaylist: async(_, args, context)=>{
+      if(!context.decoded && !context.decoded.id) songsHelpers.unAuthorizedWrapper("Please login to like this playlist");
+     
+    let {playlistId} = args;
+    let playlistExist = await Playlists.findById(playlistId);
+    if(!playlistExist) songsHelpers.notFoundWrapper("Playlist not found");    
+
+    let toggleLike = true;
+    let likedUsers = playlistExist.liked_users;
+    for(let i =0; i<likedUsers.length; i ++){
+      if(likedUsers[i].userId.toString() == context.decoded.id){
+        toggleLike= false;
+      }
+    }
+    if(toggleLike){
+      playlistExist.liked_users.push({userId:new Types.ObjectId(context.decoded.id)});
+      playlistExist.likes += 1
+    }
+    else{
+      playlistExist.liked_users =  playlistExist.liked_users.filter((obj)=> obj.userId.toString() != context.decoded.id);
+      playlistExist.likes -= 1
+    }
+    
+    let savedPlaylist = playlistExist.save();
+
+     return savedPlaylist;
+    }
   },
 };

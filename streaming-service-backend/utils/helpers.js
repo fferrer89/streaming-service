@@ -134,7 +134,9 @@ export const AlbumTypes = ['ALBUM', 'SINGLE', 'COMPILATION', 'APPEARS_ON'];
 export const Genders = ['MALE', 'FEMALE', 'OTHER'];
 
 export const generateToken = (userId, role, name) => {
+  console.log(userId, role, name, process.env.JWT_SECRET);
   return jwt.sign({ id: userId, role, name }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRATION_TIME,
   });
 };
+ 

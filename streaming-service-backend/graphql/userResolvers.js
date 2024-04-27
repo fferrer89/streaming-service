@@ -53,7 +53,7 @@ export const userResolvers = {
           '+password'
         );
         if (!user) {
-          throw new Error('Invalid email or password.');
+          throw new GraphQLError('Invalid email or password.');
         }
 
         const isPasswordCorrect = await user.isPasswordCorrect(
@@ -61,13 +61,14 @@ export const userResolvers = {
           user.password
         );
         if (!isPasswordCorrect) {
-          throw new Error('Invalid email or password.');
+          throw new GraphQLError('Invalid email or password.');
         }
-
+        console.log(user);
         const token = generateToken(user._id, 'USER', user.first_name);
 
         return { user, token };
       } catch (error) {
+        console.log(error);
         return {
           user: null,
           token: null,
