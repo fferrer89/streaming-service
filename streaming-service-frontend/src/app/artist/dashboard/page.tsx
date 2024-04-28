@@ -1,12 +1,12 @@
 import React from "react";
 
-const UserDashboard: React.FC = () => {
+const ArtistDashboard: React.FC = () => {
   return (
     <div className="flex min-h-screen items-center relative bg-black">
       <div className="flex flex-col w-[549px] gap-[10px] pl-[17px] pr-[10px] pt-[25px] pb-0 self-stretch items-center relative">
         <div className="flex flex-col h-[273px] gap-[20px] pl-0 pr-[10px] pt-[20px] pb-0 self-stretch w-full rounded-[20px] overflow-hidden [background:linear-gradient(180deg,rgba(255,249.36,249.36,0.2)_0%,rgba(255,255,255,0)_100%)] items-center relative">
           <div className="flex h-[63px] justify-between pl-[22px] pr-0 py-0 self-stretch w-full items-center relative">
-            <a href="/user/profile">
+            <a href="/artist/profile">
               <img
                 className="relative w-[66px] h-[66px] mt-[-1.50px] mb-[-1.50px] ml-[-3.00px] object-cover"
                 alt="Ellipse"
@@ -50,7 +50,7 @@ const UserDashboard: React.FC = () => {
               src="/img/home_icon_1.png"
             />
             <a
-              href="/user/dashboard"
+              href="/artist/dashboard"
               className="relative w-fit [font-family:'JetBrains_Mono-Medium',Helvetica] font-medium text-white text-[30px] text-center tracking-[0] leading-[normal] bg-transparent border-none cursor-pointer "
             >
               Home
@@ -62,7 +62,10 @@ const UserDashboard: React.FC = () => {
               alt="Search results"
               src="/img/search_icon.png"
             />
-            <a className="relative w-fit [font-family:'JetBrains_Mono-Medium',Helvetica] font-medium text-white text-[30px] text-center tracking-[0] leading-[normal] bg-transparent border-none cursor-pointer ">
+            <a
+              href="/artist/library"
+              className="relative w-fit [font-family:'JetBrains_Mono-Medium',Helvetica] font-medium text-white text-[30px] text-center tracking-[0] leading-[normal] bg-transparent border-none cursor-pointer "
+            >
               Search
             </a>
           </div>
@@ -123,7 +126,7 @@ const UserDashboard: React.FC = () => {
             <div className="flex h-[63px] pl-[22px] pr-0 py-[7px] self-stretch w-full items-center relative">
               <div className="inline-flex gap-[15px] flex-[0_0_auto] items-center relative">
                 <div className="relative w-fit mt-[-1.00px] [font-family:'JetBrains_Mono-Medium',Helvetica] font-medium text-white text-[25px] text-center tracking-[0] leading-[normal]">
-                  Your Recent Songs
+                  Your Statistics
                 </div>
               </div>
             </div>
@@ -161,4 +164,4 @@ const UserDashboard: React.FC = () => {
   );
 };
 
-export default UserDashboard;
+export default ArtistDashboard;
