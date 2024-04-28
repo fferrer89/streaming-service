@@ -1,6 +1,26 @@
+"use client";
 import React from "react";
+import { useQuery } from "@apollo/client";
+import queries from "@/graphql/queries.js";
 
 const UserDashboard: React.FC = () => {
+  const { loading: artistsLoading, data: artistsData } = useQuery(
+    queries.GET_ARTISTS
+  );
+  const { loading: albumsLoading, data: albumsData } = useQuery(
+    queries.GET_ALBUMS
+  );
+  const { loading: songsLoading, data: songsData } = useQuery(
+    queries.GET_SONGS
+  );
+  //   const { loading: playlistsLoading, data: playlistsData } = useQuery(
+  //     queries.GET_PLAYLISTS_BY_OWNER
+  //   );
+
+  if (artistsLoading || albumsLoading || songsLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="flex min-h-screen items-center relative bg-black">
       <div className="flex flex-col w-[549px] gap-[10px] pl-[17px] pr-[10px] pt-[25px] pb-0 self-stretch items-center relative">
@@ -136,7 +156,34 @@ const UserDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
+            <div className="overflow-x-auto mt-8">
+              <div className="flex flex-nowrap justify-start px-4">
+                {songsData.songs.map((song) => (
+                  <a
+                    href="/song/"
+                    className="flex-shrink-0 w-[200px] m-4 rounded p-4 shadow-lg transition-all duration-700 hover:scale-110"
+                  >
+                    <div className="relative">
+                      <img
+                        src="/img/music_note.jpeg"
+                        alt={song.title}
+                        className="w-full rounded-[10px]"
+                      />
+                    </div>
+                    <div className="mt-2 text-center text-[#1e1e1e] font-semibold">
+                      {song.title}
+                    </div>
+                    <div className="mt-1 text-center text-[#7b7b7b] text-sm">
+                      {song.artists
+                        .map((artist) => artist.display_name)
+                        .join(", ")}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
+
           <div className="w-[1050px] h-[791px] rounded-[20px] relative bg-[#fff9f933]">
             <div className="flex h-[63px] pl-[22px] pr-0 py-[7px] self-stretch w-full items-center relative">
               <div className="inline-flex gap-[15px] flex-[0_0_auto] items-center relative">
