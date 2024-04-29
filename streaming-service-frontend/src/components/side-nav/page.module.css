@@ -1,0 +1,23 @@
+.sideNav {
+    padding: 7px;
+    background-color: rgba(18, 18, 18, 0.9);
+    color: white;
+}
+.sideNav header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 400px;
+    min-width: 300px;
+}
+.sideNav nav li {
+    padding: 7px 3px 7px;
+}
+.sideNav nav li:hover {
+    background-color: rgb(71 85 105);;
+}
+.sideNav img {
+    display: inline-block;
+    margin-right: 25px;
+}
