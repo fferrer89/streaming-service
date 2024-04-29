@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useRef } from "react";
 import {
@@ -6,7 +6,7 @@ import {
   useScroll,
   useSpring,
   useTransform,
-  MotionValue
+  MotionValue,
 } from "framer-motion";
 import Hero from "@/components/views/lading/hero";
 import Info from "@/components/views/lading/info";
@@ -14,12 +14,11 @@ import Support from "@/components/views/lading/support";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
-
 function useParallax(value: MotionValue<number>, distance: number) {
   return useTransform(value, [0, 1], [-distance, distance]);
 }
 
-function Section({ children }: { children: React.ReactNode;}) {
+function Section({ children }: { children: React.ReactNode }) {
   return (
     <section className=" flex items-center justify-center">
       <div>
@@ -30,14 +29,13 @@ function Section({ children }: { children: React.ReactNode;}) {
 }
 
 export default function Home() {
-
   const divRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: scrollRef });
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
-    restDelta: 0.001
+    restDelta: 0.001,
   });
 
   let stages = [

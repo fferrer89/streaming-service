@@ -1,33 +1,34 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import { AlbumTypes, MusicGenres, Visibilities } from '../utils/helpers.js';
 
 const albumSchema = new mongoose.Schema({
   album_type: {
     type: String,
-    required: [true, "Please provide an album type"],
+    required: [true, 'Please provide an album type'],
     enum: {
-      values: ["album", "single", "compilation", "appears_on"],
-      message: "Invalid album type",
+      values: AlbumTypes,
+      message: 'Invalid album type',
     },
   },
   total_songs: {
     type: Number,
-    required: [true, "Please provide the total tracks"],
+    required: [true, 'Please provide the total tracks'],
   },
   cover_image_url: {
     type: String,
-    required: [true, "Please provide image URL"],
+    required: [true, 'Please provide image URL'],
   },
   title: {
     type: String,
-    required: [true, "Please provide an album title"],
+    required: [true, 'Please provide an album title'],
   },
   description: {
     type: String,
-    required: [true, "Please provide an album description"],
+    required: [true, 'Please provide an album description'],
   },
   release_date: {
     type: Date,
-    required: [true, "Please provide release date"],
+    required: [true, 'Please provide release date'],
   },
   created_date: {
     type: Date,
@@ -41,7 +42,7 @@ const albumSchema = new mongoose.Schema({
     {
       artistId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Artist",
+        ref: 'Artist',
       },
     },
   ],
@@ -49,17 +50,35 @@ const albumSchema = new mongoose.Schema({
     {
       songId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Song",
+        ref: 'Song',
       },
     },
   ],
   genres: {
     type: [String],
-    required: [true, "Please provide genres"],
+    required: [true, 'Please provide genres'],
+    enum: {
+      values: MusicGenres,
+      message: 'Invalid music genre',
+    },
   },
   likes: {
     type: Number,
     required: false,
+  },
+  liked_by: {
+    users: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
+    artists: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Artist',
+      },
+    ],
   },
   total_duration: {
     type: Number,
@@ -67,13 +86,13 @@ const albumSchema = new mongoose.Schema({
   },
   visibility: {
     type: String,
-    required: [true, "Please provide an album visibility"],
+    required: [true, 'Please provide an album visibility'],
     enum: {
-      values: ["public", "private"],
-      message: "Invalid album visibility type",
+      values: Visibilities,
+      message: 'Invalid album visibility type',
     },
   },
 });
 
-const Album = mongoose.model("Album", albumSchema);
+const Album = mongoose.model('Album', albumSchema);
 export default Album;

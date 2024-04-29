@@ -1,192 +1,158 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
+import validator from 'validator';
 
+import { MusicGenres } from '../utils/helpers.js';
 const songSchema = new mongoose.Schema({
   album: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Album",
+    ref: 'Album',
   },
-  artists: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Artist",
-    },
-  ],
+  artists: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Artist' }],
+    required: [true, 'Please provide artist'],
+    validate: [
+      {
+        validator: (art) => {
+          console.log(art);
+          if (!art || art.length == 0) {
+            return false;
+          }
+          return true;
+        },
+        message: () => `Please provide at least one artist`,
+      },
+      {
+        validator: (art) => {
+          for (let i = 0; i < art.length; i++) {
+            if (art[i].toString().trim().length == 0) {
+              return false;
+            }
+          }
+          return true;
+        },
+        message: () => `Artist can't be empty spaces`,
+      },
+    ],
+  },
   duration: {
     type: Number,
-    required: [true, "Please provide duration in seconds"],
+    required: [true, 'Please provide duration in seconds'],
+    validate: {
+      validator: (dur) => {
+        return /^\d+$/.test(dur);
+      },
+      message: () => `Not a valid Duration!`,
+    },
+    min: [1, 'Duration cant be less than or equal to 0'],
+    max: [7200, 'Duration cant be more than or equal to 7200'],
   },
   title: {
     type: String,
-    required: [true, "Please provide song title"],
+    required: [true, 'Please provide song title'],
+    trim: true,
+    validate: [
+      validator.isAlphanumeric,
+      'Please enter a valid title, title can only contain letters',
+    ],
+
+    minLength: [2, 'Title must be at least 2 characters long'],
+    maxLength: [30, 'title must be less than 30 characters long'],
   },
   likes: {
     type: Number,
     required: false,
+    min: [0, 'Likes cant be negative'],
   },
   song_url: {
     type: String,
-    required: [true, "Please provide song URL"],
+    required: [true, 'Please provide song URL'],
+    trim: true,
+    minLength: [11, 'URL must be 11 characters long'],
+    validate: {
+      validator: (url) => {
+        return /^(?:https?|ftp):\/\/[\w\-]+(?:\.[\w\-]+)+(?:[\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/.test(
+          url
+        );
+      },
+      message: () => `Not a valid url!`,
+    },
   },
   cover_image_url: {
     type: String,
-    required: [true, "Please provide song URL"],
+    required: [true, 'Please provide song URL'],
+    trim: true,
+    minLength: [11, 'URL must be 11 characters long'],
+    validate: {
+      validator: (url) => {
+        return /^(?:https?|ftp):\/\/[\w\-]+(?:\.[\w\-]+)+(?:[\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/.test(
+          url
+        );
+      },
+      message: () => `Not a valid url!`,
+    },
   },
   writtenBy: {
     type: String,
-    required: [true, "Please provide writer name"],
+    required: [true, 'Please provide writer name'],
+    trim: true,
+    validate: [
+      validator.isAlpha,
+      "Please enter a valid Writer's name, can only contain letters",
+    ],
+    minLength: [2, "Writer's name must be at least 2 characters long"],
+    maxLength: [30, "Writer's name must be less than 30 characters long"],
   },
   producers: {
     type: [String],
-    required: [true, "Please provide producer names"],
+    required: [true, 'Please provide producer names'],
+    validate: {
+      validator: (prods) => {
+        // Check if array is not empty
+        if (prods.length === 0) return false;
+
+        for (const prod of prods) {
+          // Check if string is not empty or just spaces
+          if (!prod.trim()) return false;
+
+          // Check if string contains only letters
+          if (!/^[a-zA-Z\s]+$/.test(prod)) return false;
+        }
+
+        return true;
+      },
+      message: () =>
+        `Invalid array of strings. Please make sure it's not empty, doesn't contain only spaces, and contains only letters.`,
+    },
   },
   language: {
     type: String,
     required: false,
+    trim: true,
+    validate: [
+      validator.isAlpha,
+      'Please enter a valid Language, title can only contain letters',
+    ],
+    minLength: [2, 'Language must be at least 2 characters long'],
+    maxLength: [30, 'Language must be less than 30 characters long'],
   },
   genre: {
     type: String,
-    required: [true, "Please provide genre"],
+    required: [true, 'Please provide genre'],
     enum: {
-      values: [
-        "acoustic",
-        "afrobeat",
-        "alt-rock",
-        "alternative",
-        "ambient",
-        "anime",
-        "black-metal",
-        "bluegrass",
-        "blues",
-        "bossanova",
-        "brazil",
-        "breakbeat",
-        "british",
-        "cantopop",
-        "chicago-house",
-        "children",
-        "chill",
-        "classical",
-        "club",
-        "comedy",
-        "country",
-        "dance",
-        "dancehall",
-        "death-metal",
-        "deep-house",
-        "detroit-techno",
-        "disco",
-        "disney",
-        "drum-and-bass",
-        "dub",
-        "dubstep",
-        "edm",
-        "electro",
-        "electronic",
-        "emo",
-        "folk",
-        "forro",
-        "french",
-        "funk",
-        "garage",
-        "german",
-        "gospel",
-        "goth",
-        "grindcore",
-        "groove",
-        "grunge",
-        "guitar",
-        "happy",
-        "hard-rock",
-        "hardcore",
-        "hardstyle",
-        "heavy-metal",
-        "hip-hop",
-        "holidays",
-        "honky-tonk",
-        "house",
-        "idm",
-        "indian",
-        "indie",
-        "indie-pop",
-        "industrial",
-        "iranian",
-        "j-dance",
-        "j-idol",
-        "j-pop",
-        "j-rock",
-        "jazz",
-        "k-pop",
-        "kids",
-        "latin",
-        "latino",
-        "malay",
-        "mandopop",
-        "metal",
-        "metal-misc",
-        "metalcore",
-        "minimal-techno",
-        "movies",
-        "mpb",
-        "new-age",
-        "new-release",
-        "opera",
-        "pagode",
-        "party",
-        "philippines-opm",
-        "piano",
-        "pop",
-        "pop-film",
-        "post-dubstep",
-        "power-pop",
-        "progressive-house",
-        "psych-rock",
-        "punk",
-        "punk-rock",
-        "r-n-b",
-        "rainy-day",
-        "reggae",
-        "reggaeton",
-        "road-trip",
-        "rock",
-        "rock-n-roll",
-        "rockabilly",
-        "romance",
-        "sad",
-        "salsa",
-        "samba",
-        "sertanejo",
-        "show-tunes",
-        "singer-songwriter",
-        "ska",
-        "sleep",
-        "songwriter",
-        "soul",
-        "soundtracks",
-        "spanish",
-        "study",
-        "summer",
-        "swedish",
-        "synth-pop",
-        "tango",
-        "techno",
-        "trance",
-        "trip-hop",
-        "turkish",
-        "work-out",
-        "world-music",
-      ],
-      message: "Invalid genre for song",
+      values: MusicGenres,
+      message: 'Invalid genre for song',
     },
   },
   lyrics: {
     type: String,
     required: false,
+    trim: true,
   },
   release_date: {
     type: Date,
-    required: [true, "Please provide release date"],
+    required: [true, 'Please provide release date'],
   },
 });
 
-const Song = mongoose.model("Song", songSchema);
+const Song = mongoose.model('Song', songSchema);
 export default Song;

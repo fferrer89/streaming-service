@@ -1,15 +1,16 @@
-import mongoose from "mongoose";
-
+import mongoose from 'mongoose';
+import { Visibilities } from '../utils/helpers.js';
 const playlistSchema = new mongoose.Schema({
   description: {
     type: String,
-    required: [true, "Please provide playlist description"],
+    required: [true, 'Please provide playlist description'],
   },
   liked_users: [
     {
+      _id:false, 
       userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
       likedDate: {
         type: Date,
@@ -19,27 +20,29 @@ const playlistSchema = new mongoose.Schema({
   ],
   title: {
     type: String,
-    required: [true, "Please provide playlist name"],
+    required: [true, 'Please provide playlist name'],
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   songs: [
     {
-      songId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Song",
-      },
+        ref: 'Song',
     },
   ],
   visibility: {
     type: String,
-    required: [true, "Please provide an playlist visibility"],
+    required: [true, 'Please provide an playlist visibility'],
     enum: {
-      values: ["public", "private"],
-      message: "Invalid playlist visibility type",
+      values: Visibilities,
+      message: 'Invalid playlist visibility type',
     },
+  },
+  likes: {
+    type: Number,
+    required: false,
   },
   created_date: {
     type: Date,
@@ -47,5 +50,5 @@ const playlistSchema = new mongoose.Schema({
   },
 });
 
-const Playlist = mongoose.model("Playlist", playlistSchema);
+const Playlist = mongoose.model('Playlist', playlistSchema);
 export default Playlist;
