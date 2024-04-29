@@ -11,6 +11,8 @@ import {
 import Hero from "@/components/views/lading/hero";
 import Info from "@/components/views/lading/info";
 import Support from "@/components/views/lading/support";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 
 function useParallax(value: MotionValue<number>, distance: number) {
@@ -19,7 +21,7 @@ function useParallax(value: MotionValue<number>, distance: number) {
 
 function Section({ children }: { children: React.ReactNode;}) {
   return (
-    <section className="h-screen flex items-center justify-center">
+    <section className=" flex items-center justify-center">
       <div>
         {children}
       </div>
@@ -39,15 +41,17 @@ export default function Home() {
   });
 
   let stages = [
+    <Navbar/>,
     <Hero/>,
     <Info/>, 
-    <Support/>
+    <Support/>,
+    <Footer/>
   ];
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between ">
       
-      <div ref={scrollRef} className="w-full h-screen overflow-x-clip overflow-y-scroll hide-scroll-bar">
+      <div ref={scrollRef} className=" overflow-x-clip overflow-y-scroll hide-scroll-bar">
           {stages.map((stage, index) => (
             <Section key={index}>
               {stage}
