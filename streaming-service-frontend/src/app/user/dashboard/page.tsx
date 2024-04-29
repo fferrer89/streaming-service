@@ -47,7 +47,7 @@ const UserDashboard: React.FC = () => {
             <img
               className="relative w-[40px] h-[40px] object-cover"
               alt="Home icon"
-              src="/img/home_icon_1.png"
+              src="/icons/home-white.png"
             />
             <a
               href="/user/dashboard"
@@ -60,7 +60,7 @@ const UserDashboard: React.FC = () => {
             <img
               className="relative w-[40px] h-[40px] object-cover"
               alt="Search results"
-              src="/img/search_icon.png"
+              src="/icons/search-white.png"
             />
             <a className="relative w-fit [font-family:'JetBrains_Mono-Medium',Helvetica] font-medium text-white text-[30px] text-center tracking-[0] leading-[normal] bg-transparent border-none cursor-pointer ">
               Search
@@ -73,7 +73,7 @@ const UserDashboard: React.FC = () => {
               <img
                 className="relative w-[50px] h-[50px] object-cover"
                 alt="Library icon"
-                src="/img/library_icon.png"
+                src="/icons/library_icon.png"
               />
               <div className="relative w-fit [font-family:'JetBrains_Mono-Medium',Helvetica] font-medium text-white text-[30px] text-center tracking-[0] leading-[normal]">
                 Your Sounds
@@ -115,7 +115,7 @@ const UserDashboard: React.FC = () => {
               <img
                 className="absolute w-[30px] h-[30px] top-[12px] left-[22px] object-cover"
                 alt="Search results"
-                src="/img/search_icon.png"
+                src="/icons/search-white.png"
               />
             </div>
           </div>
