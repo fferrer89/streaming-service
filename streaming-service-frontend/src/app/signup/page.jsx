@@ -1,6 +1,5 @@
 'use client'
-import React, { useEffect } from 'react';
-import Head from 'next/head';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
@@ -10,19 +9,41 @@ import { useForm } from 'react-hook-form';
 export default function Signup() {
   const router = useRouter();
   const { handleSubmit, register, formState: { errors }, getValues } = useForm();
+  const [role, setRole] = useState();
+  const [userError, setUserError] = useState(false);
+  const [artistError, setArtistError] = useState(false);
 
-  const [registerUser] = useMutation(queries.REGISTER_USER);
-  const [registerArtist] = useMutation(queries.REGISTER_ARTIST);
+  const [registerUser] = useMutation(queries.REGISTER_USER, {
+    onCompleted: () => {
+      setUserError(false);
+      document.getElementById('register').reset();
+      router.push('/login');
+    },
+    onError(error) {
+      setUserError(true);
+    }
+  });
+
+  const [registerArtist] = useMutation(queries.REGISTER_ARTIST, {
+    onCompleted: () => {
+      setArtistError(false);
+      document.getElementById('register').reset();
+      router.push('/login');
+    },
+    onError(error) {
+      setArtistError(true);
+    }
+  });
 
   useEffect(() => {
     document.title = 'Sound 53 | Sign Up'
   }, []);
 
-  // Handle form submit
   const handleOnSubmit = (data, event) => {
     event.preventDefault();
 
     if (data.role === 'user') {
+      setRole(data.role);
       registerUser({
         variables: {
           firstName: data.firstName,
@@ -36,6 +57,7 @@ export default function Signup() {
     }
 
     if (data.role === 'artist') {
+      setRole(data.role);
       registerArtist({
         variables: {
           firstName: data.firstName,
@@ -48,9 +70,6 @@ export default function Signup() {
         }
       });
     }
-
-    document.getElementById('register').reset();
-    router.push('/login');
   };
 
   const ErrorMessage = ({ message }) => (
@@ -60,13 +79,13 @@ export default function Signup() {
   return (
     <>
       <main className='flex flex-col justify-center items-center py-10 text-white'>
-        <div className='py-10 px-10 rounded-md lg:w-1/3 bg-black'>
+        <div className='py-10 px-12 rounded-md lg:w-1/3 bg-black'>
           <h1 className='flex text-3xl font-bold'>Sign Up <p className='ml-4 text-red-500 rotate-12'>&#9835;</p></h1>
           <div className='flex flex-col items-center mt-6 lg:w-full'>
             <form className='w-full' id='register' onSubmit={handleSubmit(handleOnSubmit)}>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='firstName' className='mb-1 text-sm'>First Name</label>
-                <input type='text' name='firstName' id='firstName' className='px-2 py-2 rounded-sm text-black'
+                <input type='text' name='firstName' id='firstName' placeholder='First Name' className='px-2 py-2 rounded-sm text-black'
                   {...register('firstName',
                     {
                       required: 'First name is required',
@@ -78,7 +97,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='lastName' className='mb-1 text-sm'>Last Name</label>
-                <input type='text' name='lastName' id='lastName' className='px-2 py-2 rounded-sm text-black'
+                <input type='text' name='lastName' id='lastName' placeholder='Last Name' className='px-2 py-2 rounded-sm text-black'
                   {...register('lastName',
                     {
                       required: 'Last name is required',
@@ -90,7 +109,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='displayName' className='mb-1 text-sm'>Display Name</label>
-                <input type='text' name='displayName' id='displayName' className='px-2 py-2 rounded-sm text-black'
+                <input type='text' name='displayName' id='displayName' placeholder='Display Name' className='px-2 py-2 rounded-sm text-black'
                   {...register('displayName',
                     {
                       required: 'Display name is required',
@@ -102,17 +121,19 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='email' className='mb-1 text-sm'>Email</label>
-                <input type='email' name='email' id='email' placeholder='name@domain.com' className='px-2 py-2 rounded-sm text-black'
+                <input type='email' name='email' id='email' placeholder='Email' className='px-2 py-2 rounded-sm text-black'
                   {...register('email',
                     {
                       required: 'Email is required',
                       pattern: { value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/, message: 'Must be a valid email' }
                     })} />
                 {errors?.email && <ErrorMessage message={errors.email.message} />}
+                {(role === 'user') && userError && <ErrorMessage message='User already exists with this email' />}
+                {(role === 'artist') && artistError && <ErrorMessage message='Artist already exists with this email' />}
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='password' className='mb-1 text-sm'>Password</label>
-                <input type='password' name='password' id='password' className='px-2 py-2 rounded-sm text-black'
+                <input type='password' name='password' id='password' placeholder='Password' className='px-2 py-2 rounded-sm text-black'
                   {...register('password',
                     {
                       required: 'Password is required',
@@ -123,7 +144,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='confirmPassword' className='mb-1 text-sm'>Confirm Password</label>
-                <input type='password' name='confirmPassword' id='confirmPassword' className='px-2 py-2 rounded-sm text-black'
+                <input type='password' name='confirmPassword' id='confirmPassword' placeholder='Confirm Password' className='px-2 py-2 rounded-sm text-black'
                   {...register('confirmPassword',
                     {
                       required: 'Confirm password is required',
