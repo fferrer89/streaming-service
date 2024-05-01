@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './.env' });
 import environment from './config/config.js';
 import { ApolloServer } from 'apollo-server-express';
-import streamRoutes from './routes/index.js';
+import fileRoutes from './routes/songFileRoutes.js';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import mongoose from 'mongoose';
 import lodash from 'lodash';
@@ -19,8 +19,15 @@ import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
 import express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
+import { authenticateToken } from './utils/helpers.js';
+import morgan from 'morgan';
+import cors from 'cors';
+const redisClient = redis.createClient();
 
-const client = redis.createClient();
+const attachRedisClient = (req, res, next) => {
+  req.redisClient = redisClient;
+  next();
+};
 
 const server = new ApolloServer({
   typeDefs,
@@ -34,18 +41,14 @@ const server = new ApolloServer({
   context: async ({ req, res }) => {
     if (req.body.operationName !== 'IntrospectionQuery') {
       console.log(
-        `${new Date()} -- Operation = ${req.body.operationName} -- Status = ${
-          res.statusCode
-        }`
+        `[GRAPHQL] -- Operation = ${req.body.operationName} -- Status = ${res.statusCode}`
       );
     }
     // will bypass authentication middelware for login, register and playground
     if (
-      /*
       // Uncomment this part to disable authentication on all queries and mutations
       req.body.operationName.toLowerCase() !== 'mutation' &&
       req.body.operationName.toLowerCase() !== 'query' &&
-      */
       req.body.operationName !== 'IntrospectionQuery' &&
       req.body.operationName !== 'registerUser' &&
       req.body.operationName !== 'registerArtist' &&
@@ -53,6 +56,7 @@ const server = new ApolloServer({
       req.body.operationName !== 'loginArtist'
     ) {
       const token = req.headers.authorization || '';
+      return { redisClient };
       try {
         var decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.exp <= Math.floor(Date.now() / 1000)) {
@@ -75,7 +79,9 @@ const server = new ApolloServer({
           }
         );
       }
-      return { decoded };
+      return { decoded, redisClient };
+    } else {
+      return { redisClient };
     }
   },
   // includeStacktraceInErrorResponses: false,
@@ -89,7 +95,7 @@ try {
     useNewUrlParser: true,
   });
 
-  await client
+  await redisClient
     .connect()
     .then(() => {})
     .catch((error) => {
@@ -100,7 +106,13 @@ try {
 
     //TODO need to add auth middleware for express
     const app = express();
-    app.use('/stream', streamRoutes);
+    app.use(express.json());
+    app.use(morgan('dev'));
+    app.use(cors());
+    //app.use(authenticateToken);
+    app.use(attachRedisClient);
+
+    app.use('/file', fileRoutes);
     app.use(graphqlUploadExpress());
 
     server.applyMiddleware({ app });
