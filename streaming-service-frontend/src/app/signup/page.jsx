@@ -36,7 +36,7 @@ export default function Signup() {
   });
 
   useEffect(() => {
-    document.title = 'Sound 53 | Sign Up'
+    document.title = 'Sign up | Sounds 54'
   }, []);
 
   const handleOnSubmit = (data, event) => {
@@ -176,7 +176,7 @@ export default function Signup() {
             </form>
           </div>
           <div className='flex flex-col sm:flex-row justify-center items-center mt-6'>
-            <p className='mr-1'>Already have an account?</p>
+            <p className='mr-2'>Already have an account?</p>
             <Link href='/login' className='underline'>Log in</Link>
           </div>
         </div>
