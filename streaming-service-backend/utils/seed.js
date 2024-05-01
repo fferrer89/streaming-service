@@ -44,7 +44,7 @@ const artists = [
     password: 'Password456#',
     date_of_birth: '01/01/1940',
     gender: 'MALE',
-    profile_image_url: 'https://example.com/bobmarley.jpg',
+    profile_image_url: new mongoose.Types.ObjectId(),
     genres: ['REGGAE'],
   },
   {
@@ -55,7 +55,7 @@ const artists = [
     password: 'Password456@',
     date_of_birth: '01/01/1980',
     gender: 'FEMALE',
-    profile_image_url: 'https://example.com/adele.jpg',
+    profile_image_url: new mongoose.Types.ObjectId(),
     genres: ['POP', 'SOUL'],
   },
 ];
