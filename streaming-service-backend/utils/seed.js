@@ -63,29 +63,29 @@ const artists = [
 const albums = [
   {
     album_type: 'ALBUM',
-    total_songs: 10,
-    cover_image_url: 'https://example.com/album1.jpg',
+    //total_songs: 10,
+    cover_image_url: new mongoose.Types.ObjectId(),
     title: 'Greatest Hits',
     description: 'Best hits of all time',
     release_date: new Date('2020-01-01'),
     artists: [],
     songs: [],
     genres: ['POP', 'ROCK'],
-    likes: 100,
+    //likes: 100,
     total_duration: 3600,
     visibility: 'PUBLIC',
   },
   {
     album_type: 'SINGLE',
-    total_songs: 1,
-    cover_image_url: 'https://example.com/album2.jpg',
+    //total_songs: 1,
+    cover_image_url: new mongoose.Types.ObjectId(),
     title: 'Single Track',
     description: 'A single track',
     release_date: new Date('2021-05-01'),
     artists: [],
     songs: [],
     genres: ['POP'],
-    likes: 50,
+    //likes: 50,
     total_duration: 180,
     visibility: 'PUBLIC',
   },
@@ -229,7 +229,6 @@ async function seed() {
 
     const albumsWithLikedBy = createdAlbums.map((album) => ({
       ...album._doc,
-      //songs: songsWithAlbumsAndArtists.map((song) => ({ songId: song._id })),
       liked_by: {
         users: createdUsers.map((user) => user._id),
         artists: createdArtists.map((artist) => artist._id),

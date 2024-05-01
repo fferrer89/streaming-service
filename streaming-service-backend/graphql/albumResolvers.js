@@ -3,7 +3,7 @@ import Album from '../models/albumModel.js';
 import mongoose from 'mongoose';
 import Song from '../models/songModel.js';
 import Artist from '../models/artistModel.js';
-
+import songsHelpers from '../utils/songsHelpers.js';
 export const albumResolvers = {
   Album: {
     artists: async (parent, _, context) => {
@@ -39,7 +39,14 @@ export const albumResolvers = {
     },
     getAlbumsByTitle: async (_, { title }, contextValue) => {
       try {
-        const albums = await Album.find({ title: title });
+        if (!title || typeof title !== 'string' || title.trim().length < 3) {
+          songsHelpers.badUserInputWrapper(
+            'Please provide at least 3 characters for album title input'
+          );
+        }
+        const albums = await Album.find({
+          title: { $regex: new RegExp(title, 'i') },
+        });
         return albums;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch albums: ${error.message}`);

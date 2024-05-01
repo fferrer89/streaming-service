@@ -12,11 +12,14 @@ const albumSchema = new mongoose.Schema({
   },
   total_songs: {
     type: Number,
-    required: [true, 'Please provide the total tracks'],
+    required: false,
+    get: function () {
+      return this.songs.length;
+    },
   },
   cover_image_url: {
-    type: String,
-    required: [true, 'Please provide image URL'],
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
   },
   title: {
     type: String,
@@ -65,6 +68,11 @@ const albumSchema = new mongoose.Schema({
   likes: {
     type: Number,
     required: false,
+    get: function () {
+      const totalLikesByUsers = this.liked_by.users.length;
+      const totalLikesByArtists = this.liked_by.artists.length;
+      return totalLikesByUsers + totalLikesByArtists;
+    },
   },
   liked_by: {
     users: [
