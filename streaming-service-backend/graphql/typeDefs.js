@@ -16,7 +16,7 @@ type Query {
     #FIXME returns the first artist found by a given first_name
     getArtistsByName(name: String!): [Artist]
     #FIXME how to calculate this? Artists cannot be "liked" according to the DB schema
-    getMostFollowedArtists: [Artist]
+    getMostFollowedArtists(top: Int!): [Artist]
     getArtistsByAlbumId(albumId: ID!): [Artist]
     #FIXME we need artists with followers in the DB schema
     getUserFollowedArtists(userId: ID!): [Artist]

@@ -130,23 +130,28 @@ export const artistResolvers = {
         );
       }
     },
+    //working fully - returns top N most followed artists based on input N
     getMostFollowedArtists: async (_, args, contextValue) => {
       try {
+        let top = args.top;
+        if (!top || top < 1) {
+          songHelper.badUserInputWrapper(
+            'Please provide valid input for top, shoulb be greater than 0'
+          );
+        }
         const artists = await Artist.find().populate('followers');
 
-        let mostFollowedArtist = null;
-        let maxFollowers = 0;
-        artists.forEach((artist) => {
-          const followersCount =
-            artist.followers.artists.length + artist.followers.users.length;
-
-          if (followersCount > maxFollowers) {
-            mostFollowedArtist = artist;
-            maxFollowers = followersCount;
-          }
+        artists.sort((a, b) => {
+          const followersCountA =
+            a.followers.artists.length + a.followers.users.length;
+          const followersCountB =
+            b.followers.artists.length + b.followers.users.length;
+          return followersCountB - followersCountA;
         });
 
-        return mostFollowedArtist;
+        const topNMostFollowedArtists = artists.slice(0, top);
+
+        return topNMostFollowedArtists;
       } catch (err) {
         throw new GraphQLError(
           `Failed to get followed artists: ${err.message}`
