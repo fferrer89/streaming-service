@@ -158,15 +158,15 @@ export default function Signup() {
                 {errors?.confirmPassword && <ErrorMessage message={errors.confirmPassword.message} />}
               </div>
               <div className='flex flex-col'>
-                <label htmlFor="role" defaultValue='' className='mb-1 text-sm'>Role</label>
-                <select name="role" id="role" defaultValue='' className='px-2 py-3 rounded-md border-2 border-black text-black'
+                <label htmlFor='role' defaultValue='' className='mb-1 text-sm'>Role</label>
+                <select name='role' id='role' defaultValue='' className='px-2 py-3 rounded-md border-2 border-black text-black'
                   {...register('role',
                     {
                       required: 'Select a role'
                     })}>
-                  <option value="" disabled>Select a role</option>
-                  <option value="user">User</option>
-                  <option value="artist">Artist</option>
+                  <option value='' disabled>Select a role</option>
+                  <option value='user'>User</option>
+                  <option value='artist'>Artist</option>
                 </select>
                 {errors?.role && <ErrorMessage message={errors.role.message} />}
               </div>
