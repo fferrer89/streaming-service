@@ -90,7 +90,7 @@ type Mutation {
         display_name: String!,
         email: String!,
         password: String!,
-        profile_image_url: String!,
+        profile_image_url: ID,
         genres: [MusicGenre!]!
     ): RegisterArtistResponse
 
@@ -237,7 +237,7 @@ type Artist {
     gender: String
     following: Following
     followers: Followers
-    profile_image_url: String!
+    profile_image_url: ID
     genres: [MusicGenre!]!
 }
 

@@ -160,6 +160,7 @@ export const artistResolvers = {
     },
   },
   Mutation: {
+    //working fully
     registerArtist: async (_, args) => {
       try {
         //No need to do manual validations, mongoose will handle everything, you just have to define proper schema for the model in mongoose
