@@ -24,7 +24,7 @@ type Query {
     albums: [Album]
     getAlbumById(_id: ID!): Album
     getAlbumsByTitle(title: String!): [Album]
-    getAlbumsByVisibility(visibility: String!): [Album]
+    getAlbumsByVisibility(visibility: Visibility!): [Album]
     getAlbumsByReleasedYear(year: Int!): [Album]
     getAlbumsByGenre(genre: String!): [Album]
     getNewlyReleasedAlbums: [Album]

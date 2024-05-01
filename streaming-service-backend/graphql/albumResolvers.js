@@ -62,10 +62,12 @@ export const albumResolvers = {
     },
     getAlbumsByReleasedYear: async (_, { year }, contextValue) => {
       try {
+        console.log(new Date(Date.UTC(year, 0, 1)));
+        console.log(new Date(year + 1, 0, 1));
         const albums = await Album.find({
           release_date: {
-            $gte: new Date(year, 0, 1), // Start of the year
-            $lt: new Date(year + 1, 0, 1), // End of the year
+            $gte: new Date(Date.UTC(year, 0, 1)), // Start of the year
+            $lt: new Date(Date.UTC(year + 1, 0, 1)), // End of the year
           },
         });
         return albums;
