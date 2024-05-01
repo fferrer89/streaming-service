@@ -8,6 +8,7 @@ import songHelper from '../utils/songsHelpers.js';
 
 export const artistResolvers = {
   Artist: {
+    //working fully
     followers: async (parent) => {
       try {
         const artist = await Artist.findById(parent._id).populate(
@@ -18,6 +19,7 @@ export const artistResolvers = {
         throw new Error('Failed to fetch followers');
       }
     },
+    //working fully
     following: async (parent) => {
       try {
         const artist = await Artist.findById(parent._id).populate(
@@ -30,6 +32,7 @@ export const artistResolvers = {
     },
   },
   Query: {
+    //working fully
     artists: async () => {
       try {
         const allArtists = await Artist.find({});
@@ -38,6 +41,7 @@ export const artistResolvers = {
         throw new GraphQLError(`Failed to fetch artists: ${error.message}`);
       }
     },
+    //working fully
     getArtistById: async (_, args, contextValue) => {
       try {
         validateMogoObjID(args._id, '_id');
@@ -47,12 +51,32 @@ export const artistResolvers = {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
       }
     },
+    //working fully - used for search
     getArtistsByName: async (_, args, contextValue) => {
       try {
-        const artists = await Artist.find({ first_name: args.name });
+        if (
+          !args.name ||
+          typeof args.name !== 'string' ||
+          args.name.trim().length < 3
+        ) {
+          songHelper.badUserInputWrapper(
+            'Please provide at least 3 characters for name input'
+          );
+        }
+        const artists = await Artist.find({
+          $or: [
+            { display_name: { $regex: new RegExp(args.name, 'i') } },
+            { first_name: { $regex: new RegExp(args.name, 'i') } },
+            { last_name: { $regex: new RegExp(args.name, 'i') } },
+          ],
+        });
         return artists;
       } catch (error) {
-        throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
+        throw new GraphQLError(`Failed to fetch artist: ${error.message}`, {
+          extensions: {
+            code: error.extensions.code,
+          },
+        });
       }
     },
     getArtistsByAlbumId: async (_, args, contextValue) => {
