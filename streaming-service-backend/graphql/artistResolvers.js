@@ -79,14 +79,23 @@ export const artistResolvers = {
         });
       }
     },
+    //working fully
     getArtistsByAlbumId: async (_, args, contextValue) => {
       try {
-        validateMogoObjID(args.albumId, 'albumId');
-        const album = await Album.findById(args.albumId);
-        if (!album) {
-          throw Error(`Failed to fetch album with id (${args.albumId})`);
+        if (
+          !args.albumId ||
+          typeof args.albumId !== 'string' ||
+          args.albumId.trim().length === 0
+        ) {
+          songHelper.badUserInputWrapper('Please provide valid id for album');
         }
-        const artistIds = album.artists;
+
+        validateMogoObjID(args.albumId.trim(), 'albumId');
+        const album = await Album.findById(args.albumId.trim()).lean();
+        if (!album) {
+          throw Error(`Failed to fetch album with id (${args.albumId.trim()})`);
+        }
+        const artistIds = album.artists.map((artist) => artist.artistId);
         const artists = await Artist.find({ _id: { $in: artistIds } });
         return artists;
       } catch (error) {
