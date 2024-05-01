@@ -208,18 +208,18 @@ async function seed() {
     }
 
     const createdAlbums = await Album.create(albumsWithArtists);
-    const aids = createdArtists.map((artist) => artist._id);
+
     const songsWithAlbumsAndArtists = songs.map((song) => ({
       ...song,
       album:
-      createdAlbums[Math.floor(Math.random() * createdAlbums.length)]._id,
+        createdAlbums[Math.floor(Math.random() * createdAlbums.length)]._id,
     }));
 
     const createdSongs = await Song.create(songsWithAlbumsAndArtists);
 
     for (let album of createdAlbums) {
       const albumSongs = createdSongs.filter((song) =>
-          song.album.equals(album._id)
+        song.album.equals(album._id)
       );
       album.songs = {
         songId: albumSongs[Math.floor(Math.random() * albumSongs.length)]._id,
@@ -237,10 +237,28 @@ async function seed() {
     }));
 
     await Promise.all(
-        albumsWithLikedBy.map((album) =>
-            Album.findByIdAndUpdate(album._id, { liked_by: album.liked_by })
-        )
+      albumsWithLikedBy.map((album) =>
+        Album.findByIdAndUpdate(album._id, { liked_by: album.liked_by })
+      )
     );
+
+    //populating followes and following for artists
+    const aids = createdArtists.map((artist) => artist._id);
+    for (let currentArtist of createdArtists) {
+      const otherArtists = createdArtists.filter(
+        (artist) => artist._id.toString() !== currentArtist._id.toString()
+      );
+      const followingArtists = otherArtists.map((artist) => artist._id);
+      const followingUsers = createdUsers.map((user) => user._id);
+      await Artist.findByIdAndUpdate(currentArtist._id, {
+        $set: {
+          'following.artists': followingArtists,
+          'followers.artists': followingArtists,
+          'following.users': followingUsers,
+          'followers.users': followingUsers,
+        },
+      });
+    }
 
     for (let playlist of playlists) {
       playlist.songs = createdSongs.map((song) => song._id);
@@ -252,9 +270,9 @@ async function seed() {
 
     for (let history of listeningHistory) {
       history.userId =
-          createdUsers[Math.floor(Math.random() * createdUsers.length)]._id;
+        createdUsers[Math.floor(Math.random() * createdUsers.length)]._id;
       history.songId =
-          createdSongs[Math.floor(Math.random() * createdSongs.length)]._id;
+        createdSongs[Math.floor(Math.random() * createdSongs.length)]._id;
     }
     console.log(listeningHistory);
     for (let album of albums) {

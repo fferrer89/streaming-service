@@ -7,6 +7,28 @@ import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
 
 export const artistResolvers = {
+  Artist: {
+    followers: async (parent) => {
+      try {
+        const artist = await Artist.findById(parent._id).populate(
+          'followers.users followers.artists'
+        );
+        return artist.followers;
+      } catch (error) {
+        throw new Error('Failed to fetch followers');
+      }
+    },
+    following: async (parent) => {
+      try {
+        const artist = await Artist.findById(parent._id).populate(
+          'following.users following.artists'
+        );
+        return artist.following;
+      } catch (error) {
+        throw new Error('Failed to fetch following');
+      }
+    },
+  },
   Query: {
     artists: async () => {
       try {
