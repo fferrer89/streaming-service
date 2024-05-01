@@ -96,12 +96,12 @@ const songs = [
     album: null,
     artists: [],
     duration: 180,
-    title: 'Song 1',
+    title: 'Song',
     likes: 20,
     song_url: 'https://example.com/song1.mp3',
     cover_image_url: 'https://example.com/song1.jpg',
-    writtenBy: 'Songwriter 1',
-    producers: ['Producer 1', 'Producer 2'],
+    writtenBy: 'Songwriter',
+    producers: ['Producer', 'Producer'],
     language: 'English',
     genre: 'POP',
     lyrics: 'Lyrics for song 1',
@@ -111,12 +111,42 @@ const songs = [
     album: null,
     artists: [],
     duration: 240,
-    title: 'Song 2',
+    title: 'Songg',
     likes: 30,
     song_url: 'https://example.com/song2.mp3',
     cover_image_url: 'https://example.com/song2.jpg',
-    writtenBy: 'Songwriter 2',
-    producers: ['Producer 3'],
+    writtenBy: 'Songwriter',
+    producers: ['Producer'],
+    language: 'English',
+    genre: 'ROCK',
+    lyrics: 'Lyrics for song 2',
+    release_date: new Date('2021-01-01'),
+  },
+  {
+    album: null,
+    artists: [],
+    duration: 180,
+    title: 'dare',
+    likes: 20,
+    song_url: 'https://example.com/song1.mp3',
+    cover_image_url: 'https://example.com/song1.jpg',
+    writtenBy: 'Songwriter',
+    producers: ['Producer', 'Producer'],
+    language: 'English',
+    genre: 'POP',
+    lyrics: 'Lyrics for song 1',
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: [],
+    duration: 240,
+    title: 'white',
+    likes: 30,
+    song_url: 'https://example.com/song2.mp3',
+    cover_image_url: 'https://example.com/song2.jpg',
+    writtenBy: 'Songwriter',
+    producers: ['Producer'],
     language: 'English',
     genre: 'ROCK',
     lyrics: 'Lyrics for song 2',
@@ -168,22 +198,49 @@ async function seed() {
     const createdUsers = await User.create(users);
     const createdArtists = await Artist.create(artists);
 
-    for (let album of albums) {
-      album.artists = createdArtists.map((artist) => artist._id);
-    }
+    const albumsWithArtists = albums.map((album) => ({
+      ...album,
+      artists: createdArtists.map((artist) => ({ artistId: artist._id })),
+    }));
 
     for (let song of songs) {
       song.artists = createdArtists.map((artist) => artist._id);
     }
 
-    const createdAlbums = await Album.create(albums);
+    const createdAlbums = await Album.create(albumsWithArtists);
+    const aids = createdArtists.map((artist) => artist._id);
+    const songsWithAlbumsAndArtists = songs.map((song) => ({
+      ...song,
+      album:
+      createdAlbums[Math.floor(Math.random() * createdAlbums.length)]._id,
+    }));
 
-    for (let song of songs) {
-      song.album =
-        createdAlbums[Math.floor(Math.random() * createdAlbums.length)]._id;
+    const createdSongs = await Song.create(songsWithAlbumsAndArtists);
+
+    for (let album of createdAlbums) {
+      const albumSongs = createdSongs.filter((song) =>
+          song.album.equals(album._id)
+      );
+      album.songs = {
+        songId: albumSongs[Math.floor(Math.random() * albumSongs.length)]._id,
+      };
+      await album.save();
     }
 
-    const createdSongs = await Song.create(songs);
+    const albumsWithLikedBy = createdAlbums.map((album) => ({
+      ...album._doc,
+      //songs: songsWithAlbumsAndArtists.map((song) => ({ songId: song._id })),
+      liked_by: {
+        users: createdUsers.map((user) => user._id),
+        artists: createdArtists.map((artist) => artist._id),
+      },
+    }));
+
+    await Promise.all(
+        albumsWithLikedBy.map((album) =>
+            Album.findByIdAndUpdate(album._id, { liked_by: album.liked_by })
+        )
+    );
 
     for (let playlist of playlists) {
       playlist.songs = createdSongs.map((song) => song._id);
@@ -195,11 +252,11 @@ async function seed() {
 
     for (let history of listeningHistory) {
       history.userId =
-        createdUsers[Math.floor(Math.random() * createdUsers.length)]._id;
+          createdUsers[Math.floor(Math.random() * createdUsers.length)]._id;
       history.songId =
-        createdSongs[Math.floor(Math.random() * createdSongs.length)]._id;
+          createdSongs[Math.floor(Math.random() * createdSongs.length)]._id;
     }
-
+    console.log(listeningHistory);
     for (let album of albums) {
       album.artists = createdArtists.map((artist) => artist._id);
     }
