@@ -242,7 +242,7 @@ async function seed() {
       )
     );
 
-    //populating followes and following for artists
+    //populating followes and following for artists and user
     const aids = createdArtists.map((artist) => artist._id);
     for (let currentArtist of createdArtists) {
       const otherArtists = createdArtists.filter(
@@ -251,6 +251,21 @@ async function seed() {
       const followingArtists = otherArtists.map((artist) => artist._id);
       const followingUsers = createdUsers.map((user) => user._id);
       await Artist.findByIdAndUpdate(currentArtist._id, {
+        $set: {
+          'following.artists': followingArtists,
+          'followers.artists': followingArtists,
+          'following.users': followingUsers,
+          'followers.users': followingUsers,
+        },
+      });
+    }
+    for (let currentUser of createdUsers) {
+      const otherUsers = createdUsers.filter(
+        (user) => user._id.toString() !== currentUser._id.toString()
+      );
+      const followingArtists = createdArtists.map((artist) => artist._id);
+      const followingUsers = otherUsers.map((user) => user._id);
+      await User.findByIdAndUpdate(currentUser._id, {
         $set: {
           'following.artists': followingArtists,
           'followers.artists': followingArtists,

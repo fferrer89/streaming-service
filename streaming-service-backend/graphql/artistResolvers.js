@@ -102,9 +102,18 @@ export const artistResolvers = {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
       }
     },
+    //working fully
     getUserFollowedArtists: async (_, args, contextValue) => {
       try {
-        const userId = args.userId;
+        let userId = args.userId;
+        if (
+          !userId ||
+          typeof userId !== 'string' ||
+          userId.trim().length === 0
+        ) {
+          songHelper.badUserInputWrapper('Please provide valid id for user');
+        }
+        userId = userId.trim();
         validateMogoObjID(userId, 'userId');
         const user = await User.findById(userId).populate('followers.artists');
 
