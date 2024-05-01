@@ -95,7 +95,7 @@ export const artistResolvers = {
       try {
         //No need to do manual validations, mongoose will handle everything, you just have to define proper schema for the model in mongoose
 
-        const existingArtist = await User.findOne({ email: args.email });
+        const existingArtist = await Artist.findOne({ email: args.email });
         if (existingArtist) {
           throw new GraphQLError(`Artist already exists with this email.`);
         }
