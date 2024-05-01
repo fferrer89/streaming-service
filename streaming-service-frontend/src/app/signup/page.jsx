@@ -297,7 +297,7 @@ export default function Signup() {
               <div className="mt-16">
                 <button
                   type="submit"
-                  className="mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-green-500 hover:bg-green-400 focus:bg-green-400"
+                  className="mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-[#C6AC8E] hover:bg-[#a2825d] focus:[#a2825d]"
                 >
                   Sign up
                 </button>
@@ -306,7 +306,7 @@ export default function Signup() {
           </div>
           <div className="flex flex-col sm:flex-row justify-center items-center mt-6">
             <p className="mr-1">Already have an account?</p>
-            <Link href="/login" className="underline">
+            <Link href="/login" className="underl ine">
               Log in
             </Link>
           </div>
