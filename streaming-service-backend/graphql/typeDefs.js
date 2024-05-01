@@ -1,5 +1,5 @@
 export const typeDefs = `#graphql
-  type Query {
+type Query {
     getUserCount: Int
     getArtistCount: Int
     getAlbumCount: Int
@@ -10,15 +10,15 @@ export const typeDefs = `#graphql
     getUserById(_id: ID!): User
     getUserFollowers(userId: String!): [User]
     getUserFollowing(userId: String!): [User]
-    
+
     artists: [Artist]
     getArtistById(_id: ID!): Artist
-  #FIXME returns the first artist found by a given first_name
+    #FIXME returns the first artist found by a given first_name
     getArtistsByName(name: String!): [Artist]
-  #FIXME how to calculate this? Artists cannot be "liked" according to the DB schema
+    #FIXME how to calculate this? Artists cannot be "liked" according to the DB schema
     getMostFollowedArtists: [Artist]
     getArtistsByAlbumId(albumId: ID!): [Artist]
-  #FIXME we need artists with followers in the DB schema
+    #FIXME we need artists with followers in the DB schema
     getUserFollowedArtists(userId: ID!): [Artist]
 
     albums: [Album]
@@ -29,9 +29,9 @@ export const typeDefs = `#graphql
     getAlbumsByGenre(genre: String!): [Album]
     getNewlyReleasedAlbums: [Album]
     getMostLikedAlbums: [Album]
-  #    FIXME albums cannot be liked by users according to the DB schema
-    getUserLikedAlbums(userId: String!): [Album]
-    getAlbumsByArtist(artistId: String!): [Album]
+    #    FIXME albums cannot be liked by users according to the DB schema
+    getUserLikedAlbums(userId: ID!): [Album]
+    getAlbumsByArtist(artistId: ID!): [Album]
 
     songs: [Song]
     getSongById(_id: ID!): Song
@@ -55,126 +55,126 @@ export const typeDefs = `#graphql
     getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
     getMostLikedPlaylists: [Playlist]
     getUserLikedPlaylists(userId: String!): [Playlist]
-    
-    streamSong(trackID: ID!): Stream
-  }
 
-  type Mutation {
+    streamSong(trackID: ID!): Stream
+}
+
+type Mutation {
     loginAdmin(email: String!, password: String!): RegisterAdminResponse
 
     registerUser(
-      first_name: String!,
-      last_name: String!,
-      display_name: String!,
-      email: String!,
-      password: String!,
-      profile_image_url: String!
+        first_name: String!,
+        last_name: String!,
+        display_name: String!,
+        email: String!,
+        password: String!,
+        profile_image_url: String!
     ): RegisterUserResponse!
-    
+
     loginUser(email: String!, password: String!): RegisterUserResponse!
 
     editUser(
-      userId: ID!,
-      first_name: String,
-      last_name: String,
-      display_name: String,
-      email: String,
-      profile_image_url: String
+        userId: ID!,
+        first_name: String,
+        last_name: String,
+        display_name: String,
+        email: String,
+        profile_image_url: String
     ): User
 
     removeUser(userId: ID!): User
 
     registerArtist(
-      first_name: String!,
-      last_name: String!,
-      display_name: String!,
-      email: String!,
-      password: String!,
-      profile_image_url: String!,
-      genres: [MusicGenre!]!
+        first_name: String!,
+        last_name: String!,
+        display_name: String!,
+        email: String!,
+        password: String!,
+        profile_image_url: String!,
+        genres: [MusicGenre!]!
     ): RegisterArtistResponse
 
     loginArtist(email: String!, password: String!): RegisterArtistResponse!
 
     editArtist(
-      artistId: ID!,
-      first_name: String,
-      last_name: String,
-      display_name: String,
-      email: String,
-      password: String,
-      profile_image_url: String,
-      genres: [MusicGenre]
+        artistId: ID!,
+        first_name: String,
+        last_name: String,
+        display_name: String,
+        email: String,
+        password: String,
+        profile_image_url: String,
+        genres: [MusicGenre]
     ): Artist
 
     removeArtist(artistId: ID!): Artist
 
     addAlbum(
-      album_type: String!,
-      total_songs: Int!,
-      cover_image_url: String!,
-      title: String!,
-      description: String!,
-      release_date: Date!,
-      artists: [ID!]!,
-      songs: [ID!]!,
-      genres: [MusicGenre!]!,
-      visibility: Visibility!
+        album_type: String!,
+        total_songs: Int!,
+        cover_image_url: String!,
+        title: String!,
+        description: String!,
+        release_date: Date!,
+        artists: [ID!]!,
+        songs: [ID!]!,
+        genres: [MusicGenre!]!,
+        visibility: Visibility!
     ): Album
 
     editAlbum(
-      _id: ID!, 
-      album_type: String,
-      total_songs: Int,
-      cover_image_url: String,
-      title: String,
-      description: String,
-      release_date: Date,
-      artists: [ID!],
-      songs: [ID!],
-      genres: [String!],
-      visibility: String
+        _id: ID!,
+        album_type: String,
+        total_songs: Int,
+        cover_image_url: String,
+        title: String,
+        description: String,
+        release_date: Date,
+        artists: [ID!],
+        songs: [ID!],
+        genres: [String!],
+        visibility: String
     ): Album
 
-  #    FIXME what is the intended behavior of this operation?
+    #    FIXME what is the intended behavior of this operation?
     addSongToAlbum(_id: ID!, songId: ID!): Album
     removeSongFromAlbum(_id: ID!, songId: ID!): Album
 
     removeAlbum(_id: ID!): Album
 
     addSong(
-      title: String!,
-      duration: Int!,
-      song_url: String!,
-      cover_image_url: String!,
-      writtenBy: String!,
-      producers: [String!]!,
-      genre: String!,
-      release_date: Date!,
-      artists:[ID!]!,
-      lyrics:String,
-      album: ID,
+        title: String!,
+        duration: Int!,
+        song_url: String!,
+        cover_image_url: String!,
+        writtenBy: String!,
+        producers: [String!]!,
+        genre: String!,
+        release_date: Date!,
+        artists:[ID!]!,
+        lyrics:String,
+        album: ID,
     ): Song!
 
     editSong(
-      songId: ID!, 
-      title: String,
-      duration: Int,
-      song_url: String,
-      cover_image_url: String,
-      writtenBy: String,
-      producers: [String!],
-      genre: String,
-      release_date: Date, 
-      artists:[ID!]
+        songId: ID!,
+        title: String,
+        duration: Int,
+        song_url: String,
+        cover_image_url: String,
+        writtenBy: String,
+        producers: [String!],
+        genre: String,
+        release_date: Date,
+        artists:[ID!]
     ): Song
 
     removeSong(songId: ID!): Song
 
     createPlaylist(
-      description: String!,
-      title: String!,
-      visibility: String!
+        description: String!,
+        title: String!,
+        visibility: String!
     ): Playlist!
 
     addSongToPlaylist(playlistId: ID!, songId: ID!): Playlist
@@ -185,28 +185,28 @@ export const typeDefs = `#graphql
     toggleLikeArtist(_id: ID!, artistId: ID!): Artist
     toggleLikePlaylist(playlistId: ID!): Playlist
     toggleLikeAlbum(_id: ID!, albumId: ID!): Album
-    
-    uploadSongFile(file: Upload!): ID
-  }
 
-  type RegisterAdminResponse {
+    uploadSongFile(file: Upload!): ID
+}
+
+type RegisterAdminResponse {
     admin: Admin!
     token: String!
-  }
+}
 
-  type Admin {
+type Admin {
     _id: ID!
     first_name: String!
     last_name: String!
     email: String!
-  }
+}
 
-  type RegisterUserResponse {
+type RegisterUserResponse {
     user: User!
     token: String!
-  }
+}
 
-  type User {
+type User {
     _id: ID!
     first_name: String!
     last_name: String!
@@ -218,14 +218,14 @@ export const typeDefs = `#graphql
     gender: String
     profile_image_url: String!
     liked_songs: [LikedSong]!
-  }
+}
 
-  type LikedSong {
+type LikedSong {
     songId: ID!
     liked_date: String!
-  }
+}
 
-  type Artist {
+type Artist {
     _id: ID!
     first_name: String!
     last_name: String!
@@ -239,24 +239,24 @@ export const typeDefs = `#graphql
     followers: Followers
     profile_image_url: String!
     genres: [MusicGenre!]!
-  }
+}
 
-  type Following {
+type Following {
     users: [User]
     artists: [Artist]
-  }
+}
 
-  type Followers {
+type Followers {
     users: [User]
     artists: [Artist]
-  }
+}
 
-  type RegisterArtistResponse {
+type RegisterArtistResponse {
     artist: Artist
     token: String!
-  }
+}
 
-  type Album {
+type Album {
     _id: ID!
     album_type: String!
     total_songs: Int!
@@ -270,11 +270,16 @@ export const typeDefs = `#graphql
     songs: [Song!]!
     genres: [MusicGenre!]!
     likes: Int
+    liked_by: AlbumLikedBy!
     total_duration: Int
     visibility: Visibility!
-  }
+}
+type AlbumLikedBy {
+    users: [ID!]!
+    artists: [ID!]!
+}
 
-  type Song {
+type Song {
     _id: ID!
     album: Album
     artists: [Artist!]!
@@ -289,9 +294,9 @@ export const typeDefs = `#graphql
     genre: MusicGenre!
     lyrics: String
     release_date: Date!
-  }
+}
 
-  type Playlist {
+type Playlist {
     _id: ID!
     description: String!
     title: String!
@@ -300,14 +305,14 @@ export const typeDefs = `#graphql
     songs: [Song]
     created_date: Date!
     likes: Int!
-  }
+}
 
-  type LikedUser {
+type LikedUser {
     userId: ID!
     likedDate: Date!
-  }
+}
 
-  enum MusicGenre {
+enum MusicGenre {
     ACOUSTIC
     AFROBEAT
     ALT_ROCK
@@ -434,23 +439,23 @@ export const typeDefs = `#graphql
     TURKISH
     WORK_OUT
     WORLD_MUSIC
-  }
+}
 
-  enum Visibility {
+enum Visibility {
     PUBLIC
     PRIVATE
-  }
+}
 
-  enum AlbumType {
+enum AlbumType {
     ALBUM
     SINGLE
     COMPILATION
     APPEARS_ON
-  }
+}
 
-  scalar Date
+scalar Date
 
-  scalar Upload
+scalar Upload
 
-  scalar Stream
+scalar Stream
 `;
