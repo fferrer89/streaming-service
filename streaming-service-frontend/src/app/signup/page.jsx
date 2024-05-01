@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
-import queries from '../../utils/queries.js'
+import queries from '@/utils/queries';
 import { useForm } from 'react-hook-form';
 
 export default function Signup() {
