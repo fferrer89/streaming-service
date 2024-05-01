@@ -78,14 +78,17 @@ export default function Signup() {
 
   return (
     <>
-      <main className='flex flex-col justify-center items-center py-10 text-white'>
-        <div className='py-10 px-12 rounded-md lg:w-1/3 bg-black'>
-          <h1 className='flex text-3xl font-bold'>Sign Up <p className='ml-4 text-red-500 rotate-12'>&#9835;</p></h1>
-          <div className='flex flex-col items-center mt-6 lg:w-full'>
+      <main className='flex flex-col justify-center items-center py-10 text-black'>
+        <div className='py-10 px-10 rounded-lg w-full sm:max-w-md bg-white sm:shadow-2xl'>
+          <h1 className='text-3xl font-bold'>Sign up</h1>
+          <div className='text-xl font-bold mt-4'>Join today and dive into the world of music
+            <p className='inline ml-2 text-3xl font-bold animate-pulse text-red-500 rotate-12'>&#9835;</p>
+          </div>
+          <div className='flex flex-col items-center mt-10 lg:w-full'>
             <form className='w-full' id='register' onSubmit={handleSubmit(handleOnSubmit)}>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='firstName' className='mb-1 text-sm'>First Name</label>
-                <input type='text' name='firstName' id='firstName' placeholder='First Name' className='px-2 py-2 rounded-sm text-black'
+                <input type='text' name='firstName' id='firstName' placeholder='First Name' className='px-2 py-2 rounded-md border-2 border-black text-black'
                   {...register('firstName',
                     {
                       required: 'First name is required',
@@ -97,7 +100,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='lastName' className='mb-1 text-sm'>Last Name</label>
-                <input type='text' name='lastName' id='lastName' placeholder='Last Name' className='px-2 py-2 rounded-sm text-black'
+                <input type='text' name='lastName' id='lastName' placeholder='Last Name' className='px-2 py-2 rounded-md border-2 border-black text-black'
                   {...register('lastName',
                     {
                       required: 'Last name is required',
@@ -109,7 +112,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='displayName' className='mb-1 text-sm'>Display Name</label>
-                <input type='text' name='displayName' id='displayName' placeholder='Display Name' className='px-2 py-2 rounded-sm text-black'
+                <input type='text' name='displayName' id='displayName' placeholder='Display Name' className='px-2 py-2 rounded-md border-2 border-black text-black'
                   {...register('displayName',
                     {
                       required: 'Display name is required',
@@ -121,7 +124,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='email' className='mb-1 text-sm'>Email</label>
-                <input type='email' name='email' id='email' placeholder='Email' className='px-2 py-2 rounded-sm text-black'
+                <input type='email' name='email' id='email' placeholder='Email' className='px-2 py-2 rounded-md border-2 border-black text-black'
                   {...register('email',
                     {
                       required: 'Email is required',
@@ -133,7 +136,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='password' className='mb-1 text-sm'>Password</label>
-                <input type='password' name='password' id='password' placeholder='Password' className='px-2 py-2 rounded-sm text-black'
+                <input type='password' name='password' id='password' placeholder='Password' className='px-2 py-2 rounded-md border-2 border-black text-black'
                   {...register('password',
                     {
                       required: 'Password is required',
@@ -144,7 +147,7 @@ export default function Signup() {
               </div>
               <div className='flex flex-col mb-4'>
                 <label htmlFor='confirmPassword' className='mb-1 text-sm'>Confirm Password</label>
-                <input type='password' name='confirmPassword' id='confirmPassword' placeholder='Confirm Password' className='px-2 py-2 rounded-sm text-black'
+                <input type='password' name='confirmPassword' id='confirmPassword' placeholder='Confirm Password' className='px-2 py-2 rounded-md border-2 border-black text-black'
                   {...register('confirmPassword',
                     {
                       required: 'Confirm password is required',
@@ -154,9 +157,9 @@ export default function Signup() {
                     })} />
                 {errors?.confirmPassword && <ErrorMessage message={errors.confirmPassword.message} />}
               </div>
-              <div className='flex flex-col mb-8'>
+              <div className='flex flex-col'>
                 <label htmlFor="role" defaultValue='' className='mb-1 text-sm'>Role</label>
-                <select name="role" id="role" defaultValue='' className='px-2 py-3 rounded-sm text-black'
+                <select name="role" id="role" defaultValue='' className='px-2 py-3 rounded-md border-2 border-black text-black'
                   {...register('role',
                     {
                       required: 'Select a role'
@@ -167,12 +170,12 @@ export default function Signup() {
                 </select>
                 {errors?.role && <ErrorMessage message={errors.role.message} />}
               </div>
-              <div>
-                <button type='submit' className='mx-auto text-center px-6 py-4 rounded-full bg-green-500 w-full'>Sign Up</button>
+              <div className='mt-16'>
+                <button type='submit' className='mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-green-500 hover:bg-green-400 focus:bg-green-400'>Sign up</button>
               </div>
             </form>
           </div>
-          <div className='flex justify-center mt-6'>
+          <div className='flex flex-col sm:flex-row justify-center items-center mt-6'>
             <p className='mr-1'>Already have an account?</p>
             <Link href='/login' className='underline'>Log in</Link>
           </div>
