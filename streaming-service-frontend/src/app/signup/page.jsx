@@ -284,10 +284,10 @@ export default function Signup() {
                 </select>
                 {errors?.role && <ErrorMessage message={errors.role.message} />}
               </div>
-              <div className="mt-16">
+              <div className={errors?.role ? 'mt-10' : 'mt-16'}>
                 <button
                   type="submit"
-                  className="mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-[#C6AC8E] hover:bg-[#a2825d] focus:[#a2825d]"
+                  className="mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-[#a2825d] hover:bg-[#C6AC8E] focus:[#C6AC8E]"
                 >
                   Sign up
                 </button>

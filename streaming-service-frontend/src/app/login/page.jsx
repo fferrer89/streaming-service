@@ -106,7 +106,7 @@ export default function Login() {
                 {(role === 'artist') && artistError && <ErrorMessage message='Login Failed: Invalid email or password' />}
               </div>
               <div className={(userError || artistError || errors?.role) ? 'mt-6' : 'mt-16'}>
-                <button type='submit' className='mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-green-500 hover:bg-green-400 focus:bg-green-400'>Log in</button>
+                <button type='submit' className='mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-[#a2825d] hover:bg-[#C6AC8E] focus:[#C6AC8E]'>Log in</button>
               </div>
             </form>
           </div>
