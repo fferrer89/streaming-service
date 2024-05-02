@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 import lodash from 'lodash';
 import { typeDefs } from './graphql/typeDefs.js';
 // import {enumResolvers} from "./graphql/enumResolvers.js";
+import { adminResolvers } from './graphql/adminResolvers.js';
 import { userResolvers } from './graphql/userResolvers.js';
 import { artistResolvers } from './graphql/artistResolvers.js';
 import { albumResolvers } from './graphql/albumResolvers.js';
@@ -32,6 +33,7 @@ const attachRedisClient = (req, res, next) => {
 const server = new ApolloServer({
   typeDefs,
   resolvers: lodash.merge(
+    adminResolvers,
     userResolvers,
     artistResolvers,
     albumResolvers,
@@ -53,7 +55,8 @@ const server = new ApolloServer({
       req.body.operationName !== 'registerUser' &&
       req.body.operationName !== 'registerArtist' &&
       req.body.operationName !== 'loginUser' &&
-      req.body.operationName !== 'loginArtist'
+      req.body.operationName !== 'loginArtist' &&
+      req.body.operationName !== 'loginAdmin'
     ) {
       const token = req.headers.authorization || '';
       return { redisClient };
