@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import Admin from '../models/adminModel.js';
 import User from '../models/userModel.js';
 import Artist from '../models/artistModel.js';
 import Album from '../models/albumModel.js';
@@ -11,6 +12,13 @@ await mongoose.connect('mongodb://localhost:27017/streaming-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
+const admin = {
+  first_name: 'Han',
+  last_name: 'Solo',
+  email: 'hansolo@example.com',
+  password: 'HanSolo@1234'
+}
 
 const users = [
   {
@@ -188,6 +196,7 @@ const playlists = [
 
 async function seed() {
   try {
+    await Admin.deleteMany({});
     await User.deleteMany({});
     await Artist.deleteMany({});
     await Album.deleteMany({});
@@ -195,6 +204,7 @@ async function seed() {
     await ListeningHistory.deleteMany({});
     await Playlist.deleteMany({});
 
+    const createAdmin = await Admin.create(admin);
     const createdUsers = await User.create(users);
     const createdArtists = await Artist.create(artists);
 
