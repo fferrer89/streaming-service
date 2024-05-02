@@ -20,9 +20,45 @@ const REGISTER_ARTIST = gql`
   }
 `;
 
-let queries = {
+const LOGIN_ADMIN = gql`
+  mutation loginAdmin($email: String!, $password: String!) {
+    loginAdmin(email: $email, password: $password) {
+      admin {
+        _id
+      }
+      token
+    }
+  }
+`;
+
+const LOGIN_USER = gql`
+  mutation loginUser($email: String!, $password: String!) {
+    loginUser(email: $email, password: $password) {
+      user {
+        _id
+      }
+      token
+    }
+  }
+`;
+
+const LOGIN_ARTIST = gql`
+  mutation loginArtist($email: String!, $password: String!) {
+    loginArtist(email: $email, password: $password) {
+      artist {
+        _id
+      }
+      token
+    }
+  }
+`;
+
+const queries = {
   REGISTER_USER,
-  REGISTER_ARTIST
+  REGISTER_ARTIST,
+  LOGIN_ADMIN,
+  LOGIN_USER,
+  LOGIN_ARTIST
 };
 
 export default queries;

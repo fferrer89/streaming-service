@@ -41,7 +41,7 @@ export default function Signup() {
   });
 
   useEffect(() => {
-    document.title = "Sound 53 | Sign Up";
+    document.title = 'Sign up | Sounds 54'
   }, []);
 
   const handleOnSubmit = (data, event) => {
@@ -56,7 +56,6 @@ export default function Signup() {
           displayName: data.displayName,
           email: data.email,
           password: data.password,
-          //profileImageUrl: 'example.com'
         },
       });
     }
@@ -70,7 +69,6 @@ export default function Signup() {
           displayName: data.displayName,
           email: data.email,
           password: data.password,
-          //profileImageUrl: 'example.com',
           genres: [],
         },
       });
@@ -273,42 +271,32 @@ export default function Signup() {
                   <ErrorMessage message={errors.confirmPassword.message} />
                 )}
               </div>
-              <div className="flex flex-col">
-                <label htmlFor="role" defaultValue="" className="mb-1 text-sm">
-                  Role
-                </label>
-                <select
-                  name="role"
-                  id="role"
-                  defaultValue=""
-                  className="px-2 py-3 rounded-md border-2 border-black text-black"
-                  {...register("role", {
-                    required: "Select a role",
-                  })}
-                >
-                  <option value="" disabled>
-                    Select a role
-                  </option>
-                  <option value="user">User</option>
-                  <option value="artist">Artist</option>
+              <div className='flex flex-col'>
+                <label htmlFor='role' defaultValue='' className='mb-1 text-sm'>Role</label>
+                <select name='role' id='role' defaultValue='' className='px-2 py-3 rounded-md border-2 border-black text-black'
+                  {...register('role',
+                    {
+                      required: 'Select a role'
+                    })}>
+                  <option value='' disabled>Select a role</option>
+                  <option value='user'>User</option>
+                  <option value='artist'>Artist</option>
                 </select>
                 {errors?.role && <ErrorMessage message={errors.role.message} />}
               </div>
-              <div className="mt-16">
+              <div className={errors?.role ? 'mt-10' : 'mt-16'}>
                 <button
                   type="submit"
-                  className="mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-[#C6AC8E] hover:bg-[#a2825d] focus:[#a2825d]"
+                  className="mx-auto text-center text-xl px-6 py-4 rounded-full w-full bg-[#a2825d] hover:bg-[#C6AC8E] focus:[#C6AC8E]"
                 >
                   Sign up
                 </button>
               </div>
             </form>
           </div>
-          <div className="flex flex-col sm:flex-row justify-center items-center mt-6">
-            <p className="mr-1">Already have an account?</p>
-            <Link href="/login" className="underl ine">
-              Log in
-            </Link>
+          <div className='flex flex-col sm:flex-row justify-center items-center mt-6'>
+            <p className='mr-2'>Already have an account?</p>
+            <Link href='/login' className='underline'>Log in</Link>
           </div>
         </div>
       </main>

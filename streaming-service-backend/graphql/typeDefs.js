@@ -69,7 +69,7 @@ type Mutation {
         display_name: String!,
         email: String!,
         password: String!,
-        profile_image_url: String!
+        profile_image_url: String
     ): RegisterUserResponse!
 
     loginUser(email: String!, password: String!): RegisterUserResponse!
