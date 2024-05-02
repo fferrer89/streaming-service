@@ -1,6 +1,6 @@
 import { GraphQLError } from 'graphql';
 import { Types } from 'mongoose';
-
+import { ObjectId } from 'mongodb';
 const ObjectIdtoString = (songs) => {
   const ObjToStr = (song) => {
     song.album = song.album.toString();
@@ -265,12 +265,13 @@ const validURL = (url) => {
 
 const validObjectId = (id, field = 'input') => {
   try {
-    let objId = new Types.ObjectId(id);
-    if (objId.toString != id) badUserInputWrapper(`Invalid Id for ${field}`);
+    // let objId = new Types.ObjectId(id);
+    if (!ObjectId.isValid(id.trim()))
+      badUserInputWrapper(`Invalid Id for ${field}`);
   } catch (error) {
     return error;
   }
-  return objId;
+  return id;
 };
 
 export default {

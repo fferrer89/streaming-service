@@ -42,12 +42,12 @@ type Query {
     getSongsByWriter(searchTerm: String!): [Song]
     getSongsByProducer(searchTerm: String!): [Song]
     getSongsByGenre(genre: MusicGenre!): [Song]
-    getNewlyReleasedSongs: [Song]
-    getMostLikedSongs: [Song]
-    getTrendingSongs: [Song]
+    getNewlyReleasedSongs(limit: Int): [Song]
+    getMostLikedSongs(limit: Int): [Song]
+    getTrendingSongs(limit: Int): [Song]
     getUserLikedSongs(userId: String!): [Song]
     getRecommendedSongs(userId: ID!): [Song]
-    getMostLikedSongsOfArtist(artistId: ID!): [Song]
+    getMostLikedSongsOfArtist(artistId: ID!, limit: Int): [Song]
 
     playlists: [Playlist]
     getPlaylistById(_id: ID!): Playlist

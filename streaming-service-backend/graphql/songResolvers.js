@@ -9,7 +9,6 @@ import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
 import { GridFSBucket } from 'mongodb';
 import SongFile from '../models/songFileModel.js';
 import mongoose from 'mongoose';
-
 export const songResolvers = {
   Query: {
     songs: async (_, args, context) => {
@@ -17,18 +16,20 @@ export const songResolvers = {
       if (songs.length == 0) {
         songHelper.notFoundWrapper('Songs Not found');
       }
-      return songHelper.ObjectIdtoString(songs);
+      // no need to convert to string
+      return songs;
     },
     getSongById: async (_, args, context) => {
       let { _id: id } = args;
       try {
+        id = id.trim();
         songHelper.validObjectId(id);
         let song = await Songs.findById(id);
         if (!song) {
           throw 'Song Not found';
         }
 
-        return songHelper.ObjectIdtoString(song);
+        return song;
       } catch (error) {
         songHelper.notFoundWrapper(error);
       }
@@ -37,7 +38,11 @@ export const songResolvers = {
     getSongsByTitle: async (_, args, context) => {
       let { searchTerm: term } = args;
       term = songHelper.emptyValidation(term, 'Title');
-
+      if (term.length < 3) {
+        songHelper.badUserInputWrapper(
+          'search term should be at least 3 characters long'
+        );
+      }
       let songs = await Songs.find({
         title: { $regex: new RegExp(term, 'i') },
       });
@@ -45,39 +50,44 @@ export const songResolvers = {
         songHelper.notFoundWrapper('Song not found');
       }
 
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
 
     getSongsByAlbumID: async (_, args, context) => {
       let { albumId } = args;
       albumId = songHelper.emptyValidation(albumId, 'albumId');
-      albumId = songHelper.validObjectId(albumId);
+      albumId = songHelper.validObjectId(albumId, 'albumId');
       let songs = await Songs.find({ album: albumId });
 
       if (songs.length == 0) {
         songHelper.notFoundWrapper('Songs not found by this album id');
       }
 
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
 
     getSongsByArtistID: async (_, args, context) => {
       let { artistId } = args;
 
       artistId = songHelper.emptyValidation(artistId, 'artistId');
-      artistId = songHelper.validObjectId(artistId);
+      artistId = songHelper.validObjectId(artistId, 'artistId');
 
       let songs = await Songs.find({ artists: { $eq: artistId } });
 
       if (songs.length == 0) {
         songHelper.notFoundWrapper('Songs not found by this Artist id');
       }
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
 
     getSongsByWriter: async (_, args, context) => {
       let { searchTerm: term } = args;
       term = songHelper.emptyValidation(term, "Writer's name");
+      if (term.length < 3) {
+        songHelper.badUserInputWrapper(
+          'search term should be at least 3 characters long'
+        );
+      }
       let songs = await Songs.find({
         writtenBy: { $regex: new RegExp(term, 'i') },
       });
@@ -85,7 +95,7 @@ export const songResolvers = {
         songHelper.notFoundWrapper('Song not found');
       }
 
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
 
     getSongsByGenre: async (_, args, context) => {
@@ -96,47 +106,60 @@ export const songResolvers = {
       if (songs.length < 1) {
         songHelper.notFoundWrapper('Song not found');
       }
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
-    getMostLikedSongs: async (_, args, context) => {
+    getMostLikedSongs: async (_, { limit = 10 }, context) => {
+      if (limit < 1) {
+        songHelper.badUserInputWrapper('limit should be grater than 0');
+      }
       let songs = await Songs.aggregate([
         { $sort: { likes: -1 } },
-        { $limit: 10 },
+        { $limit: limit },
       ]);
       if (songs.length < 1) {
         return [];
       }
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
-    getNewlyReleasedSongs: async (_, args, context) => {
+    getNewlyReleasedSongs: async (_, { limit = 10 }, context) => {
+      if (limit < 1) {
+        songHelper.badUserInputWrapper('limit should be grater than 0');
+      }
       let songs = await Songs.aggregate([
         { $sort: { release_date: -1 } },
-        { $limit: 10 },
+        { $limit: limit },
       ]);
       if (songs.length < 1) {
         return [];
       }
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
-    getTrendingSongs: async (_, args, context) => {
+    getTrendingSongs: async (_, { limit = 10 }, context) => {
       //Not complete;
+      if (limit < 1) {
+        songHelper.badUserInputWrapper('limit should be grater than 0');
+      }
       const yesterdayDate = new Date();
       yesterdayDate.setDate(yesterdayDate.getDate() - 1); //last 24 hours
 
       const group = { $group: { _id: '$songId', countSong: { $sum: 1 } } };
       const match = { $match: { timestamp: { $gte: yesterdayDate } } };
       const sort = { $sort: { $countSong: 1 } };
-      const limit = { $limit: 10 };
+      const limitkey = { $limit: limit };
       const sortByCount = { $sortByCount: '$songId' };
 
-      let songsIds = await ListenHistory.aggregate([match, sortByCount, limit]);
+      let songsIds = await ListenHistory.aggregate([
+        match,
+        sortByCount,
+        limitkey,
+      ]);
       //YET TO BE TESTED;
     },
 
     getUserLikedSongs: async (_, args, context) => {
       let { userId } = args;
-      songHelper.emptyValidation(userId, 'user id');
-
+      userId = songHelper.emptyValidation(userId, 'user id');
+      songHelper.validObjectId(userId, 'userId');
       let likedSongsId = await User.findById({
         _id: new Types.ObjectId(userId),
       }).select('liked_songs');
@@ -150,19 +173,23 @@ export const songResolvers = {
       });
 
       let songs = await Songs.find({ _id: { $in: likedSongsId } });
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
 
     getMostLikedSongsOfArtist: async (_, args, context) => {
-      let { artistId } = args;
+      let { artistId, limit } = args;
+      if (limit < 1) {
+        songHelper.badUserInputWrapper('limit should be grater than 0');
+      }
       artistId = songHelper.emptyValidation(artistId, 'artistId');
+      songHelper.validObjectId(artistId, 'artistId');
       let songs = await Songs.aggregate([
         { $match: { artists: { $eq: new Types.ObjectId(artistId) } } },
         { $sort: { likes: -1 } },
-        { $limit: 10 },
+        { $limit: limit || 10 },
       ]);
 
-      return songHelper.ObjectIdtoString(songs);
+      return songs;
     },
     streamSong: async (_, { songID }, { db }) => {
       // this does not work, we are using express to steram song file
@@ -215,14 +242,15 @@ export const songResolvers = {
       };
 
       //converting ObjectId to string;
-      return artists.map((artist) => {
-        artist._id = artist._id.toString();
-        artist.following.users = converToString(artist.following.users);
-        artist.following.artists = converToString(artist.following.artists);
-        artist.followers.users = converToString(artist.followers.users);
-        artist.followers.artists = converToString(artist.followers.artists);
-        return artist;
-      });
+      return artists;
+      // .map((artist) => {
+      //   artist._id = artist._id.toString();
+      //   artist.following.users = converToString(artist.following.users);
+      //   artist.following.artists = converToString(artist.following.artists);
+      //   artist.followers.users = converToString(artist.followers.users);
+      //   artist.followers.artists = converToString(artist.followers.artists);
+      //   return artist;
+      // });
     },
   },
   Upload: GraphQLUpload,
