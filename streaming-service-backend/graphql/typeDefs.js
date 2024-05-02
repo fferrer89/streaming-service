@@ -16,7 +16,7 @@ type Query {
     #FIXME returns the first artist found by a given first_name
     getArtistsByName(name: String!): [Artist]
     #FIXME how to calculate this? Artists cannot be "liked" according to the DB schema
-    getMostFollowedArtists(top: Int!): [Artist]
+    getMostFollowedArtists(top: Int): [Artist]
     getArtistsByAlbumId(albumId: ID!): [Artist]
     #FIXME we need artists with followers in the DB schema
     getUserFollowedArtists(userId: ID!): [Artist]
@@ -28,9 +28,10 @@ type Query {
     getAlbumsByReleasedYear(year: Int!): [Album]
     getAlbumsByGenre(genre: String!): [Album]
     getNewlyReleasedAlbums: [Album]
-    getMostLikedAlbums: [Album]
+    getMostLikedAlbums(limit: Int): [Album]
     #    FIXME albums cannot be liked by users according to the DB schema
     getUserLikedAlbums(userId: ID!): [Album]
+    getArtistLikedAlbums(artistId: ID!): [Album]
     getAlbumsByArtist(artistId: ID!): [Album]
 
     songs: [Song]
@@ -110,14 +111,13 @@ type Mutation {
     removeArtist(artistId: ID!): Artist
 
     addAlbum(
-        album_type: String!,
-        total_songs: Int!,
-        cover_image_url: String!,
+        album_type: AlbumType!,
+        cover_image_url: ID,
         title: String!,
         description: String!,
         release_date: Date!,
-        artists: [ID!]!,
-        songs: [ID!]!,
+        artists: [ID!],
+        songs: [ID!],
         genres: [MusicGenre!]!,
         visibility: Visibility!
     ): Album
@@ -125,13 +125,10 @@ type Mutation {
     editAlbum(
         _id: ID!,
         album_type: String,
-        total_songs: Int,
-        cover_image_url: String,
+        cover_image_url: ID,
         title: String,
         description: String,
         release_date: Date,
-        artists: [ID!],
-        songs: [ID!],
         genres: [String!],
         visibility: String
     ): Album
@@ -139,6 +136,8 @@ type Mutation {
     #    FIXME what is the intended behavior of this operation?
     addSongToAlbum(_id: ID!, songId: ID!): Album
     removeSongFromAlbum(_id: ID!, songId: ID!): Album
+    addArtistToAlbum(_id: ID!, artistId: ID!): Album
+    removeArtistFromAlbum(_id: ID!, artistId: ID!): Album
 
     removeAlbum(_id: ID!): Album
 
@@ -260,7 +259,7 @@ type Album {
     _id: ID!
     album_type: String!
     total_songs: Int!
-    cover_image_url: String!
+    cover_image_url: String
     title: String!
     description: String!
     release_date: Date!
