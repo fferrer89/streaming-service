@@ -135,9 +135,7 @@ export const artistResolvers = {
       try {
         let top = args.top;
         if (!top || top < 1) {
-          songHelper.badUserInputWrapper(
-            'Please provide valid input for top, shoulb be greater than 0'
-          );
+          top = 10;
         }
         const artists = await Artist.find().populate('followers');
 
