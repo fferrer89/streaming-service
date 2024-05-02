@@ -13,7 +13,7 @@ export default function Login() {
   const [loginAdmin] = useMutation(queries.LOGIN_ADMIN, {
     onCompleted: (data) => {
       const { token } = data.loginAdmin;
-      document.cookie = `token=${token}; SameSite=Strict; Strict path=/`
+      document.cookie = `token=${token}; SameSite=Strict; Strict path=/`;
       setAdminError(false);
       document.getElementById('login').reset();
       router.push('/admin/dashboard');

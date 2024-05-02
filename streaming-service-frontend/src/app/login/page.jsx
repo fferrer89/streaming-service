@@ -16,7 +16,7 @@ export default function Login() {
   const [loginUser] = useMutation(queries.LOGIN_USER, {
     onCompleted: (data) => {
       const { token } = data.loginUser;
-      document.cookie = `token=${token}; SameSite=Strict; Strict path=/`
+      document.cookie = `token=${token}; SameSite=Strict; Strict path=/`;
       setUserError(false);
       document.getElementById('login').reset();
       router.push('/user/dashboard');
