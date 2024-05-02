@@ -8,6 +8,7 @@ import songHelper from '../utils/songsHelpers.js';
 
 export const artistResolvers = {
   Artist: {
+    //working fully
     followers: async (parent) => {
       try {
         const artist = await Artist.findById(parent._id).populate(
@@ -18,6 +19,7 @@ export const artistResolvers = {
         throw new Error('Failed to fetch followers');
       }
     },
+    //working fully
     following: async (parent) => {
       try {
         const artist = await Artist.findById(parent._id).populate(
@@ -30,6 +32,7 @@ export const artistResolvers = {
     },
   },
   Query: {
+    //working fully
     artists: async () => {
       try {
         const allArtists = await Artist.find({});
@@ -38,6 +41,7 @@ export const artistResolvers = {
         throw new GraphQLError(`Failed to fetch artists: ${error.message}`);
       }
     },
+    //working fully
     getArtistById: async (_, args, contextValue) => {
       try {
         validateMogoObjID(args._id, '_id');
@@ -47,31 +51,69 @@ export const artistResolvers = {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
       }
     },
+    //working fully - used for search
     getArtistsByName: async (_, args, contextValue) => {
       try {
-        const artists = await Artist.find({ first_name: args.name });
+        if (
+          !args.name ||
+          typeof args.name !== 'string' ||
+          args.name.trim().length < 3
+        ) {
+          songHelper.badUserInputWrapper(
+            'Please provide at least 3 characters for name input'
+          );
+        }
+        const artists = await Artist.find({
+          $or: [
+            { display_name: { $regex: new RegExp(args.name, 'i') } },
+            { first_name: { $regex: new RegExp(args.name, 'i') } },
+            { last_name: { $regex: new RegExp(args.name, 'i') } },
+          ],
+        });
         return artists;
       } catch (error) {
-        throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
+        throw new GraphQLError(`Failed to fetch artist: ${error.message}`, {
+          extensions: {
+            code: error.extensions.code,
+          },
+        });
       }
     },
+    //working fully
     getArtistsByAlbumId: async (_, args, contextValue) => {
       try {
-        validateMogoObjID(args.albumId, 'albumId');
-        const album = await Album.findById(args.albumId);
-        if (!album) {
-          throw Error(`Failed to fetch album with id (${args.albumId})`);
+        if (
+          !args.albumId ||
+          typeof args.albumId !== 'string' ||
+          args.albumId.trim().length === 0
+        ) {
+          songHelper.badUserInputWrapper('Please provide valid id for album');
         }
-        const artistIds = album.artists;
+
+        validateMogoObjID(args.albumId.trim(), 'albumId');
+        const album = await Album.findById(args.albumId.trim()).lean();
+        if (!album) {
+          throw Error(`Failed to fetch album with id (${args.albumId.trim()})`);
+        }
+        const artistIds = album.artists.map((artist) => artist.artistId);
         const artists = await Artist.find({ _id: { $in: artistIds } });
         return artists;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
       }
     },
+    //working fully
     getUserFollowedArtists: async (_, args, contextValue) => {
       try {
-        const userId = args.userId;
+        let userId = args.userId;
+        if (
+          !userId ||
+          typeof userId !== 'string' ||
+          userId.trim().length === 0
+        ) {
+          songHelper.badUserInputWrapper('Please provide valid id for user');
+        }
+        userId = userId.trim();
         validateMogoObjID(userId, 'userId');
         const user = await User.findById(userId).populate('followers.artists');
 
@@ -88,23 +130,26 @@ export const artistResolvers = {
         );
       }
     },
+    //working fully - returns top N most followed artists based on input N
     getMostFollowedArtists: async (_, args, contextValue) => {
       try {
+        let top = args.top;
+        if (!top || top < 1) {
+          top = 10;
+        }
         const artists = await Artist.find().populate('followers');
 
-        let mostFollowedArtist = null;
-        let maxFollowers = 0;
-        artists.forEach((artist) => {
-          const followersCount =
-            artist.followers.artists.length + artist.followers.users.length;
-
-          if (followersCount > maxFollowers) {
-            mostFollowedArtist = artist;
-            maxFollowers = followersCount;
-          }
+        artists.sort((a, b) => {
+          const followersCountA =
+            a.followers.artists.length + a.followers.users.length;
+          const followersCountB =
+            b.followers.artists.length + b.followers.users.length;
+          return followersCountB - followersCountA;
         });
 
-        return mostFollowedArtist;
+        const topNMostFollowedArtists = artists.slice(0, top);
+
+        return topNMostFollowedArtists;
       } catch (err) {
         throw new GraphQLError(
           `Failed to get followed artists: ${err.message}`
@@ -113,6 +158,7 @@ export const artistResolvers = {
     },
   },
   Mutation: {
+    //working fully
     registerArtist: async (_, args) => {
       try {
         //No need to do manual validations, mongoose will handle everything, you just have to define proper schema for the model in mongoose
