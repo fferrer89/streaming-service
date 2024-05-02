@@ -4,7 +4,7 @@ import Personal from '../Personal';
 
 const Sidebar: React.FC = () => {
     return (
-        <div className="grid gap-[0.2rem] items-start max-w-[400px] h-screen p-2">
+        <div className="flex flex-col gap-2 max-w-lg h-screen p-2 justify-start items-start min-w-lg">
             <SideNav />
             <Personal/>
         </div>
