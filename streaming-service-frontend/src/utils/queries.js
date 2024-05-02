@@ -53,12 +53,47 @@ const LOGIN_ARTIST = gql`
   }
 `;
 
+const GET_USER_COUNT = gql`
+  query getUserCount {
+    getUserCount
+  }
+`;
+
+const GET_ARTIST_COUNT = gql`
+  query getArtistCount {
+    getArtistCount
+  }
+`;
+
+const GET_ALBUM_COUNT = gql`
+  query getAlbumCount {
+    getAlbumCount
+  }
+`;
+
+const GET_SONG_COUNT = gql`
+  query getSongCount {
+    getSongCount
+  }
+`;
+
+const GET_PLAYLIST_COUNT = gql`
+  query getPlaylistCount {
+    getPlaylistCount
+  }
+`;
+
 const queries = {
   REGISTER_USER,
   REGISTER_ARTIST,
   LOGIN_ADMIN,
   LOGIN_USER,
-  LOGIN_ARTIST
+  LOGIN_ARTIST,
+  GET_USER_COUNT,
+  GET_ARTIST_COUNT,
+  GET_ALBUM_COUNT,
+  GET_SONG_COUNT,
+  GET_PLAYLIST_COUNT
 };
 
 export default queries;
