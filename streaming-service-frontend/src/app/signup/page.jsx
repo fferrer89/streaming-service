@@ -56,7 +56,6 @@ export default function Signup() {
           displayName: data.displayName,
           email: data.email,
           password: data.password,
-          //profileImageUrl: 'example.com'
         },
       });
     }
@@ -70,7 +69,6 @@ export default function Signup() {
           displayName: data.displayName,
           email: data.email,
           password: data.password,
-          //profileImageUrl: 'example.com',
           genres: [],
         },
       });
