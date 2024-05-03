@@ -1,16 +1,49 @@
 'use client'
 import React, { useEffect } from 'react';
 import queries from '@/utils/queries';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import AdminSidebar from '@/components/admin-sidebar/AdminSidebar.jsx';
 import { FaUserAlt } from 'react-icons/fa';
+import { gql } from "@apollo/client";
 
 export default function UserList() {
   const { data, loading, error } = useQuery(queries.GET_USERS);
+  const [removeUser] = useMutation(queries.REMOVE_USER, {
+    update(cache, { data: { removeUser } }) {
+      cache.modify({
+        fields: {
+          users(existingUsers = []) {
+            const newUsers = existingUsers.filter(userRef => {
+              const user = cache.readFragment({
+                _id: userRef._ref,
+                fragment: gql`
+                  fragment RemoveUser on User {
+                    _id
+                    type
+                  }
+                `
+              });
+              return user._id !== removeUser._id;
+            });
+            return newUsers;
+          }
+        }
+      });
+    },
+    refetchQueries: [{ query: queries.GET_USERS }]
+  });
 
   useEffect(() => {
     document.title = 'Dashboard | Sounds 54';
   }, []);
+
+  const handleUserDelete = (userId) => {
+    removeUser({
+      variables: {
+        userId: userId
+      }
+    });
+  };
 
   if (loading) {
     return <div>Loading</div>
@@ -30,7 +63,7 @@ export default function UserList() {
                 <span className='text-sm mb-2 text-[#C6AC8E]'>{`${user.first_name} ${user.last_name}`}</span>
                 <span className='text-sm mb-2 text-[#C6AC8E]'>{user.email}</span>
                 <span className='text-sm text-[#C6AC8E]'>{user.gender}</span>
-                <button className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                <button onClick={() => handleUserDelete(user._id)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
               </div>
             ))}
           </div>
