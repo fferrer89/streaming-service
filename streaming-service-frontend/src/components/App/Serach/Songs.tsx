@@ -1,8 +1,9 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator"
+import SongItem from './units/song';
 
 interface SongProps {
-  name: string;
+  title: string;
   link: string;
 }
 
@@ -26,8 +27,10 @@ const Songs: React.FC<SongsProps> = ({ songs }) => {
       <div className='w-full h-full px-3'>
         {songs.length > 0 ? (
           songs.map((song, index) => (
-            <div key={index}>
-              <a href={song.link}>{song.name}</a>
+            <div className="overflow-x-auto ">
+                <div className="flex flex-nowrap justify-start px-4">
+                <SongItem song={song} key={index} />
+                </div>
             </div>
           ))
         ) : (

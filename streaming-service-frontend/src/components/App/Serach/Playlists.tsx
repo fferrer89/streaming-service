@@ -1,19 +1,22 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator"
+import PlaylistItem from './units/playlists';
 
-interface PlaylistProps {
-  name: string;
-  link: string;
+
+interface Playlist {
+    name: string;
+    link: string;
 }
-
+  
 interface PlaylistsProps {
-  playlists: PlaylistProps[];
+playlistsData: { playlists: Playlist[] };
 }
+  
 
-const Playlists: React.FC<PlaylistsProps> = ({ playlists }) => {
+const Playlists: React.FC<PlaylistsProps> = ({ playlistsData }) => {
   return (
     <div
-      className="flex flex-col w-full h-48 gap-3 p-0 bg-white rounded-lg overflow-hidden items-center relative"
+      className="flex flex-col w-full h-fit gap-3 p-0 bg-white rounded-lg overflow-hidden items-center relative"
       style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
     >
       <div className="inline-flex  flex-auto items-center relative w-full px-5 pt-3 ">
@@ -23,12 +26,14 @@ const Playlists: React.FC<PlaylistsProps> = ({ playlists }) => {
       </div>
       
       <Separator className="w-[95%]" />
-      <div className='w-full h-full px-3'>
-        {playlists.length > 0 ? (
-          playlists.map((playlist, index) => (
-            <div key={index}>
-              <a href={playlist.link}>{playlist.name}</a>
-            </div>
+      <div className='w-full h-full py-5 px-3 overflow-x-auto flex flex-row'>
+        {playlistsData.playlists.length > 0 ? (
+          playlistsData.playlists.map((playlist, index) => (
+          
+        
+                <PlaylistItem playlist={playlist} key={index} />
+            
+
           ))
         ) : (
           <div>Playlist not found</div>

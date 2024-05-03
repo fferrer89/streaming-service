@@ -5,7 +5,7 @@ import Songs from './Songs';
 const Personal: React.FC = () => {
   return (
     <div
-      className="flex-col h-auto max-h-full gap-5 px-4 pb-4 w-full rounded-lg overflow-hidden flex items-center relative self-stretch"
+      className="flex-col h-full max-h-full gap-5 px-4 pb-4 w-full rounded-lg overflow-hidden flex items-center relative self-stretch"
       style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
     >
       <div className="h-16 justify-between p-2 w-full flex items-center relative self-stretch">

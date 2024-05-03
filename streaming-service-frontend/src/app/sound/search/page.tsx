@@ -3,6 +3,10 @@ import React, { useState, useEffect } from "react";
 import Artists from "@/components/App/Serach/Artists";
 import Playlists from "@/components/App/Serach/Playlists";
 import Songs from "@/components/App/Serach/Songs";
+
+
+
+
 type ResultType = {
     artists: { name: string; link: string }[];
     playlists: { name: string; link: string }[];
@@ -56,9 +60,12 @@ type ResultType = {
           /> 
         </div>
       </div>
-      <Artists artists={results.artists} />
-      <Playlists playlists={results.playlists} />
-      <Songs songs={results.songs} />
+      <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
+        <Artists artists={results.artists} />
+        <Playlists playlistsData={{playlists: results.playlists}} />
+        <Songs songs={results.songs} />
+      </div>
+      
     </div>
   );
 };
