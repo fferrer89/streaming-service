@@ -83,6 +83,27 @@ const LOGIN_ARTIST = gql`
   }
 `;
 
+const GET_USERS = gql`
+  query users {
+    users {
+      _id
+      created_date
+      date_of_birth
+      display_name
+      email
+      first_name
+      gender
+      last_name
+      liked_songs {
+        liked_date
+        songId
+      }
+      password_changed_date
+      profile_image_url
+    }
+  }
+`;
+
 const GET_ARTISTS = gql`
   query query {
     artists {
@@ -243,12 +264,13 @@ const queries = {
   LOGIN_ADMIN,
   LOGIN_USER,
   LOGIN_ARTIST,
+  GET_ADMIN,
+  GET_USERS,
   GET_ARTISTS,
   GET_ALBUMS,
   GET_SONGS,
   GET_PLAYLISTS_BY_OWNER,
   GET_COUNT,
-  GET_ADMIN,
   REMOVE_USER,
   REMOVE_ARTIST,
   REMOVE_ALBUM,
