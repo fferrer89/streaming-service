@@ -40,7 +40,7 @@ export default function Login() {
   });
 
   useEffect(() => {
-    document.title = 'Login | Sounds 54'
+    document.title = 'Login | Sounds 54';
   }, []);
 
   const handleOnSubmit = (data, event) => {

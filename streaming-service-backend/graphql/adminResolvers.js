@@ -9,6 +9,14 @@ import Playlist from '../models/playlistModel.js';
 
 export const adminResolvers = {
   Query: {
+    admin: async () => {
+      try {
+        const admin = Admin.find();
+        return admin;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch admin: ${error.message}`);
+      }
+    },
     getUserCount: async () => {
       try {
         const users = await User.find();
