@@ -175,33 +175,65 @@ const GET_PLAYLISTS_BY_OWNER = gql`
     }
   }
 `
-const GET_USER_COUNT = gql`
-  query getUserCount {
+
+const GET_COUNT = gql`
+  query getCount {
     getUserCount
-  }
-`;
-
-const GET_ARTIST_COUNT = gql`
-  query getArtistCount {
     getArtistCount
-  }
-`;
-
-const GET_ALBUM_COUNT = gql`
-  query getAlbumCount {
     getAlbumCount
-  }
-`;
-
-const GET_SONG_COUNT = gql`
-  query getSongCount {
     getSongCount
+    getPlaylistCount
   }
 `;
 
-const GET_PLAYLIST_COUNT = gql`
-  query getPlaylistCount {
-    getPlaylistCount
+const GET_ADMIN = gql`
+  query admin {
+    admin {
+      _id
+      first_name
+      last_name
+      email
+    }
+  }
+`;
+
+const REMOVE_USER = gql`
+  mutation removeUser($userId: ID!) {
+    removeUser(userId: $userId) {
+      _id
+    }
+  }
+`;
+
+const REMOVE_ARTIST = gql`
+  mutation removeArtist($artistId: ID!) {
+    removeArtist(artistId: $artistId) {
+      _id
+    }
+  }
+`;
+
+const REMOVE_ALBUM = gql`
+  mutation removeAlbum($id: ID!) {
+    removeAlbum(_id: $id) {
+      _id
+    }
+  }
+`;
+
+const REMOVE_SONG = gql`
+  mutation removeSong($songId: ID!) {
+    removeSong(songId: $songId) {
+      _id
+    }
+  }
+`;
+
+const REMOVE_PLAYLIST = gql`
+  mutation removePlaylist($playlistId: ID!) {
+    removePlaylist(playlistId: $playlistId) {
+      _id
+    }
   }
 `;
 
@@ -215,11 +247,13 @@ const queries = {
   GET_ALBUMS,
   GET_SONGS,
   GET_PLAYLISTS_BY_OWNER,
-  GET_USER_COUNT,
-  GET_ARTIST_COUNT,
-  GET_ALBUM_COUNT,
-  GET_SONG_COUNT,
-  GET_PLAYLIST_COUNT
+  GET_COUNT,
+  GET_ADMIN,
+  REMOVE_USER,
+  REMOVE_ARTIST,
+  REMOVE_ALBUM,
+  REMOVE_SONG,
+  REMOVE_PLAYLIST
 };
 
 export default queries;
