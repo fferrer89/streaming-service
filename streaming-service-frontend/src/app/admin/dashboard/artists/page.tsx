@@ -1,21 +1,39 @@
 'use client'
 import React, { useEffect } from 'react';
+import AdminSidebar from '@/components/admin-sidebar/AdminSidebar';
 import queries from '@/utils/queries';
-import { useMutation, useQuery } from '@apollo/client';
-import AdminSidebar from '@/components/admin-sidebar/AdminSidebar.jsx';
-import { FaUser } from "react-icons/fa6";
 import { gql } from "@apollo/client";
+import { useMutation, useQuery } from '@apollo/client';
+import { FaUser } from "react-icons/fa6";
 
-export default function ArtistList() {
+interface ArtistRef {
+  _ref: string;
+}
+
+interface Artist {
+  _id: string;
+  type: string
+}
+
+interface Artists {
+  _id: string;
+  display_name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  gender: string;
+}
+
+const ArtistList: React.FC = () => {
   const { data, loading, error } = useQuery(queries.GET_ARTISTS);
   const [removeArtist] = useMutation(queries.REMOVE_ARTIST, {
     update(cache, { data: { removeArtist } }) {
       cache.modify({
         fields: {
           users(existingArtists = []) {
-            const newArtists = existingArtists.filter(artistRef => {
-              const artist = cache.readFragment({
-                _id: artistRef._ref,
+            const newArtists = existingArtists.filter((artistRef: ArtistRef) => {
+              const artist = cache.readFragment<Artist>({
+                id: artistRef._ref,
                 fragment: gql`
                   fragment RemoveArtist on Artist {
                     _id
@@ -23,7 +41,7 @@ export default function ArtistList() {
                   }
                 `
               });
-              return artist._id !== removeArtist._id;
+              return artist && artist._id !== removeArtist._id;
             });
             return newArtists;
           }
@@ -37,7 +55,7 @@ export default function ArtistList() {
     document.title = 'Dashboard | Sounds 54';
   }, []);
 
-  const handleArtistDelete = (artistId) => {
+  const handleArtistDelete = (artistId: string) => {
     removeArtist({
       variables: {
         artistId: artistId
@@ -56,7 +74,7 @@ export default function ArtistList() {
         <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
           <h1 className='text-4xl text-[#22333B]'>Artists</h1>
           <div className='flex flex-col md:flex-wrap md:flex-row gap-2 w-full'>
-            {data.artists.map((artist) => (
+            {data.artists.map((artist: Artists) => (
               <div key={artist._id} className="flex flex-col sm:w-60 items-center px-5 py-10 rounded-md bg-[#22333B]">
                 <FaUser className="w-24 h-24 mb-4 rounded-full" />
                 <h5 className="mb-2 text-xl font-medium text-[#C6AC8E]">{artist.display_name}</h5>
@@ -72,3 +90,5 @@ export default function ArtistList() {
     </>
   );
 }
+
+export default ArtistList;

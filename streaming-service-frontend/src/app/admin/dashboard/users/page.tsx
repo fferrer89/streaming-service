@@ -1,21 +1,39 @@
 'use client'
 import React, { useEffect } from 'react';
+import AdminSidebar from '@/components/admin-sidebar/AdminSidebar';
 import queries from '@/utils/queries';
-import { useMutation, useQuery } from '@apollo/client';
-import AdminSidebar from '@/components/admin-sidebar/AdminSidebar.jsx';
-import { FaUserAlt } from 'react-icons/fa';
 import { gql } from "@apollo/client";
+import { useMutation, useQuery } from '@apollo/client';
+import { FaUserAlt } from 'react-icons/fa';
 
-export default function UserList() {
+interface UserRef {
+  _ref: string;
+}
+
+interface User {
+  _id: string;
+  type: string;
+}
+
+interface Users {
+  _id: string;
+  display_name: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  gender: string;
+}
+
+const UserList: React.FC = () => {
   const { data, loading, error } = useQuery(queries.GET_USERS);
   const [removeUser] = useMutation(queries.REMOVE_USER, {
     update(cache, { data: { removeUser } }) {
       cache.modify({
         fields: {
           users(existingUsers = []) {
-            const newUsers = existingUsers.filter(userRef => {
-              const user = cache.readFragment({
-                _id: userRef._ref,
+            const newUsers = existingUsers.filter((userRef: UserRef) => {
+              const user = cache.readFragment<User>({
+                id: userRef._ref,
                 fragment: gql`
                   fragment RemoveUser on User {
                     _id
@@ -23,7 +41,7 @@ export default function UserList() {
                   }
                 `
               });
-              return user._id !== removeUser._id;
+              return user && user._id !== removeUser._id;
             });
             return newUsers;
           }
@@ -37,7 +55,7 @@ export default function UserList() {
     document.title = 'Dashboard | Sounds 54';
   }, []);
 
-  const handleUserDelete = (userId) => {
+  const handleUserDelete = (userId: string) => {
     removeUser({
       variables: {
         userId: userId
@@ -56,7 +74,7 @@ export default function UserList() {
         <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
           <h1 className='text-4xl text-[#22333B]'>Users</h1>
           <div className='flex flex-col md:flex-wrap md:flex-row gap-2 w-full'>
-            {data.users.map((user) => (
+            {data.users.map((user: Users) => (
               <div key={user._id} className='flex flex-col sm:w-60 items-center px-5 py-10 rounded-md bg-[#22333B]'>
                 <FaUserAlt className='w-24 h-24 mb-4 rounded-full' />
                 <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{user.display_name}</h5>
@@ -72,3 +90,5 @@ export default function UserList() {
     </>
   );
 }
+
+export default UserList;
