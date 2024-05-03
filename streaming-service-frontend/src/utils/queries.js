@@ -173,6 +173,7 @@ const GET_PLAYLISTS_BY_OWNER = gql`
       title
       visibility
     }
+`
 const GET_USER_COUNT = gql`
   query getUserCount {
     getUserCount
