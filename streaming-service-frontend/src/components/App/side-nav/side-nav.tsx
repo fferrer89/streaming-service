@@ -1,7 +1,7 @@
 'use client'
 import React from 'react';
 
-import MusicPlayer from "@/components/music-player/music-player";
+
 import Link from "next/link";
 import styles from "./page.module.css";
 import Image from "next/image";
@@ -21,7 +21,7 @@ const SideNav: React.FC = () => {
                         alt='Profile image'
                     />
                 </Link>
-                <MusicPlayer/>
+       
             </header>
             <nav>
                 <ul>

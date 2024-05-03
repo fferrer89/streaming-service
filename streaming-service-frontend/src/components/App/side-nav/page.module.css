@@ -1,22 +1,23 @@
 .sideNav {
-    padding: 7px;
-    background-color: rgba(18, 18, 18, 0.9);
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
+    width: 100%;
+    border-radius: 8px ;
 }
 .sideNav header{
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    max-width: 400px;
-    min-width: 300px;
+    justify-items: center;
+    width: 100%;
 }
 .sideNav nav li {
-    padding: 7px 3px 7px;
+    margin: 10px 0;
+    padding: 15px 7px 15px;
 }
-.sideNav nav li:hover {
-    background-color: rgb(71 85 105);;
-}
+
 .sideNav img {
     display: inline-block;
     margin-right: 25px;
