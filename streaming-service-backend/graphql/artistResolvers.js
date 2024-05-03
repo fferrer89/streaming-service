@@ -1,6 +1,5 @@
 import Artist from '../models/artistModel.js';
 import { GraphQLError } from 'graphql';
-import jwt from 'jsonwebtoken';
 import Album from '../models/albumModel.js';
 import User from '../models/userModel.js';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
@@ -14,6 +13,7 @@ export const artistResolvers = {
         const artist = await Artist.findById(parent._id).populate(
           'followers.users followers.artists'
         );
+
         return artist.followers;
       } catch (error) {
         throw new Error('Failed to fetch followers');
@@ -25,6 +25,7 @@ export const artistResolvers = {
         const artist = await Artist.findById(parent._id).populate(
           'following.users following.artists'
         );
+
         return artist.following;
       } catch (error) {
         throw new Error('Failed to fetch following');
@@ -33,19 +34,44 @@ export const artistResolvers = {
   },
   Query: {
     //working fully
-    artists: async () => {
+    artists: async (_, args, context) => {
       try {
+        const cachedArtists = await context.redisClient.json.get('artists');
+        if (cachedArtists) {
+          return cachedArtists;
+        }
+
         const allArtists = await Artist.find({});
-        return allArtists;
+        if (allArtists && allArtists.length !== 0) {
+          await context.redisClient.json.set('artists', '$', allArtists);
+          await context.redisClient.EXPIRE('artists', 1800);
+
+          return allArtists;
+        } else {
+          return [];
+        }
       } catch (error) {
         throw new GraphQLError(`Failed to fetch artists: ${error.message}`);
       }
     },
     //working fully
-    getArtistById: async (_, args, contextValue) => {
+    getArtistById: async (_, args, context) => {
       try {
         validateMogoObjID(args._id, '_id');
+
+        const cachedArtist = await context.redisClient.json.get(`artist:${args._id}`);
+        if (cachedArtist) {
+          return cachedArtist;
+        }
+
         const artist = await Artist.findById(args._id);
+        if (!artist) {
+          songHelper.notFoundWrapper('Artist not found');
+        }
+
+        await context.redisClient.json.set(`artist:${args._id}`, '$', artist);
+        await context.redisClient.EXPIRE(`artist:${args._id}`, 1800);
+
         return artist;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`);
@@ -68,7 +94,7 @@ export const artistResolvers = {
             { display_name: { $regex: new RegExp(args.name, 'i') } },
             { first_name: { $regex: new RegExp(args.name, 'i') } },
             { last_name: { $regex: new RegExp(args.name, 'i') } },
-          ],
+          ]
         });
         return artists;
       } catch (error) {
@@ -92,9 +118,11 @@ export const artistResolvers = {
 
         validateMogoObjID(args.albumId.trim(), 'albumId');
         const album = await Album.findById(args.albumId.trim()).lean();
+
         if (!album) {
           throw Error(`Failed to fetch album with id (${args.albumId.trim()})`);
         }
+
         const artistIds = album.artists.map((artist) => artist.artistId);
         const artists = await Artist.find({ _id: { $in: artistIds } });
         return artists;
@@ -181,12 +209,14 @@ export const artistResolvers = {
         if (validationErrors) {
           songHelper.badUserInputWrapper(validationErrors);
         }
+
         const savedArtist = await newArtist.save();
         const token = generateToken(
           savedArtist._id,
           'ARTIST',
           savedArtist.first_name
         );
+
         return { artist: savedArtist, token };
       } catch (error) {
         throw new GraphQLError(`Error Registering Artist: ${error.message}`, {
@@ -203,13 +233,16 @@ export const artistResolvers = {
         if (!artist) {
           songHelper.unAuthorizedWrapper('Invalid email or password.');
         }
+
         const isPasswordCorrect = await artist.isPasswordCorrect(
           args.password,
           artist.password
         );
+
         if (!isPasswordCorrect) {
           songHelper.unAuthorizedWrapper('Invalid email or password.');
         }
+
         const token = generateToken(artist._id, 'artist', artist.first_name);
         return { artist, token };
       } catch (error) {
@@ -221,6 +254,7 @@ export const artistResolvers = {
         const { artistId, ...updateData } = args;
         validateMogoObjID(artistId, 'artistId');
         let artist = await Artist.findById(artistId);
+
         if (
           !context &&
           !context.decoded &&
@@ -229,6 +263,7 @@ export const artistResolvers = {
         ) {
           songHelper.unAuthorizedWrapper();
         }
+
         if (!artist) {
           songHelper.notFoundWrapper('Artist not found');
         }
@@ -251,5 +286,22 @@ export const artistResolvers = {
         throw err;
       }
     },
+    removeArtist: async (_, args, context) => {
+      try {
+        validateMogoObjID(args.artistId.trim(), 'artist id');
+        const deletedArtist = await Artist.findByIdAndDelete(args.artistId.trim());
+
+        await context.redisClient.del(`artist:${args.artistId}`);
+        await context.redisClient.del('artists');
+
+        if (!deletedArtist) {
+          songHelper.notFoundWrapper('Artist not found');
+        }
+
+        return deletedArtist;
+      } catch (error) {
+        throw new GraphQLError(`Error deleting artist: ${error.message}`)
+      }
+    }
   },
 };

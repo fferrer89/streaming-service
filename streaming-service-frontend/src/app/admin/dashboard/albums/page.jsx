@@ -4,10 +4,34 @@ import queries from '@/utils/queries';
 import { useMutation, useQuery } from '@apollo/client';
 import AdminSidebar from '@/components/admin-sidebar/AdminSidebar.jsx';
 import { BsSoundwave } from 'react-icons/bs';
+import { gql } from "@apollo/client";
 
-export default function UserList() {
+export default function AlbumList() {
   const { data, loading, error } = useQuery(queries.GET_ALBUMS);
-  const [removeAlbum] = useMutation(queries.REMOVE_ALBUM);
+  const [removeAlbum] = useMutation(queries.REMOVE_ALBUM, {
+    update(cache, { data: { removeAlbum } }) {
+      cache.modify({
+        fields: {
+          albums(existingAlbums = []) {
+            const newAlbums = existingAlbums.filter(albumRef => {
+              const album = cache.readFragment({
+                _id: albumRef._ref,
+                fragment: gql`
+                  fragment RemoveAlbum on Album {
+                    _id
+                    type
+                  }
+                `
+              });
+              return album._id !== removeAlbum._id;
+            });
+            return newAlbums;
+          }
+        }
+      });
+    },
+    refetchQueries: [{ query: queries.GET_ALBUMS }]
+  });
 
   const date = (date) => {
     date = date.split('T')[0];

@@ -1,6 +1,4 @@
 import User from '../models/userModel.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
@@ -13,10 +11,12 @@ export const userResolvers = {
         if (cachedUsers) {
           return cachedUsers;
         }
+
         const allUsers = await User.find();
         if (allUsers && allUsers.length !== 0) {
           await context.redisClient.json.set('users', '$', allUsers);
           await context.redisClient.EXPIRE('users', 1800);
+
           return allUsers;
         } else {
           return [];
@@ -28,18 +28,20 @@ export const userResolvers = {
     getUserById: async (_, args, context) => {
       try {
         validateMogoObjID(args._id, '_id');
-        const cachedUser = await context.redisClient.json.get(
-          `user:${args._id}`
-        );
+
+        const cachedUser = await context.redisClient.json.get(`user:${args._id}`);
         if (cachedUser) {
           return cachedUser;
         }
+
         const user = await User.findById(args._id);
         if (!user) {
-          songHelper.notFoundWrapper('Uer not found');
+          songHelper.notFoundWrapper('User not found');
         }
+
         await context.redisClient.json.set(`user:${args._id}`, '$', user);
         await context.redisClient.EXPIRE(`user:${args._id}`, 1800);
+
         return user;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch user: ${error.message}`);
@@ -83,7 +85,6 @@ export const userResolvers = {
         });
       }
     },
-
     loginUser: async (_, args) => {
       try {
         const user = await User.findOne({ email: args.email }).select(
@@ -97,6 +98,7 @@ export const userResolvers = {
           args.password,
           user.password
         );
+
         if (!isPasswordCorrect) {
           throw new GraphQLError('Invalid email or password.');
         }
@@ -108,5 +110,22 @@ export const userResolvers = {
         throw error;
       }
     },
+    removeUser: async (_, args, context) => {
+      try {
+        validateMogoObjID(args.userId.trim(), 'user id');
+        const deletedUser = await User.findByIdAndDelete(args.userId.trim());
+
+        await context.redisClient.del(`user:${args.userId}`);
+        await context.redisClient.del('users');
+
+        if (!deletedUser) {
+          songHelper.notFoundWrapper('User not found');
+        }
+
+        return deletedUser;
+      } catch (error) {
+        throw new GraphQLError(`Error deleting user: ${error.message}`)
+      }
+    }
   },
 };

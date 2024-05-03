@@ -25,7 +25,7 @@ export default function SongList() {
           <div className='flex flex-col md:flex-wrap md:flex-row gap-2 w-full'>
             {data.songs.map((song) => (
               <div key={song._id} className='flex flex-col sm:w-60 items-center px-5 py-10 rounded-md bg-[#22333B]'>
-                <FaUserAlt className='w-24 h-24 mb-4 rounded-full' />
+                <PiMusicNotesFill className='w-24 h-24 mb-4 rounded-full' />
                 <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{song.title}</h5>
                 <span className='text-sm mb-2 text-[#C6AC8E]'>{song.genre}</span>
                 <span className='text-sm mb-2 text-[#C6AC8E]'>{song.writtenBy}</span>
