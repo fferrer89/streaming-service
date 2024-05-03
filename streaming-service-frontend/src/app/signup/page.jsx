@@ -41,7 +41,7 @@ export default function Signup() {
   });
 
   useEffect(() => {
-    document.title = 'Sign up | Sounds 54'
+    document.title = 'Sign up | Sounds 54';
   }, []);
 
   const handleOnSubmit = (data, event) => {
@@ -56,7 +56,7 @@ export default function Signup() {
           displayName: data.displayName,
           email: data.email,
           password: data.password,
-        },
+        }
       });
     }
 
@@ -70,7 +70,7 @@ export default function Signup() {
           email: data.email,
           password: data.password,
           genres: [],
-        },
+        }
       });
     }
   };
@@ -233,7 +233,7 @@ export default function Signup() {
                     maxLength: {
                       value: 25,
                       message: "Must be less than 25 characters long",
-                    },
+                    }
                   })}
                 />
                 {errors?.password && (
@@ -264,7 +264,7 @@ export default function Signup() {
                       return (
                         getValues().password === value || "Passwords must match"
                       );
-                    },
+                    }
                   })}
                 />
                 {errors?.confirmPassword && (
