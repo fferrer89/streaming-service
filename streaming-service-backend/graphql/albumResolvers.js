@@ -5,6 +5,8 @@ import Song from '../models/songModel.js';
 import Artist from '../models/artistModel.js';
 import songsHelpers from '../utils/songsHelpers.js';
 import { validateMogoObjID } from '../utils/helpers.js';
+import songHelper from '../utils/songsHelpers.js';
+
 export const albumResolvers = {
   Album: {
     artists: async (parent, _, context) => {
@@ -18,22 +20,45 @@ export const albumResolvers = {
       const ids = songIds.map((song) => song.songId);
       const songs = await Song.find({ _id: { $in: ids } });
       return songs;
-    },
+    }
   },
-
   Query: {
-    albums: async () => {
+    albums: async (_, args, context) => {
       try {
+        const cachedAlbums = await context.redisClient.json.get('albums');
+        if (cachedAlbums) {
+          return cachedAlbums;
+        }
+
         const allAlbums = await Album.find();
-        return allAlbums;
+        if (allAlbums && allAlbums.length !== 0) {
+          await context.redisClient.json.set('albums', '$', allAlbums);
+          await context.redisClient.EXPIRE('albums', 1800);
+
+          return allAlbums;
+        } else {
+          return [];
+        }
       } catch (error) {
         throw new GraphQLError(`Failed to fetch albums: ${error.message}`);
       }
     },
-    getAlbumById: async (_, { _id }, contextValue) => {
+    getAlbumById: async (_, { _id }, context) => {
       try {
         validateMogoObjID(_id.trim(), 'album id');
+        const cachedAlbum = await context.redisClient.json.get(`album:${_id}`);
+        if (cachedAlbum) {
+          return cachedAlbum;
+        }
+
         const album = await Album.findById(_id.trim());
+        if (!album) {
+          songHelper.notFoundWrapper('Album not found');
+        }
+
+        await context.redisClient.json.set(`album:${_id}`, '$', album);
+        await context.redisClient.EXPIRE(`album:${_id}`, 1800);
+
         return album;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch album: ${error.message}`);
@@ -313,10 +338,12 @@ export const albumResolvers = {
       }
     },
 
-    removeAlbum: async (_, { _id }, contextValue) => {
+    removeAlbum: async (_, { _id }, context) => {
       try {
         validateMogoObjID(_id.trim(), 'album id');
         const deletedAlbum = await Album.findByIdAndDelete(_id.trim());
+        await context.redisClient.del(`album:${_id}`);
+        await context.redisClient.del('albums');
         if (!deletedAlbum) {
           throw new Error('Album not found');
         }

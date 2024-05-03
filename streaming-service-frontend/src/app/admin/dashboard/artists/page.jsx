@@ -1,16 +1,49 @@
 'use client'
 import React, { useEffect } from 'react';
 import queries from '@/utils/queries';
-import { useQuery } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import AdminSidebar from '@/components/admin-sidebar/AdminSidebar.jsx';
 import { FaUser } from "react-icons/fa6";
+import { gql } from "@apollo/client";
 
 export default function ArtistList() {
   const { data, loading, error } = useQuery(queries.GET_ARTISTS);
+  const [removeArtist] = useMutation(queries.REMOVE_ARTIST, {
+    update(cache, { data: { removeArtist } }) {
+      cache.modify({
+        fields: {
+          users(existingArtists = []) {
+            const newArtists = existingArtists.filter(artistRef => {
+              const artist = cache.readFragment({
+                _id: artistRef._ref,
+                fragment: gql`
+                  fragment RemoveArtist on Artist {
+                    _id
+                    type
+                  }
+                `
+              });
+              return artist._id !== removeArtist._id;
+            });
+            return newArtists;
+          }
+        }
+      });
+    },
+    refetchQueries: [{ query: queries.GET_ARTISTS }]
+  });
 
   useEffect(() => {
     document.title = 'Dashboard | Sounds 54';
   }, []);
+
+  const handleArtistDelete = (artistId) => {
+    removeArtist({
+      variables: {
+        artistId: artistId
+      }
+    });
+  };
 
   if (loading) {
     return <div>Loading</div>
@@ -30,9 +63,7 @@ export default function ArtistList() {
                 <span className="text-sm mb-2 text-[#C6AC8E]">{`${artist.first_name} ${artist.last_name}`}</span>
                 <span className="text-sm mb-2 text-[#C6AC8E]">{artist.email}</span>
                 <span className="text-sm text-[#C6AC8E]">{artist.gender}</span>
-                <div className="flex mt-4 md:mt-6">
-                  <a href="#" className="inline-flex items-center px-4 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800">Delete</a>
-                </div>
+                <button onClick={() => handleArtistDelete(artist._id)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
               </div>
             ))}
           </div>
