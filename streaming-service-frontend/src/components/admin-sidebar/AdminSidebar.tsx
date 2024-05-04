@@ -7,7 +7,7 @@ import { BsSoundwave } from "react-icons/bs";
 import { PiMusicNotesFill } from "react-icons/pi";
 import { usePathname } from 'next/navigation';
 
-export default function AdminSideBar() {
+const AdminSideBar: React.FC = () => {
   const pathname = usePathname();
 
   return (
@@ -17,25 +17,21 @@ export default function AdminSideBar() {
         <span className='text-2xl mt-2 text-[#C6AC8E]'>Sounds 54</span>
       </div>
       <div className='flex flex-col flex-1 gap-1 py-8 text-[#C6AC8E]'>
-        <Link href='/admin/dashboard' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard' ? 'text-[#d7c5b0] bg-[#38474F]': ''}`}>
+        <Link href='/admin/dashboard' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard' ? 'text-[#d7c5b0] bg-[#38474F]' : ''}`}>
           <HiOutlineViewGrid fontSize={24} />
           <span className='text-lg'>Dashboard</span>
         </Link>
-        <Link href='/admin/dashboard/users' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard/users' ? 'text-[#d7c5b0] bg-[#38474F]': ''}`}>
+        <Link href='/admin/dashboard/users' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard/users' ? 'text-[#d7c5b0] bg-[#38474F]' : ''}`}>
           <HiUsers fontSize={24} />
           <span className='text-lg'>Users</span>
         </Link>
-        <Link href='/admin/dashboard/artists' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard/artists' ? 'text-[#d7c5b0] bg-[#38474F]': ''}`}>
+        <Link href='/admin/dashboard/artists' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard/artists' ? 'text-[#d7c5b0] bg-[#38474F]' : ''}`}>
           <HiUserGroup fontSize={24} />
           <span className='text-lg'>Artists</span>
         </Link>
-        <Link href='/admin/dashboard/albums' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard/albums' ? 'text-[#d7c5b0] bg-[#38474F]': ''}`}>
+        <Link href='/admin/dashboard/albums' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard/albums' ? 'text-[#d7c5b0] bg-[#38474F]' : ''}`}>
           <BsSoundwave fontSize={24} />
           <span className='text-lg'>Albums</span>
-        </Link>
-        <Link href='/admin/dashboard/songs' className={`flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] ${pathname === '/admin/dashboard/songs' ? 'text-[#d7c5b0] bg-[#38474F]': ''}`}>
-          <PiMusicNotesFill fontSize={24} />
-          <span className='text-lg'>Songs</span>
         </Link>
       </div>
       <div className='border-t-2 border-zinc-600'>
@@ -47,3 +43,5 @@ export default function AdminSideBar() {
     </div>
   );
 }
+
+export default AdminSideBar;
