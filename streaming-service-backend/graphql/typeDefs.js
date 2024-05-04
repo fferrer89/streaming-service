@@ -284,7 +284,7 @@ type Song {
     _id: ID!
     album: Album
     artists: [Artist!]!
-    duration: Int!
+    duration: Int
     title: String!
     likes: Int
     song_url: ID!
