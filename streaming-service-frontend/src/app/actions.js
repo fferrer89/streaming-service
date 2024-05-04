@@ -4,7 +4,6 @@ import queries from "../utils/queries";
 import { getClient } from "../utils";
 import {redirect} from 'next/navigation';
 import {revalidatePath} from 'next/cache';
-import {useQuery} from "@apollo/client";
 export async function createAlbum(prevState, formData) {
     let title, release_date, album_type, description, genres, visibility, artistId, artists;
     let errors = [];
@@ -80,5 +79,54 @@ export async function createAlbum(prevState, formData) {
         redirect internally throws an error, so it should be called outside of try/catch blocks.
          */
         redirect(`/artists/${artistId}`); // Navigate to new route
+    }
+}
+export async function deleteAlbum(prevState, formData) {
+    let albumId, artistId;
+    let errors = [];
+    albumId = formData.get('albumId');
+    artistId = formData.get('artistId');
+    try {
+        albumId = validation.checkId(albumId, 'albumId');
+        artistId = validation.checkId(artistId, 'artistId');
+    } catch (e) {
+        errors.push(e);
+    }
+    if (errors.length > 0) {
+        return {errorMessages: errors};
+    } else {
+        try {
+            const client = getClient();
+            const {data}  = await client.mutate({
+                mutation: queries.REMOVE_ALBUM,
+                variables: {id:albumId },
+                // FIXME: REMOVING ALBUM DOES NOT REMOVE IT FROM THE UI
+                update: (cache, {data: {removeAlbum}}) => {
+                    console.log(cache.identify(removeAlbum));
+                    cache.evict({id: cache.identify(removeAlbum)});
+                    cache.gc();
+                }
+            });
+
+        } catch (e) {
+            errors.push(e.message);
+            return {errorMessages: errors};
+        }
+
+        /*
+        @link: https://nextjs.org/docs/app/api-reference/functions/revalidatePath
+        Adds the newly added user to the '/users' STATIC page
+        */
+        // revalidatePath(`/artists/${artistId}`);
+        revalidatePath('/artists/[id]', 'page'); // revalidatePath('/')
+        /*
+        redirect returns a 307 (Temporary Redirect) status code by default. When used in a Server Action, it
+        returns a 303 (See Other), which is commonly used for redirecting to a success page as a result of a
+        POST request.
+
+        redirect internally throws an error, so it should be called outside of try/catch blocks.
+         */
+        redirect(`/artists/${artistId}`); // Navigate to new route
+        return {album: albumId};
     }
 }
