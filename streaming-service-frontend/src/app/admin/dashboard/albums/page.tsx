@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect } from 'react';
-import AdminSidebar from '@/components/admin-sidebar/AdminSidebar';
+import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
 import { gql } from "@apollo/client";
 import { useMutation, useQuery } from '@apollo/client';
@@ -70,20 +70,20 @@ const AlbumList: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading</div>
+    return <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>Loading</div>
   }
 
   if (data) {
     return (
       <>
-        <main className='flex flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
+        <main className='flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
           <AdminSidebar></AdminSidebar>
           <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
             <h1 className='text-4xl text-[#22333B]'>Albums</h1>
-            <div className='flex flex-col md:flex-wrap md:flex-row gap-2 w-full'>
+            <div className='flex flex-col md:flex-wrap md:flex-row gap-6 w-full'>
               {data.albums.map((album: Albums) => (
-                <div key={album._id} className='flex flex-col sm:w-60 items-center px-5 py-10 rounded-md bg-[#22333B]'>
-                  <BsSoundwave className='w-24 h-24 mb-4 rounded-full' />
+                <div key={album._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
+                  <BsSoundwave className='w-16 h-16 mb-4 rounded-full' />
                   <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{album.title}</h5>
                   <span className='text-sm mb-2 text-[#C6AC8E]'>{album.album_type}</span>
                   <span className='text-sm mb-2 text-[#C6AC8E]'>Songs: {album.total_songs}</span>
