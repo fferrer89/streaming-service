@@ -1,6 +1,5 @@
 'use client'
 import React, { ReactNode, useEffect } from 'react';
-import AdminSidebar from '@/components/admin-sidebar/AdminSidebar';
 import queries from '@/utils/queries';
 import { useQuery } from '@apollo/client';
 import { HiUsers, HiUserGroup } from "react-icons/hi";
@@ -54,7 +53,6 @@ const AdminDashboard: React.FC = () => {
   return (
     <>
       <main className='flex flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
-        <AdminSidebar></AdminSidebar>
         <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
           <h1 className='text-4xl text-[#22333B]'>
             Welcome {`${adminData.admin[0].first_name} ${adminData.admin[0].last_name}`}&#33;
