@@ -37,7 +37,7 @@ const SideNav: React.FC = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link href={'/search'}>
+                        <Link href={'sound/search'}>
                             <Image
                                 src='/icons/search-white.png'
                                 width={30}
