@@ -64,7 +64,14 @@ const UserList: React.FC = () => {
   };
 
   if (loading) {
-    return <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>Loading</div>
+    return (
+      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
+        <span className='mr-2'>Loading</span>
+        <span className='animate-bounce'>.</span>
+        <span className='animate-bounce delay-75'>.</span>
+        <span className='animate-bounce delay-200'>.</span>
+      </div>
+    );
   }
 
   if (data) {
