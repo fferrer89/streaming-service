@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../utils/redux/store";
 import { playSong, pauseSong, stopSong } from "../../../utils/redux/features/song/songSlice";
+import { motion } from "framer-motion";
 import Heart from "../../Svg/Heart";
 import Shuffle from "../../Svg/Shuffle";
 import Previous from "../../Svg/Previous";
@@ -35,9 +36,18 @@ const SPlayer: React.FC = () => {
   if (!currentSong) {
     return null;
   }
+  const footerVariants = {
+    hidden: { y: "100%" },
+    visible: { y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+  };
 
   return (
-    <footer className="fixed opacity-75 bottom-0 left-0 w-full bg-stone-900 shadow-lg col-span-6 p-3 grid grid-cols-3 gap-4">
+    <motion.footer 
+      className="fixed opacity-75 bottom-0 left-0 w-full bg-stone-900 shadow-lg col-span-6 p-3 grid grid-cols-3 gap-4"
+      initial="hidden"
+      animate="visible"
+      variants={footerVariants}
+    >
       <div className="flex items-center">
         <img
           className="h-10 w-10 mr-4 flex-shrink-0"
@@ -97,7 +107,7 @@ const SPlayer: React.FC = () => {
           </span>
         </div>
       </div>
-    </footer>
+    </motion.footer>
   );
 };
 
