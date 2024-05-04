@@ -1,8 +1,8 @@
 'use client'
-import React, { useEffect } from 'react';
+import React, { ReactNode, useEffect } from 'react';
+import AdminSidebar from '@/components/admin-sidebar/AdminSidebar';
 import queries from '@/utils/queries';
 import { useQuery } from '@apollo/client';
-import AdminSidebar from '@/components/admin-sidebar/AdminSidebar.jsx';
 import { HiUsers, HiUserGroup } from "react-icons/hi";
 import { BsSoundwave } from "react-icons/bs";
 import { PiMusicNotesFill } from "react-icons/pi";
@@ -11,7 +11,7 @@ import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Legend, Too
 
 let countData = [];
 
-export default function AdminDashboard() {
+const AdminDashboard: React.FC = () => {
   const { data: adminData, loading: adminLoading, error: adminError } = useQuery(queries.GET_ADMIN);
   const { data, loading, error } = useQuery(queries.GET_COUNT);
 
@@ -125,6 +125,12 @@ export default function AdminDashboard() {
   );
 }
 
-function CountWrapper({ children }) {
+interface CountWrapperProps {
+  children: ReactNode;
+}
+
+const CountWrapper: React.FC<CountWrapperProps> = ({ children }) => {
   return <div className='flex flex-1 min-w-48 items-center py-4 px-4 rounded-sm bg-[#22333B]'>{children}</div>
 }
+
+export default AdminDashboard;
