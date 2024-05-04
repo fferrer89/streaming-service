@@ -119,7 +119,7 @@ type Mutation {
         description: String!,
         release_date: Date!,
         artists: [ID!],
-        songs: [ID!],
+        songs: [ID],
         genres: [MusicGenre!]!,
         visibility: Visibility!
     ): Album
