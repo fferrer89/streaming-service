@@ -36,7 +36,7 @@ const songSchema = new mongoose.Schema({
   },
   duration: {
     type: Number,
-    required: [true, 'Please provide duration in seconds'],
+    required: false,
     validate: {
       validator: (dur) => {
         return /^\d+$/.test(dur);
@@ -50,10 +50,10 @@ const songSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide song title'],
     trim: true,
-    validate: [
-      validator.isAlphanumeric,
-      'Please enter a valid title, title can only contain letters',
-    ],
+    // validate: [
+    //   validator.isAlphanumeric,
+    //   'Please enter a valid title, title can only contain letters',
+    // ],
 
     minLength: [2, 'Title must be at least 2 characters long'],
     maxLength: [30, 'title must be less than 30 characters long'],
@@ -64,65 +64,47 @@ const songSchema = new mongoose.Schema({
     min: [0, 'Likes cant be negative'],
   },
   song_url: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: [true, 'Please provide song URL'],
     trim: true,
-    minLength: [11, 'URL must be 11 characters long'],
-    validate: {
-      validator: (url) => {
-        return /^(?:https?|ftp):\/\/[\w\-]+(?:\.[\w\-]+)+(?:[\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/.test(
-          url
-        );
-      },
-      message: () => `Not a valid url!`,
-    },
   },
   cover_image_url: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: [true, 'Please provide song URL'],
     trim: true,
-    minLength: [11, 'URL must be 11 characters long'],
-    validate: {
-      validator: (url) => {
-        return /^(?:https?|ftp):\/\/[\w\-]+(?:\.[\w\-]+)+(?:[\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/.test(
-          url
-        );
-      },
-      message: () => `Not a valid url!`,
-    },
   },
   writtenBy: {
     type: String,
     required: [true, 'Please provide writer name'],
     trim: true,
-    validate: [
-      validator.isAlpha,
-      "Please enter a valid Writer's name, can only contain letters",
-    ],
+    // validate: [
+    //   validator.isAlphanumeric,
+    //   "Please enter a valid Writer's name, can only contain letters",
+    // ],
     minLength: [2, "Writer's name must be at least 2 characters long"],
     maxLength: [30, "Writer's name must be less than 30 characters long"],
   },
   producers: {
     type: [String],
     required: [true, 'Please provide producer names'],
-    validate: {
-      validator: (prods) => {
-        // Check if array is not empty
-        if (prods.length === 0) return false;
+    // validate: {
+    //   validator: (prods) => {
+    //     // Check if array is not empty
+    //     if (prods.length === 0) return false;
 
-        for (const prod of prods) {
-          // Check if string is not empty or just spaces
-          if (!prod.trim()) return false;
+    //     for (const prod of prods) {
+    //       // Check if string is not empty or just spaces
+    //       if (!prod.trim()) return false;
 
-          // Check if string contains only letters
-          if (!/^[a-zA-Z\s]+$/.test(prod)) return false;
-        }
+    //       // Check if string contains only letters
+    //       if (!/^[a-zA-Z\s]+$/.test(prod)) return false;
+    //     }
 
-        return true;
-      },
-      message: () =>
-        `Invalid array of strings. Please make sure it's not empty, doesn't contain only spaces, and contains only letters.`,
-    },
+    //     return true;
+    //   },
+    //   message: () =>
+    //     `Invalid array of strings. Please make sure it's not empty, doesn't contain only spaces, and contains only letters.`,
+    // },
   },
   language: {
     type: String,

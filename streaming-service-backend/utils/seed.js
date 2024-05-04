@@ -7,18 +7,54 @@ import Album from '../models/albumModel.js';
 import Song from '../models/songModel.js';
 import ListeningHistory from '../models/listeningHistoryModel.js';
 import Playlist from '../models/playlistModel.js';
+import mongo from 'mongodb';
+import Grid from 'gridfs-stream';
+import fs from 'fs';
+import { Readable } from 'stream';
+import { MusicGenres } from './helpers.js';
 
 await mongoose.connect('mongodb://localhost:27017/streaming-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
+const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+const uploadSong = async (filePath, albumTitle, songTitle) => {
+  try {
+    filePath = `${filePath}/${songTitle}.mp3`.replaceAll(' ', '_');
+    const readableStream = fs.createReadStream(filePath);
+
+    const uploadStream = bucket.openUploadStream(songTitle);
+
+    readableStream.pipe(uploadStream);
+
+    uploadStream.on('error', (error) => {
+      console.error('Error uploading track:', error);
+      throw error;
+    });
+
+    return new Promise((resolve, reject) => {
+      uploadStream.on('finish', () => {
+        console.log('File uploaded successfully with ID:', uploadStream.id);
+        resolve(uploadStream.id);
+      });
+
+      uploadStream.on('error', (error) => {
+        console.error('Error uploading track:', error);
+        reject(error);
+      });
+    });
+  } catch (error) {
+    console.error('Error uploading track:', error);
+    throw error;
+  }
+};
 const admin = {
   first_name: 'Han',
   last_name: 'Solo',
   email: 'hansolo@example.com',
-  password: 'HanSolo@1234'
-}
+  password: 'HanSolo@1234',
+};
 
 const users = [
   {
@@ -68,6 +104,204 @@ const artists = [
   },
 ];
 
+const SmithMr = {
+  first_name: 'Smith',
+  last_name: 'Mr',
+  display_name: 'Mr Smith',
+  email: 'smith@example.com',
+  password: 'Password4123#',
+  date_of_birth: '01/01/1940',
+  gender: 'MALE',
+  genres: ['COUNTRY'],
+};
+
+const BillHobson = {
+  first_name: 'Bill',
+  last_name: 'Hobson',
+  display_name: 'Bill Hobson',
+  email: 'bill@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/1980',
+  gender: 'MALE',
+  genres: ['ROCK'],
+};
+
+const JohnDoe = {
+  first_name: 'John',
+  last_name: 'Doe',
+  display_name: 'POPSTAR',
+  email: 'john@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/1990',
+  gender: 'MALE',
+  genres: ['POP'],
+};
+
+const AldousIchnite = {
+  first_name: 'Aldous',
+  last_name: 'Ichnite',
+  display_name: 'Aldous Ichnite',
+  email: 'aldous@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/1999',
+  gender: 'MALE',
+  genres: ['ELECTRONIC'],
+};
+
+const DanaSchechter = {
+  first_name: 'Dana',
+  last_name: 'Schechter',
+  display_name: 'Dana Schechter',
+  email: 'dana@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/1999',
+  gender: 'FEMALE',
+  genres: ['INDIE_POP'],
+};
+
+const MiamiSlice = {
+  first_name: 'Miami',
+  last_name: 'Slice',
+  display_name: 'Miami Slice',
+  email: 'miami@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/2001',
+  gender: 'FEMALE',
+  genres: ['DISCO', 'HOUSE', 'DANCE'],
+};
+
+const TripleHere = {
+  first_name: 'Triple',
+  last_name: 'Here',
+  display_name: 'Triple5 Here',
+  email: 'triple@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/2001',
+  gender: 'MALE',
+  genres: ['SYNTH_POP', 'TRIP_HOP'],
+};
+
+const KetsaMia = {
+  first_name: 'Ketsa',
+  last_name: 'Mia',
+  display_name: 'Ketsa Mia',
+  email: 'ketsa@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/1980',
+  gender: 'FEMALE',
+  genres: ['SYNTH_POP', 'HIP_HOP'],
+};
+
+const AudioKofee = {
+  first_name: 'Audio',
+  last_name: 'Kofee',
+  display_name: 'Audio Kofee',
+  email: 'audio@example.com',
+  password: 'Password123#',
+  date_of_birth: '01/01/1990',
+  gender: 'MALE',
+  genres: ['ELECTRONIC', 'SYNTH_POP'],
+};
+
+const johnAlbum = {
+  album_type: 'SINGLE',
+  title: 'Girlseeker',
+  description: 'A single track',
+  release_date: new Date('2012-05-01'),
+  artists: [],
+  songs: [],
+  genres: ['POP'],
+  visibility: 'PUBLIC',
+};
+
+const smithAlbum = {
+  album_type: 'ALBUM',
+  title: 'A New Roar',
+  description: 'Album',
+  release_date: new Date('2042-03-02'),
+  artists: [],
+  songs: [],
+  genres: ['COUNTRY'],
+  visibility: 'PUBLIC',
+};
+
+const billAlbum = {
+  album_type: 'ALBUM',
+  title: 'Killdozer',
+  description: 'Album',
+  release_date: new Date('2012-05-01'),
+  artists: [],
+  songs: [],
+  genres: ['ROCK'],
+  visibility: 'PUBLIC',
+};
+
+const aldousAlbum = {
+  album_type: 'ALBUM',
+  title: 'Fear of Getting Out',
+  description: 'Album desc',
+  release_date: new Date('2024-04-29'),
+  artists: [],
+  songs: [],
+  genres: ['ELECTRONIC'],
+  visibility: 'PUBLIC',
+};
+
+const miamiAlbum = {
+  album_type: 'ALBUM',
+  title: 'Brooklyn To Brooklyn',
+  description: 'Album desc',
+  release_date: new Date('2014-11-19'),
+  artists: [],
+  songs: [],
+  genres: ['DISCO', 'HOUSE', 'DANCE'],
+  visibility: 'PUBLIC',
+};
+
+const danaAlbum = {
+  album_type: 'ALBUM',
+  title: 'Bee And Flower',
+  description: 'Album desc',
+  release_date: new Date('2012-11-19'),
+  artists: [],
+  songs: [],
+  genres: ['INDIE_POP'],
+  visibility: 'PUBLIC',
+};
+
+const tripleAlbum = {
+  album_type: 'ALBUM',
+  title: 'Mellow Fellow',
+  description: 'Album desc',
+  release_date: new Date('2024-04-19'),
+  artists: [],
+  songs: [],
+  genres: ['SYNTH_POP', 'TRIP_HOP'],
+  visibility: 'PUBLIC',
+};
+
+const ketsaAlbum = {
+  album_type: 'ALBUM',
+  title: 'Fresh Starts',
+  description: 'Album desc',
+  release_date: new Date('2023-12-19'),
+  artists: [],
+  songs: [],
+  genres: ['SYNTH_POP', 'HIP_HOP'],
+  visibility: 'PUBLIC',
+};
+
+const audioAlbum = {
+  album_type: 'ALBUM',
+  title: 'Sad Mood',
+  description: 'Album desc',
+  release_date: new Date('2022-11-19'),
+  artists: [],
+  songs: [],
+  genres: ['ELECTRONIC', 'SYNTH_POP'],
+  visibility: 'PUBLIC',
+};
+
 const albums = [
   {
     album_type: 'ALBUM',
@@ -106,8 +340,8 @@ const songs = [
     duration: 180,
     title: 'Song',
     likes: 20,
-    song_url: 'https://example.com/song1.mp3',
-    cover_image_url: 'https://example.com/song1.jpg',
+    song_url: new mongoose.Types.ObjectId(),
+    cover_image_url: new mongoose.Types.ObjectId(),
     writtenBy: 'Songwriter',
     producers: ['Producer', 'Producer'],
     language: 'English',
@@ -121,8 +355,8 @@ const songs = [
     duration: 240,
     title: 'Songg',
     likes: 30,
-    song_url: 'https://example.com/song2.mp3',
-    cover_image_url: 'https://example.com/song2.jpg',
+    song_url: new mongoose.Types.ObjectId(),
+    cover_image_url: new mongoose.Types.ObjectId(),
     writtenBy: 'Songwriter',
     producers: ['Producer'],
     language: 'English',
@@ -136,8 +370,8 @@ const songs = [
     duration: 180,
     title: 'dare',
     likes: 20,
-    song_url: 'https://example.com/song1.mp3',
-    cover_image_url: 'https://example.com/song1.jpg',
+    song_url: new mongoose.Types.ObjectId(),
+    cover_image_url: new mongoose.Types.ObjectId(),
     writtenBy: 'Songwriter',
     producers: ['Producer', 'Producer'],
     language: 'English',
@@ -151,14 +385,361 @@ const songs = [
     duration: 240,
     title: 'white',
     likes: 30,
-    song_url: 'https://example.com/song2.mp3',
-    cover_image_url: 'https://example.com/song2.jpg',
+    song_url: new mongoose.Types.ObjectId(),
+    cover_image_url: new mongoose.Types.ObjectId(),
     writtenBy: 'Songwriter',
     producers: ['Producer'],
     language: 'English',
     genre: 'ROCK',
     lyrics: 'Lyrics for song 2',
     release_date: new Date('2021-01-01'),
+  },
+];
+
+const smithSongs = [
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Dead Zone',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith', 'Michael Johnson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Peaceful',
+    writtenBy: 'Alice Johnson',
+    producers: ['David Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-02-15'),
+  },
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Going Home',
+    writtenBy: 'Bob White',
+    producers: ['Mary Johnson', 'Tom Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-03-20'),
+  },
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Slingshot',
+    writtenBy: 'Sarah Davis',
+    producers: ['Jack Thompson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-04-10'),
+  },
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Hard Time',
+    writtenBy: 'Emily Brown',
+    producers: ['Harry Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-05-05'),
+  },
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Two Step Daisy Duke',
+    writtenBy: 'Olivia Taylor',
+    producers: ['Daniel Wilson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-06-20'),
+  },
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Hayley',
+    writtenBy: 'Lucas Adams',
+    producers: ['Sophia Evans'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-07-15'),
+  },
+  {
+    album: null,
+    artists: ['Mr Smith'],
+    title: 'Mindsweep',
+    writtenBy: 'Noah Harris',
+    producers: ['Emma Thompson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-08-10'),
+  },
+];
+
+const aldousSongs = [
+  {
+    album: null,
+    artists: ['Aldous Ichnite'],
+    title: 'The Locks Change',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: ['Aldous Ichnite'],
+    title: 'Fear of Getting Out',
+    writtenBy: 'Alice Johnson',
+    producers: ['David Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-02-15'),
+  },
+  {
+    album: null,
+    artists: ['Aldous Ichnite'],
+    title: 'Flickering By the Fire Escape',
+    writtenBy: 'Bob White',
+    producers: ['Mary Johnson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-03-20'),
+  },
+];
+
+const billSongs = [
+  {
+    album: null,
+    artists: ['Bill Hobson'],
+    title: 'Gates Of Heaven',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: ['Bill Hobson'],
+    title: 'Sweet Home Alabama',
+    writtenBy: 'Alice Johnson',
+    producers: ['David Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-02-15'),
+  },
+];
+
+const danaSongs = [
+  {
+    album: null,
+    artists: ['Dana Schechter'],
+    title: 'I Know Your Name',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: ['Dana Schechter'],
+    title: 'Swallow Your Stars',
+    writtenBy: 'Alice Johnson',
+    producers: ['David Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-02-15'),
+  },
+  {
+    album: null,
+    artists: ['Dana Schechter'],
+    title: "It's The Rain",
+    writtenBy: 'Bob White',
+    producers: ['Mary Johnson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-03-20'),
+  },
+  {
+    album: null,
+    artists: ['Dana Schechter'],
+    title: 'Jackson',
+    writtenBy: 'Sarah Davis',
+    producers: ['Jack Thompson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-04-10'),
+  },
+];
+
+const ketsaSongs = [
+  {
+    album: null,
+    artists: ['Ketsa Mia'],
+    title: 'Catch My Drift',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: ['Ketsa Mia'],
+    title: 'Fresh Starts',
+    writtenBy: 'Alice Johnson',
+    producers: ['David Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-02-15'),
+  },
+  {
+    album: null,
+    artists: ['Ketsa Mia'],
+    title: 'Effort',
+    writtenBy: 'Bob White',
+    producers: ['Mary Johnson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-03-20'),
+  },
+  {
+    album: null,
+    artists: ['Ketsa Mia'],
+    title: 'Eventually',
+    writtenBy: 'Sarah Davis',
+    producers: ['Jack Thompson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-04-10'),
+  },
+];
+
+const tripleSongs = [
+  {
+    album: null,
+    artists: ['Triple'],
+    title: 'Vim and Vinagarette Remastered',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+];
+
+const johnSongs = [
+  {
+    album: null,
+    artists: ['Triple'],
+    title: 'Dream',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+];
+
+const miamiSongs = [
+  {
+    album: null,
+    artists: ['Miami Slice'],
+    title: 'Beach Life',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: ['Miami Slice'],
+    title: 'Solid Gold',
+    writtenBy: 'Alice Johnson',
+    producers: ['David Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-02-15'),
+  },
+  {
+    album: null,
+    artists: ['Miami Slice'],
+    title: 'Feel The Beat',
+    writtenBy: 'Bob White',
+    producers: ['Mary Johnson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-03-20'),
+  },
+  {
+    album: null,
+    artists: ['Miami Slice'],
+    title: 'Good News',
+    writtenBy: 'Sarah Davis',
+    producers: ['Jack Thompson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-04-10'),
+  },
+];
+
+const audioSongs = [
+  {
+    album: null,
+    artists: ['Audio Kofee'],
+    title: 'Atmospheric Sad Beat',
+    writtenBy: 'John Doe',
+    producers: ['Jane Smith'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-01-01'),
+  },
+  {
+    album: null,
+    artists: ['Audio Kofee'],
+    title: 'Digital Piano Technology',
+    writtenBy: 'Alice Johnson',
+    producers: ['David Brown'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-02-15'),
+  },
+  {
+    album: null,
+    artists: ['Audio Kofee'],
+    title: 'Sad Dramatic Time',
+    writtenBy: 'Bob White',
+    producers: ['Mary Johnson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-03-20'),
+  },
+  {
+    album: null,
+    artists: ['Audio Kofee'],
+    title: 'Sad Tension',
+    writtenBy: 'Sarah Davis',
+    producers: ['Jack Thompson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-04-10'),
+  },
+  {
+    album: null,
+    artists: ['Audio Kofee'],
+    title: 'Warm Abstraction',
+    writtenBy: 'Mike Adams',
+    producers: ['Emily Wilson'],
+    language: 'English',
+    genre: MusicGenres[Math.floor(Math.random() * MusicGenres.length)],
+    release_date: new Date('2020-05-25'),
   },
 ];
 
@@ -194,6 +775,54 @@ const playlists = [
   },
 ];
 
+let customData = [
+  {
+    artist: SmithMr,
+    album: smithAlbum,
+    songs: smithSongs,
+  },
+  {
+    artist: BillHobson,
+    album: billAlbum,
+    songs: billSongs,
+  },
+  {
+    artist: JohnDoe,
+    album: johnAlbum,
+    songs: johnSongs,
+  },
+  {
+    artist: AldousIchnite,
+    album: aldousAlbum,
+    songs: aldousSongs,
+  },
+  {
+    artist: DanaSchechter,
+    album: danaAlbum,
+    songs: danaSongs,
+  },
+  {
+    artist: MiamiSlice,
+    album: miamiAlbum,
+    songs: miamiSongs,
+  },
+  {
+    artist: TripleHere,
+    album: tripleAlbum,
+    songs: tripleSongs,
+  },
+  {
+    artist: KetsaMia,
+    album: ketsaAlbum,
+    songs: ketsaSongs,
+  },
+  {
+    artist: AudioKofee,
+    album: audioAlbum,
+    songs: audioSongs,
+  },
+];
+
 async function seed() {
   try {
     await Admin.deleteMany({});
@@ -203,6 +832,9 @@ async function seed() {
     await Song.deleteMany({});
     await ListeningHistory.deleteMany({});
     await Playlist.deleteMany({});
+
+    const filesCollection = mongoose.connection.db.collection('fs.files');
+    await filesCollection.deleteMany({});
 
     const createAdmin = await Admin.create(admin);
     const createdUsers = await User.create(users);
@@ -311,6 +943,30 @@ async function seed() {
     await ListeningHistory.create(listeningHistory);
     await Album.create(albums);
     await Song.create(songs);
+
+    for (let data of customData) {
+      //console.log(data.artist);
+      let cArtist = await Artist.create(data.artist);
+
+      let cAlbum = await Album.create(data.album);
+      cAlbum.artists = [{ artistId: cArtist._id }];
+      await cAlbum.save();
+      for (let song of data.songs) {
+        let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
+        console.log(`Song path : ${songPath}`);
+        const songId = await uploadSong(
+          `./utils/songData/${data.album.title}`,
+          data.album.title,
+          song.title
+        );
+        console.log(songId);
+        song.artists = [cArtist._id];
+        song.album = cAlbum._id;
+        song.song_url = songId;
+        song.cover_image_url = new mongoose.Types.ObjectId();
+        let cSong = await Song.create(song);
+      }
+    }
 
     console.log('Database seeded successfully!');
   } catch (error) {

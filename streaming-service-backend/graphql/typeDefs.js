@@ -144,8 +144,8 @@ type Mutation {
     addSong(
         title: String!,
         duration: Int!,
-        song_url: String!,
-        cover_image_url: String!,
+        song_url: ID!,
+        cover_image_url: ID!,
         writtenBy: String!,
         producers: [String!]!,
         genre: String!,
@@ -159,8 +159,8 @@ type Mutation {
         songId: ID!,
         title: String,
         duration: Int,
-        song_url: String,
-        cover_image_url: String,
+        song_url: ID,
+        cover_image_url: ID,
         writtenBy: String,
         producers: [String!],
         genre: String,
@@ -285,8 +285,8 @@ type Song {
     duration: Int!
     title: String!
     likes: Int
-    song_url: String!
-    cover_image_url: String!
+    song_url: ID!
+    cover_image_url: ID
     writtenBy: String!
     producers: [String!]!
     language: String
