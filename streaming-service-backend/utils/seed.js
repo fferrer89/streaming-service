@@ -13,10 +13,13 @@ import fs from 'fs';
 import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
 
-await mongoose.connect('mongodb://localhost:27017/streaming-service', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+await mongoose.connect(
+  'mongodb+srv://marcos:WXgAl20LBjRb49b8@cluster0.ofr2q.mongodb.net/streaming-service?retryWrites=true&w=majority&appName=Cluster0',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 const uploadSong = async (filePath, albumTitle, songTitle) => {
@@ -65,7 +68,7 @@ const users = [
     password: 'Password123$',
     date_of_birth: '01/01/1990',
     gender: 'MALE',
-    profile_image_url: 'https://example.com/johndoe.jpg',
+    profile_image_url: 'https://picsum.photos/200/200?random=1',
   },
   {
     first_name: 'Jane',
@@ -75,7 +78,7 @@ const users = [
     password: 'Password456$',
     date_of_birth: '01/01/1995',
     gender: 'FEMALE',
-    profile_image_url: 'https://example.com/janedoe.jpg',
+    profile_image_url: 'https://picsum.photos/200/200?random=2',
   },
 ];
 
@@ -88,7 +91,7 @@ const artists = [
     password: 'Password456#',
     date_of_birth: '01/01/1940',
     gender: 'MALE',
-    profile_image_url: new mongoose.Types.ObjectId(),
+    profile_image_url: 'https://picsum.photos/200/200?random=3',
     genres: ['REGGAE'],
   },
   {
@@ -99,7 +102,7 @@ const artists = [
     password: 'Password456@',
     date_of_birth: '01/01/1980',
     gender: 'FEMALE',
-    profile_image_url: new mongoose.Types.ObjectId(),
+    profile_image_url: 'https://picsum.photos/200/200?random=4',
     genres: ['POP', 'SOUL'],
   },
 ];
@@ -305,29 +308,25 @@ const audioAlbum = {
 const albums = [
   {
     album_type: 'ALBUM',
-    //total_songs: 10,
-    cover_image_url: new mongoose.Types.ObjectId(),
+    cover_image_url: 'https://picsum.photos/200/200?random=5',
     title: 'Greatest Hits',
     description: 'Best hits of all time',
     release_date: new Date('2020-01-01'),
     artists: [],
     songs: [],
     genres: ['POP', 'ROCK'],
-    //likes: 100,
     total_duration: 3600,
     visibility: 'PUBLIC',
   },
   {
     album_type: 'SINGLE',
-    //total_songs: 1,
-    cover_image_url: new mongoose.Types.ObjectId(),
+    cover_image_url: 'https://picsum.photos/200/200?random=6',
     title: 'Single Track',
     description: 'A single track',
     release_date: new Date('2021-05-01'),
     artists: [],
     songs: [],
     genres: ['POP'],
-    //likes: 50,
     total_duration: 180,
     visibility: 'PUBLIC',
   },

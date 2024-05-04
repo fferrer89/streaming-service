@@ -1,5 +1,7 @@
 export const typeDefs = `#graphql
 type Query {
+    admin: [Admin]
+
     getUserCount: Int
     getArtistCount: Int
     getAlbumCount: Int
