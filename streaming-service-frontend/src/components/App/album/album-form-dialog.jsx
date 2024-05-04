@@ -1,17 +1,11 @@
-import React, {useEffect, useRef, useState} from "react";
+import {useRef} from "react";
 import {MusicGenres, Visibilities, AlbumTypes} from '../../../utils/helpers'
-import {createAlbum} from '../../../app/actions';
-import {useFormState as useFormState} from 'react-dom';
-// const initialState = {
-//     message: null
-// };
+
 import {loadErrorMessages, loadDevMessages} from "@apollo/client/dev";
 
 loadDevMessages();
 loadErrorMessages();
-export default function AlbumFormDialog({artistId, formState, formAction, setShowAddFormDialog, showAddFormDialog}) {
-    // const [isModalOpen, setIsModalOpen] = useState(true);
-    const hasPageBeenRendered = useRef(false);
+export default function AlbumFormDialog({artistId, createAlbumFormState, createAlbumFormAction, setShowAddFormDialog, showAddFormDialog}) {
     const formElement = useRef();
 
     return (
@@ -20,13 +14,13 @@ export default function AlbumFormDialog({artistId, formState, formAction, setSho
                     value='close'
                     onClick={(event) => {
                         formElement?.current?.reset();
-                        delete formState?.errorMessages;
+                        delete createAlbumFormState?.errorMessages;
                         setShowAddFormDialog(false);
                     }}
             >
                 X
             </button>
-            <form action={formAction} id='dialog-form-album' ref={formElement}>
+            <form action={createAlbumFormAction} id='dialog-form-album' ref={formElement}>
                 <ul>
                     <li>
                         <input aria-label='Artist Id' type='text' id='artistId' name='artistId' hidden
@@ -89,9 +83,9 @@ export default function AlbumFormDialog({artistId, formState, formAction, setSho
                         </label>
                     </li>
                 </ul>
-                {formState && formState?.errorMessages && (
+                {createAlbumFormState && createAlbumFormState?.errorMessages && (
                     <ul>
-                        {formState?.errorMessages?.map((msg, index) => {
+                        {createAlbumFormState?.errorMessages?.map((msg, index) => {
                             return (
                                 <li className='error' key={index}>
                                     {msg}
