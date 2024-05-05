@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../utils/redux/store";
 import { playSong, pauseSong, stopSong } from "../../../utils/redux/features/song/songSlice";
@@ -16,6 +16,22 @@ const SPlayer: React.FC = () => {
   const dispatch = useDispatch();
   const { currentSong, isPlaying } = useSelector((state: RootState) => state.song);
   const [currentTime, setCurrentTime] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    if (currentSong) {
+      setCurrentTime(currentSong.currentTime);
+      if (audioRef.current) {
+        const songUrl = `http://localhost:4000/file/song/stream/${currentSong.song_url}`;
+        audioRef.current.src = songUrl;
+        if (isPlaying) {
+          audioRef.current.play();
+        } else {
+          audioRef.current.pause();
+        }
+      }
+    }
+  }, [currentSong, isPlaying]);
 
   const togglePlayPause = () => {
     if (currentSong) {
@@ -24,6 +40,12 @@ const SPlayer: React.FC = () => {
       } else {
         dispatch(playSong(currentSong));
       }
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
     }
   };
 
@@ -36,30 +58,32 @@ const SPlayer: React.FC = () => {
   if (!currentSong) {
     return null;
   }
+
   const footerVariants = {
     hidden: { y: "100%" },
     visible: { y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   return (
-    <motion.footer 
+    <motion.footer
       className="fixed opacity-75 bottom-0 left-0 w-full bg-stone-900 shadow-lg col-span-6 p-3 grid grid-cols-3 gap-4"
       initial="hidden"
       animate="visible"
       variants={footerVariants}
     >
+      <audio ref={audioRef} onTimeUpdate={handleTimeUpdate} />
       <div className="flex items-center">
         <img
           className="h-10 w-10 mr-4 flex-shrink-0"
-          src="https://picsum.photos/56.webp?random=10"
-          alt=""
+          src={currentSong.artists[0].profile_image_url || "https://picsum.photos/56.webp?random=10"}
+          alt={currentSong.title}
         />
         <div className="mr-4">
           <div className="text-sm text-white text-line-clamp-1 font-light">
             {currentSong.title}
           </div>
           <div className="text-xs text-gray-100 text-line-clamp-1">
-            <span>{currentSong.artist}</span>
+            <span>{currentSong.artists[0].display_name}</span>
           </div>
         </div>
         <div className="flex items-center">

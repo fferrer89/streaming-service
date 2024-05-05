@@ -1,10 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Song {
-  id: number;
+  _id: string;
   title: string;
-  artist: string;
   duration: number;
+  song_url: string;
+  writtenBy: string;
+  producers: string[];
+  language: string;
+  genre: string;
+  lyrics: string;
+  release_date: Date;
+  album: {
+    _id: string;
+    title: string;
+  };
+  artists: {
+    _id: string;
+    display_name: string;
+    profile_image_url: string;
+  }[];
   currentTime: number;
 }
 

@@ -1,6 +1,7 @@
 import React from 'react';
+import Image from 'next/image';
 
-interface SongProps {
+interface Song {
   _id: string;
   title: string;
   duration: number;
@@ -22,16 +23,37 @@ interface SongProps {
   }[];
 }
 
-const SongItem: React.FC<SongProps> = ({ _id, title, cover_image_url }) => {
+interface SongProps extends Song {
+  onClick?: (song: Song) => void;
+}
+
+const SongItem: React.FC<SongProps> = ({ onClick, ...song }) => {
+  const truncatedTitle = song.title.split(' ');
+
   return (
-    <a href={`/song/${_id}`} className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 m-4 rounded p-4 shadow-lg transition-all duration-700 hover:scale-110">
-      <div className="relative">
-        <img src={cover_image_url || "/img/music_note.jpeg"} alt={title} className="w-full rounded-[10px]" />
-      </div>
-      <div className="mt-2 text-center text-[#1e1e1e] font-semibold">
-        {title}
-      </div>
-    </a>
+    <div className="w-[100px] h-[100px] m-2 p-4 rounded-lg shadow-md hover:scale-105 transition-transform flex flex-col items-center justify-center">
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          onClick?.(song);
+        }}
+        className="flex flex-col items-center"
+      >
+        <div>
+          <Image
+            src={"/img/music_note.jpeg"}
+            alt={song.title}
+            width={50}
+            height={50}
+            className="rounded-lg object-cover"
+          />
+        </div>
+        <span className="mt-1 text-sm font-semibold text-gray-800 text-center break-words max-w-full">
+          {truncatedTitle[0]}
+        </span>
+      </a>
+    </div>
   );
 };
 

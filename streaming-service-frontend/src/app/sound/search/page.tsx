@@ -4,10 +4,11 @@ import { useQuery } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Artists from "@/components/App/Serach/Artists";
 import Playlists from "@/components/App/Serach/Playlists";;
-import Songs from "@/components/App/Serach/Songs";;
+import Songs from "@/components/App/Serach/Songs";
+import apolloClient from "@/utils";
 
 const SEARCH_QUERIES = gql`
-  query SearchQueries($searchTerm: String!) {
+query SearchQueries($searchTerm: String!) {
     getPlaylistsByTitle(searchTerm: $searchTerm) {
       _id
       title
@@ -23,7 +24,6 @@ const SEARCH_QUERIES = gql`
       title
       duration
       song_url
-      cover_image_url
       writtenBy
       producers
       language
@@ -37,6 +37,7 @@ const SEARCH_QUERIES = gql`
       artists {
         _id
         display_name
+        profile_image_url
       }
     }
     getArtistsByName(name: $searchTerm) {
@@ -45,8 +46,7 @@ const SEARCH_QUERIES = gql`
       profile_image_url
       genres
     }
-  }
-`;
+  }`;
 
 type ResultType = {
   artists: {
@@ -70,7 +70,6 @@ type ResultType = {
     title: string;
     duration: number;
     song_url: string;
-    cover_image_url: string;
     writtenBy: string;
     producers: string[];
     language: string;
@@ -84,47 +83,54 @@ type ResultType = {
     artists: {
       _id: string;
       display_name: string;
+    profile_image_url: string;
     }[];
   }[];
 };
 
 const Search: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-  const [results, setResults] = useState<ResultType>({ artists: [], playlists: [], songs: [] });
-
-  const { data, loading, error } = useQuery(SEARCH_QUERIES, {
-    variables: { searchTerm: debouncedSearchTerm },
-    skip: debouncedSearchTerm.length < 3,
-  });
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [results, setResults] = useState<ResultType>({ artists: [], playlists: [], songs: [] });
+  
+    const { data, loading, error } = useQuery(SEARCH_QUERIES, {
+      client: apolloClient,
+      variables: { searchTerm: debouncedSearchTerm },
+      skip: !debouncedSearchTerm, // Skip the query if the search term is empty
+    });
+  
+    console.log(data);
+  
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
     };
-  }, [searchTerm]);
-
-  useEffect(() => {
-    if (data) {
-      setResults({
-        artists: data.getArtistsByName,
-        playlists: data.getPlaylistsByTitle,
-        songs: data.getSongsByTitle,
-      });
-    }
-  }, [data]);
+  
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setDebouncedSearchTerm(searchTerm);
+      }, 500);
+  
+      return () => {
+        clearTimeout(timer);
+      };
+    }, [searchTerm]);
+  
+    useEffect(() => {
+      if (data) {
+        setResults({
+          artists: data.getArtistsByName,
+          playlists: data.getPlaylistsByTitle,
+          songs: data.getSongsByTitle,
+        });
+      } else if (!debouncedSearchTerm) {
+        setResults({ artists: [], playlists: [], songs: [] });
+      }
+    }, [data, debouncedSearchTerm]);
 
   return (
+
     <div
-      className="flex-col h-full p-5 gap-5 w-full rounded-lg flex items-center relative self-stretch"
+      className="  flex-col h-full p-5 gap-5 w-full rounded-lg flex items-center relative self-stretch "
       style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
     >
       <div className="min-w-[500px] mx-auto">
@@ -155,18 +161,16 @@ const Search: React.FC = () => {
           />
         </div>
       </div>
-      {loading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div>Error: {error.message}</div>
-      ) : (
-        <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
-          <Artists artists={results.artists} />
-          <Playlists playlistsData={{ playlists: results.playlists }} />
-          <Songs songs={results.songs} />
-        </div>
-      )}
+      
+    <div className="flex flex-col w-full h-full items-center overflow-y-scroll p-4 space-y-4 justify-start ">
+        <Songs songs={results.songs} />
+        <Artists artists={results.artists} />
+        <Playlists playlistsData={{ playlists: results.playlists }} />
+        
     </div>
+    
+    </div>
+
   );
 };
 

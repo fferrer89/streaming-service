@@ -40,7 +40,7 @@ const SideNav: React.FC = () => {
     <section className={styles.sideNav}>
       <header>
         <Link href={'/user/profile'}>
-          <Image className=' rounded-full border border-white' src={profileImageUrl} width={45} height={45} alt='Profile image' />
+          <Image className=' rounded-full border border-white' src={"/img/ellipse.png"} width={45} height={45} alt='Profile image' />
         </Link>
       </header>
       <nav>

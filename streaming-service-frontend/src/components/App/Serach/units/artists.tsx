@@ -7,19 +7,18 @@ interface ArtistProps {
   genres: string[];
 }
 
-const ArtistItem: React.FC<ArtistProps> = ({ _id, display_name, profile_image_url, genres }) => {
-  return (
-    <div className="flex justify-center items-center">
-      <a href={`/artist/${_id}`} className="flex-shrink-0 h-fit w-[200px] m-4 rounded p-4 shadow-lg transition-all duration-700 hover:scale-105 flex flex-col items-center justify-center">
-        <div className="relative">
-          <img src={profile_image_url || "/img/artist-icon.jpeg"} alt={display_name} className="w-[110px] rounded-[10px]" />
-        </div>
-        <div className="mt-2 text-center text-[#1e1e1e] font-semibold">
-          {display_name}
-        </div>
-      </a>
-    </div>
-  );
-};
+const ArtistItem: React.FC<ArtistProps> = ({ _id, display_name, profile_image_url }) => (
+  <a
+    href={`/artist/${_id}`}
+    className="m-2 p-2 rounded-lg shadow-md hover:scale-105 transition-transform flex flex-col items-center"
+  >
+    <img
+      src={"/img/artist-icon.jpeg"}
+      alt={display_name}
+      className="w-16 h-16 rounded-lg object-cover"
+    />
+    <span className="mt-1 text-sm font-semibold text-gray-800">{display_name}</span>
+  </a>
+);
 
 export default ArtistItem;
