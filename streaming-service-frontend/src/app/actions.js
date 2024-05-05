@@ -50,32 +50,17 @@ export async function createAlbum(prevState, formData) {
     if (errors.length > 0) {
         return {errorMessages: errors};
     } else {
-        let responseData;
         try {
             const client = getClient();
             const {data}  = await client.mutate({
                 mutation: queries.ADD_ALBUM,
                 variables: { title, release_date, album_type, description, genres, visibility, artists },
-                // https://www.apollographql.com/docs/react/data/mutations/#updating-local-data
-                update: (cache, {data: {addAlbum}}) => {
-                    const {getAlbumsByArtist} = cache.readQuery({
-                        query: queries.GET_ALBUMS_BY_ARTIST,
-                        variables: {artistId:artistId},
-                    });
-                    cache.writeQuery({
-                        query: queries.GET_ALBUMS_BY_ARTIST,
-                        variables: {artistId:artistId},
-                        data: {getAlbumsByArtist: [...getAlbumsByArtist, addAlbum]}
-                    });
-                }
             });
-            responseData = data;
+            return {album: data?.addAlbum};
         } catch (e) {
+            errors.push(e.message);
             return {errorMessages: errors};
         }
-        // revalidatePath(`/artists/${artistId}`);
-        revalidatePath('/artists/[id]', 'page')
-        return {album: responseData?.addAlbum};
     }
 }
 export async function updateAlbum(prevState, formData) {
@@ -146,6 +131,7 @@ export async function updateAlbum(prevState, formData) {
             });
             return {album: data?.editAlbum};
         } catch (e) {
+            errors.push(e.message);
             return {errorMessages: errors};
         }
     }

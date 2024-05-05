@@ -332,16 +332,6 @@ const ADD_ALBUM = gql`
       artists: $artists
     ) {
       _id
-      title
-      album_type
-      description
-      release_date
-      visibility
-      cover_image_url
-      genres
-      songs {
-        _id
-      }
     }
   }
 `;
