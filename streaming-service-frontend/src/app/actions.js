@@ -59,36 +59,86 @@ export async function createAlbum(prevState, formData) {
             });
             return {album: data?.addAlbum};
         } catch (e) {
-            errors.push(e.message);
-            errors.push(queries.ADD_ALBUM);
-            errors.push(title, release_date, album_type, description, genres, visibility, artists);
             return {errorMessages: errors};
         }
-
-        /*
-        @link: https://nextjs.org/docs/app/api-reference/functions/revalidatePath
-        Adds the newly added user to the '/users' STATIC page
-        */
-        // revalidatePath(`/artists/${artistId}`);
-        revalidatePath('/artists/[id]', 'page'); // revalidatePath('/')
-        /*
-        redirect returns a 307 (Temporary Redirect) status code by default. When used in a Server Action, it
-        returns a 303 (See Other), which is commonly used for redirecting to a success page as a result of a
-        POST request.
-
-        redirect internally throws an error, so it should be called outside of try/catch blocks.
-         */
-        redirect(`/artists/${artistId}`); // Navigate to new route
     }
 }
-export async function deleteAlbum(prevState, formData) {
-    let albumId, artistId;
+export async function updateAlbum(prevState, formData) {
+    let title, release_date, album_type, description, genres, visibility, artistId, artists, albumId;
     let errors = [];
     albumId = formData.get('albumId');
+    title = formData.get('title');
+    release_date = formData.get('release_date');
+    album_type = formData.get('album_type');
+    description = formData.get('description');
+    genres = formData.get('genres');
+    visibility = formData.get('visibility');
     artistId = formData.get('artistId');
     try {
-        albumId = validation.checkId(albumId, 'albumId');
+        if (title) {
+            title = validation.checkString(title, 'title');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (album_type) {
+            album_type = validation.checkString(album_type, 'album_type');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (description) {
+            description = validation.checkString(description, 'description');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (genres) {
+            genres = validation.checkString(genres, 'genres');
+            genres = [genres]
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (visibility) {
+            visibility = validation.checkString(visibility, 'visibility');
+        }
+
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
         artistId = validation.checkId(artistId, 'artistId');
+        albumId = validation.checkId(albumId, 'albumId');
+        artists = [artistId]
+    } catch (e) {
+        errors.push(e);
+    }
+
+    if (errors.length > 0) {
+        return {errorMessages: errors};
+    } else {
+        try {
+            const client = getClient();
+            const {data}  = await client.mutate({
+                mutation: queries.EDIT_ALBUM,
+                variables: {_id:albumId, title, release_date, album_type, description, genres, visibility, artists },
+                // https://www.apollographql.com/docs/react/data/mutations/#updating-local-data
+            });
+            return {album: data?.editAlbum};
+        } catch (e) {
+            return {errorMessages: errors};
+        }
+    }
+}
+export async function deleteAlbum(albumId) {
+    let errors = [];
+    try {
+        albumId = validation.checkId(albumId, 'albumId');
     } catch (e) {
         errors.push(e);
     }
@@ -101,32 +151,12 @@ export async function deleteAlbum(prevState, formData) {
                 mutation: queries.REMOVE_ALBUM,
                 variables: {id:albumId },
                 // FIXME: REMOVING ALBUM DOES NOT REMOVE IT FROM THE UI
-                update: (cache, {data: {removeAlbum}}) => {
-                    console.log(cache.identify(removeAlbum));
-                    cache.evict({id: cache.identify(removeAlbum)});
-                    cache.gc();
-                }
             });
-
+            return {album: data?.removeAlbum};
         } catch (e) {
+            // removeAlbum
             errors.push(e.message);
             return {errorMessages: errors};
         }
-
-        /*
-        @link: https://nextjs.org/docs/app/api-reference/functions/revalidatePath
-        Adds the newly added user to the '/users' STATIC page
-        */
-        // revalidatePath(`/artists/${artistId}`);
-        revalidatePath('/artists/[id]', 'page'); // revalidatePath('/')
-        /*
-        redirect returns a 307 (Temporary Redirect) status code by default. When used in a Server Action, it
-        returns a 303 (See Other), which is commonly used for redirecting to a success page as a result of a
-        POST request.
-
-        redirect internally throws an error, so it should be called outside of try/catch blocks.
-         */
-        redirect(`/artists/${artistId}`); // Navigate to new route
-        return {album: albumId};
     }
 }
