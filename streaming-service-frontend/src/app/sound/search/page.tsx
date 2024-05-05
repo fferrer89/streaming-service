@@ -1,53 +1,148 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from "react";
+import { useQuery } from "@apollo/client";
+import { gql } from "@apollo/client";
 import Artists from "@/components/App/Serach/Artists";
-import Playlists from "@/components/App/Serach/Playlists";
-import Songs from "@/components/App/Serach/Songs";
+import Playlists from "@/components/App/Serach/Playlists";;
+import Songs from "@/components/App/Serach/Songs";;
 
-
-
+const SEARCH_QUERIES = gql`
+  query SearchQueries($searchTerm: String!) {
+    getPlaylistsByTitle(searchTerm: $searchTerm) {
+      _id
+      title
+      description
+      visibility
+      owner {
+        _id
+        display_name
+      }
+    }
+    getSongsByTitle(searchTerm: $searchTerm) {
+      _id
+      title
+      duration
+      song_url
+      cover_image_url
+      writtenBy
+      producers
+      language
+      genre
+      lyrics
+      release_date
+      album {
+        _id
+        title
+      }
+      artists {
+        _id
+        display_name
+      }
+    }
+    getArtistsByName(name: $searchTerm) {
+      _id
+      display_name
+      profile_image_url
+      genres
+    }
+  }
+`;
 
 type ResultType = {
-    artists: { name: string; link: string }[];
-    playlists: { name: string; link: string }[];
-    songs: any[]; // Replace 'any' with the actual type of 'songs' if it's known
-  };
-  
-  const Search: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [results, setResults] = useState<ResultType>({artists: [], playlists: [], songs: []});
+  artists: {
+    _id: string;
+    display_name: string;
+    profile_image_url: string;
+    genres: string[];
+  }[];
+  playlists: {
+    _id: string;
+    title: string;
+    description: string;
+    visibility: string;
+    owner: {
+      _id: string;
+      display_name: string;
+    };
+  }[];
+  songs: {
+    _id: string;
+    title: string;
+    duration: number;
+    song_url: string;
+    cover_image_url: string;
+    writtenBy: string;
+    producers: string[];
+    language: string;
+    genre: string;
+    lyrics: string;
+    release_date: Date;
+    album: {
+      _id: string;
+      title: string;
+    };
+    artists: {
+      _id: string;
+      display_name: string;
+    }[];
+  }[];
+};
+
+const Search: React.FC = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [results, setResults] = useState<ResultType>({ artists: [], playlists: [], songs: [] });
+
+  const { data, loading, error } = useQuery(SEARCH_QUERIES, {
+    variables: { searchTerm: debouncedSearchTerm },
+    skip: debouncedSearchTerm.length < 3,
+  });
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchTerm) {
-     
-        const mockSearch = async (term: string) => {
-          return {
-            artists: [{name: "Artist 1", link: "/artist/1"}, {name: "Artist 2", link: "/artist/2"}],
-            playlists: [{name: "Playlist 1", link: "/playlist/1"}, {name: "Playlist 2", link: "/playlist/2"}],
-            songs: []
-          };
-        };
-        mockSearch(searchTerm).then(setResults);
-      }
-    }, 500);  
-    return () => clearTimeout(timeoutId);  
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
   }, [searchTerm]);
+
+  useEffect(() => {
+    if (data) {
+      setResults({
+        artists: data.getArtistsByName,
+        playlists: data.getPlaylistsByTitle,
+        songs: data.getSongsByTitle,
+      });
+    }
+  }, [data]);
 
   return (
     <div
-      className="flex-col h-full p-5 gap-5  w-full rounded-lg  flex items-center relative self-stretch"
+      className="flex-col h-full p-5 gap-5 w-full rounded-lg flex items-center relative self-stretch"
       style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
     >
       <div className="min-w-[500px] mx-auto">
         <div className="relative flex items-center w-full h-12 rounded-lg focus-within:shadow-lg bg-white opacity-75 overflow-hidden">
           <div className="grid place-items-center h-full w-12 text-gray-300">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
             </svg>
           </div>
           <input
@@ -57,18 +152,22 @@ type ResultType = {
             placeholder="Search something.."
             value={searchTerm}
             onChange={handleSearch}
-          /> 
+          />
         </div>
       </div>
-      <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
-        <Artists artists={results.artists} />
-        <Playlists playlistsData={{playlists: results.playlists}} />
-        <Songs songs={results.songs} />
-      </div>
-      
+      {loading ? (
+        <div>Loading...</div>
+      ) : error ? (
+        <div>Error: {error.message}</div>
+      ) : (
+        <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
+          <Artists artists={results.artists} />
+          <Playlists playlistsData={{ playlists: results.playlists }} />
+          <Songs songs={results.songs} />
+        </div>
+      )}
     </div>
   );
 };
 
 export default Search;
-
