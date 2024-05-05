@@ -1,6 +1,6 @@
 const environment = {
   development: {
-    mongoUrl: 'mongodb://127.0.0.1:27017/streaming-service',
+    mongoUrl: 'mongodb+srv://marcos:WXgAl20LBjRb49b8@cluster0.ofr2q.mongodb.net/streaming-service?retryWrites=true&w=majority&appName=Cluster0',
   },
   production: {
     mongoUrl: 'mongodb://user:pass@example.com:1234/streaming-service',
