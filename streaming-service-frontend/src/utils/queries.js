@@ -316,6 +316,28 @@ const ADD_ALBUM = gql`
     }
   }
 `;
+const EDIT_ALBUM = gql`
+  mutation editAlbum(
+    $_id: ID!
+    $title: String
+    $album_type: AlbumType
+    $description: String
+    $release_date: Date
+    $visibility: Visibility
+    $genres: [MusicGenre!]
+  ) {
+    editAlbum(
+      _id: $_id
+      title: $title
+      album_type: $album_type
+      description: $description
+      release_date: $release_date
+      visibility: $visibility
+      genres: $genres) {
+      _id
+    }
+  }
+`;
 
 const queries = {
   REGISTER_USER,
@@ -337,7 +359,8 @@ const queries = {
   REMOVE_PLAYLIST,
   GET_ARTIST_BY_ID,
   GET_ALBUMS_BY_ARTIST,
-  ADD_ALBUM
+  ADD_ALBUM,
+  EDIT_ALBUM
 };
 
 export default queries;
