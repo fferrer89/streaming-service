@@ -2,9 +2,9 @@
 import React from 'react'
 import Link from 'next/link';
 import { FcBullish } from 'react-icons/fc';
-import { HiOutlineViewGrid, HiUsers, HiUserGroup, HiOutlineLogout } from "react-icons/hi";
-import { BsSoundwave } from "react-icons/bs";
-import { PiMusicNotesFill } from "react-icons/pi";
+import { HiOutlineViewGrid, HiUsers, HiUserGroup, HiOutlineLogout } from 'react-icons/hi';
+import { BsSoundwave } from 'react-icons/bs';
+import { PiMusicNotesFill } from 'react-icons/pi';
 import { usePathname } from 'next/navigation';
 
 const AdminSideBar: React.FC = () => {
