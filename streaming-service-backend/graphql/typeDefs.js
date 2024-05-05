@@ -119,20 +119,20 @@ type Mutation {
         description: String!,
         release_date: Date!,
         artists: [ID!],
-        songs: [ID!],
+        songs: [ID],
         genres: [MusicGenre!]!,
         visibility: Visibility!
     ): Album
 
     editAlbum(
         _id: ID!,
-        album_type: String,
+        album_type: AlbumType,
         cover_image_url: ID,
         title: String,
         description: String,
         release_date: Date,
-        genres: [String!],
-        visibility: String
+        genres: [MusicGenre!],
+        visibility: Visibility
     ): Album
 
     #    FIXME what is the intended behavior of this operation?
@@ -146,8 +146,8 @@ type Mutation {
     addSong(
         title: String!,
         duration: Int!,
-        song_url: String!,
-        cover_image_url: String!,
+        song_url: ID!,
+        cover_image_url: ID!,
         writtenBy: String!,
         producers: [String!]!,
         genre: String!,
@@ -161,8 +161,8 @@ type Mutation {
         songId: ID!,
         title: String,
         duration: Int,
-        song_url: String,
-        cover_image_url: String,
+        song_url: ID,
+        cover_image_url: ID,
         writtenBy: String,
         producers: [String!],
         genre: String,
@@ -284,11 +284,11 @@ type Song {
     _id: ID!
     album: Album
     artists: [Artist!]!
-    duration: Int!
+    duration: Int
     title: String!
     likes: Int
-    song_url: String!
-    cover_image_url: String!
+    song_url: ID!
+    cover_image_url: ID
     writtenBy: String!
     producers: [String!]!
     language: String

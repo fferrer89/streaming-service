@@ -9,3 +9,4 @@ package-lock.json
 .idea/
 *.env
 .anima
+streaming-service-backend/utils/songData

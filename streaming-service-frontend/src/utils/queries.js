@@ -195,7 +195,35 @@ const GET_PLAYLISTS_BY_OWNER = gql`
       visibility
     }
   }
-`
+`;
+const GET_ARTIST_BY_ID = gql`
+  query query($id: ID!) {
+    getArtistById(_id: $id) {
+      _id
+      first_name
+      last_name
+      display_name
+
+    }
+  }
+`;
+
+const GET_ALBUMS_BY_ARTIST = gql`
+  query query($artistId: ID!) {
+    getAlbumsByArtist(artistId: $artistId) {
+      _id
+      title
+      album_type
+      description
+      release_date
+      visibility
+      genres
+      songs {
+        _id
+      }
+    }
+  }
+`;
 
 const GET_COUNT = gql`
   query getCount {
@@ -257,6 +285,59 @@ const REMOVE_PLAYLIST = gql`
     }
   }
 `;
+const ADD_ALBUM = gql`
+  mutation addAlbum(
+    $title: String!
+    $album_type: AlbumType!
+    $description: String!
+    $release_date: Date!
+    $visibility: Visibility!
+    $genres: [MusicGenre!]!
+    $artists: [ID!]
+  ) {
+    addAlbum(
+      title: $title
+      album_type: $album_type
+      description: $description
+      release_date: $release_date
+      visibility: $visibility
+      genres: $genres
+      artists: $artists) {
+      _id
+      title
+      album_type
+      description
+      release_date
+      visibility
+      genres
+      songs {
+        _id
+      }
+    }
+  }
+`;
+const EDIT_ALBUM = gql`
+  mutation editAlbum(
+    $_id: ID!
+    $title: String
+    $album_type: AlbumType
+    $description: String
+    $release_date: Date
+    $visibility: Visibility
+    $genres: [MusicGenre!]
+  ) {
+    editAlbum(
+      _id: $_id
+      title: $title
+      album_type: $album_type
+      description: $description
+      release_date: $release_date
+      visibility: $visibility
+      genres: $genres) {
+      _id
+    }
+  }
+`;
 
 const queries = {
   REGISTER_USER,
@@ -275,7 +356,11 @@ const queries = {
   REMOVE_ARTIST,
   REMOVE_ALBUM,
   REMOVE_SONG,
-  REMOVE_PLAYLIST
+  REMOVE_PLAYLIST,
+  GET_ARTIST_BY_ID,
+  GET_ALBUMS_BY_ARTIST,
+  ADD_ALBUM,
+  EDIT_ALBUM
 };
 
 export default queries;
