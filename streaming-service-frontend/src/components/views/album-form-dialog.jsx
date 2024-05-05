@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import {AlbumTypes, MusicGenres, Visibilities} from "../../utils/helpers";
 
 export default function AlbumFormDialog({method, actionData, action,
-                                            setShowFormDialog, albumData, artistId}) {
+                                            setShowFormDialog, albumData, artistId, refetch}) {
     // Add & Edit Modal Hooks
     const hasPageBeenRendered = useRef(false);
     const formElement = useRef();
@@ -28,6 +28,7 @@ export default function AlbumFormDialog({method, actionData, action,
                 formElement.current.reset();
                 setAddModalStatus('');
                 setShowFormDialog(false);
+                refetch()
             }
         }
         delete actionData?.album;
@@ -42,7 +43,8 @@ export default function AlbumFormDialog({method, actionData, action,
                             onClick={(event) => {
                                 event.preventDefault();
                                 setAddModalStatus('');
-                                updateAddModalStatus()
+                                updateAddModalStatus();
+                                refetch()
                             }}
                     >
                         X

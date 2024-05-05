@@ -337,6 +337,7 @@ const ADD_ALBUM = gql`
       description
       release_date
       visibility
+      cover_image_url
       genres
       songs {
         _id
