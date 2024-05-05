@@ -150,7 +150,7 @@ type Mutation {
         cover_image_url: ID!,
         writtenBy: String!,
         producers: [String!]!,
-        genre: String!,
+        genre: MusicGenre!,
         release_date: Date!,
         artists:[ID!]!,
         lyrics:String,
@@ -165,7 +165,7 @@ type Mutation {
         cover_image_url: ID,
         writtenBy: String,
         producers: [String!],
-        genre: String,
+        genre: MusicGenre,
         release_date: Date,
         artists:[ID!]
     ): Song

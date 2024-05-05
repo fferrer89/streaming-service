@@ -2,8 +2,6 @@
 import validation from '../utils/validations';
 import queries from "../utils/queries";
 import { getClient } from "../utils";
-import {redirect} from 'next/navigation';
-import {revalidatePath} from 'next/cache';
 export async function createAlbum(prevState, formData) {
     let title, release_date, album_type, description, genres, visibility, artistId, artists;
     let errors = [];
@@ -58,7 +56,7 @@ export async function createAlbum(prevState, formData) {
             });
             return {album: data?.addAlbum};
         } catch (e) {
-            errors.push(e.message);
+            errors.push(e?.message);
             return {errorMessages: errors};
         }
     }
@@ -131,7 +129,7 @@ export async function updateAlbum(prevState, formData) {
             });
             return {album: data?.editAlbum};
         } catch (e) {
-            errors.push(e.message);
+            errors.push(e?.message);
             return {errorMessages: errors};
         }
     }
@@ -151,12 +149,205 @@ export async function deleteAlbum(albumId) {
             const {data}  = await client.mutate({
                 mutation: queries.REMOVE_ALBUM,
                 variables: {id:albumId },
-                // FIXME: REMOVING ALBUM DOES NOT REMOVE IT FROM THE UI
             });
             return {album: data?.removeAlbum};
         } catch (e) {
-            // removeAlbum
-            errors.push(e.message);
+            errors.push(e?.message);
+            return {errorMessages: errors};
+        }
+    }
+}
+
+export async function createSong(prevState, formData) {
+    let title, song_url, cover_image_url, writtenBy, producers, genre, release_date, artists, album;
+    let errors = [];
+    title = formData.get('title');
+    song_url = formData.get('song_url'); // ID
+    cover_image_url = formData.get('cover_image_url'); // ID
+    writtenBy = formData.get('writtenBy');
+    producers = formData.get('producers'); // [String]
+    genre = formData.get('genre'); // MusicGenre
+    release_date = formData.get('release_date');
+    artists = formData.get('artists'); // [ID]
+    album = formData.get('album'); // ID
+    try {
+        title = validation.checkString(title, 'title');
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        song_url = validation.checkId(song_url, 'song_url');
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        cover_image_url = validation.checkId(cover_image_url, 'cover_image_url');
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        writtenBy = validation.checkString(writtenBy, 'writtenBy');
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        producers = validation.checkStringArray(producers, 'producers');
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        genre = validation.checkString(genre, 'genre');
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        // TODO: Release date
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        // TODO: artists
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        album = validation.checkId(album, 'album');
+    } catch (e) {
+        errors.push(e);
+    }
+    if (errors.length > 0) {
+        return {errorMessages: errors};
+    } else {
+        try {
+            const client = getClient();
+            const {data}  = await client.mutate({
+                mutation: queries.ADD_SONG,
+                variables: { title, song_url, cover_image_url, writtenBy, producers, genre, release_date, artists, album },
+            });
+            return {song: data?.addSong};
+        } catch (e) {
+            errors.push(e?.message);
+            return {errorMessages: errors};
+        }
+    }
+}
+export async function updateSong(prevState, formData) {
+    let songId, title, duration, song_url, cover_image_url, writtenBy, producers, genre, release_date, artists, album;
+    let errors = [];
+    songId = formData.get('songId');
+    title = formData.get('title');
+    duration = formData.get('duration');
+    song_url = formData.get('song_url'); // ID
+    cover_image_url = formData.get('cover_image_url'); // ID
+    writtenBy = formData.get('writtenBy');
+    producers = formData.get('producers'); // [String]
+    genre = formData.get('genre'); // MusicGenre
+    release_date = formData.get('release_date');
+    artists = formData.get('artists'); // [ID]
+    // album = formData.get('album'); // ID
+    try {
+        songId = validation.checkId(songId, 'songId');
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (title) {
+            title = validation.checkString(title, 'title');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (duration) {
+            // TODO: Validate duration
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (song_url) {
+            song_url = validation.checkId(song_url, 'song_url');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (cover_image_url) {
+            cover_image_url = validation.checkId(cover_image_url, 'cover_image_url');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (writtenBy) {
+            writtenBy = validation.checkString(writtenBy, 'writtenBy');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (producers) {
+            producers = validation.checkStringArray(producers, 'producers');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (genre) {
+            genre = validation.checkString(genre, 'genre');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (release_date) {
+            // TODO: Release date
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (artists) {
+            // TODO: artists
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    if (errors.length > 0) {
+        return {errorMessages: errors};
+    } else {
+        try {
+            const client = getClient();
+            const {data}  = await client.mutate({
+                mutation: queries.EDIT_SONG,
+                variables: {songId, title, duration, song_url, cover_image_url, writtenBy, producers, genre, release_date, artists },
+            });
+            return {song: data?.editSong};
+        } catch (e) {
+            errors.push(e?.message);
+            return {errorMessages: errors};
+        }
+    }
+}
+export async function deleteSong(songId) {
+    let errors = [];
+    try {
+        songId = validation.checkId(songId, 'songId');
+    } catch (e) {
+        errors.push(e);
+    }
+    if (errors.length > 0) {
+        return {errorMessages: errors};
+    } else {
+        try {
+            const client = getClient();
+            const {data}  = await client.mutate({
+                mutation: queries.REMOVE_SONG,
+                variables: { songId },
+            });
+            return {song: data?.removeSong};
+        } catch (e) {
+            errors.push(e?.message);
             return {errorMessages: errors};
         }
     }

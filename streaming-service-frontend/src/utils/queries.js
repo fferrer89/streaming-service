@@ -443,6 +443,62 @@ const GET_SONG_BY_ID = gql`
     }
   }
 `;
+const ADD_SONG = gql`
+  mutation addSong(
+    $title: String!
+    $song_url: ID!
+    $cover_image_url: ID!
+    $writtenBy: String!
+    $producers: [String!]!
+    $genre: MusicGenre!
+    $release_date: Date!
+    $artists: [ID!]!
+    $album: ID
+  ) {
+    addSong(
+      title: $title
+      song_url: $song_url
+      cover_image_url: $cover_image_url
+      writtenBy: $writtenBy
+      producers: $producers
+      genre: $genre
+      release_date: $release_date
+      artists: $artists
+      album: $album
+    ) {
+      _id
+    }
+  }
+`;
+const EDIT_SONG = gql`
+  mutation editSong(
+    $songId: ID!
+    $title: String
+    $duration: Int
+    $song_url: ID
+    $cover_image_url: ID
+    $writtenBy: String
+    $producers: [String!]
+    $genre: MusicGenre
+    $release_date: Date
+    $artists: [ID!]
+  ) {
+    editSong(
+      songId: $songId
+      title: $title
+      duration: $duration
+      song_url: $song_url
+      cover_image_url: $cover_image_url
+      writtenBy: $writtenBy
+      producers: $producers
+      genre: $genre
+      release_date: $release_date
+      artists: $artists
+    ) {
+      _id
+    }
+  }
+`;
 
 const EDIT_ARTIST = gql`
   mutation mutation(
@@ -503,6 +559,8 @@ const queries = {
   GET_ALBUM_BY_ID,
   GET_SONGS_BY_ARTIST,
   GET_SONG_BY_ID,
+  ADD_SONG,
+  EDIT_SONG,
   EDIT_ARTIST,
 };
 

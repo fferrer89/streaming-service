@@ -25,14 +25,12 @@ export default function AlbumFormDialog({method, actionData, action,
             if (actionData?.errorMessages?.length > 0) {
                 setAddModalStatus('open');
             } else if (actionData?.album?._id) {
-                console.info(actionData?.album?._id);
                 formElement.current.reset();
                 setAddModalStatus('');
                 setShowFormDialog(false);
                 refetch()
             }
         }
-        console.info(actionData);
         delete actionData?.album;
         hasPageBeenRendered.current = true;
     }, [actionData?.errorMessages?.length, actionData?.album?._id]);
