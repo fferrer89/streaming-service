@@ -3,10 +3,10 @@ import React, { ReactNode, useEffect } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
 import { useQuery } from '@apollo/client';
-import { HiUsers, HiUserGroup } from "react-icons/hi";
-import { BsSoundwave } from "react-icons/bs";
-import { PiMusicNotesFill } from "react-icons/pi";
-import { BsMusicPlayerFill } from "react-icons/bs";
+import { HiUsers, HiUserGroup } from 'react-icons/hi';
+import { BsSoundwave } from 'react-icons/bs';
+import { PiMusicNotesFill } from 'react-icons/pi';
+import { BsMusicPlayerFill } from 'react-icons/bs';
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Legend, Tooltip, Bar, PieChart, Pie, Cell } from 'recharts';
 
 interface User {
@@ -45,7 +45,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+    <text x={x} y={y} fill='white' textAnchor={x > cx ? 'start' : 'end'} dominantBaseline='central'>
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
@@ -105,12 +105,14 @@ const AdminDashboard: React.FC = () => {
   let userMaleCount = 0;
   let userOtherCount = 0;
   userData.users.forEach((user: User) => {
-    if (user.gender.toLowerCase() === 'female') {
-      userFemaleCount++;
-    } else if (user.gender.toLowerCase() === 'male') {
-      userMaleCount++;
-    } else {
-      userOtherCount++;
+    if (user.gender) {
+      if (user.gender.toLowerCase() === 'female') {
+        userFemaleCount++;
+      } else if (user.gender.toLowerCase() === 'male') {
+        userMaleCount++;
+      } else {
+        userOtherCount++;
+      }
     }
   });
 
@@ -124,12 +126,14 @@ const AdminDashboard: React.FC = () => {
   let artistMaleCount = 0;
   let artistOtherCount = 0;
   artistData.artists.forEach((artist: Artist) => {
-    if (artist.gender.toLowerCase() === 'female') {
-      artistFemaleCount++;
-    } else if (artist.gender.toLowerCase() === 'male') {
-      artistMaleCount++;
-    } else {
-      artistOtherCount++;
+    if (artist.gender) {
+      if (artist.gender.toLowerCase() === 'female') {
+        artistFemaleCount++;
+      } else if (artist.gender.toLowerCase() === 'male') {
+        artistMaleCount++;
+      } else {
+        artistOtherCount++;
+      }
     }
   });
 
@@ -142,10 +146,12 @@ const AdminDashboard: React.FC = () => {
   let songEnglishCount = 0;
   let songOtherCount = 0;
   songData.songs.forEach((song: Song) => {
-    if (song.language.toLowerCase() === 'english') {
-      songEnglishCount++;
-    } else {
-      songOtherCount++;
+    if (song.language) {
+      if (song.language.toLowerCase() === 'english') {
+        songEnglishCount++;
+      } else {
+        songOtherCount++;
+      }
     }
   });
 
@@ -154,146 +160,148 @@ const AdminDashboard: React.FC = () => {
     { name: 'Other', value: songOtherCount }
   ];
 
-  return (
-    <>
-      <main className='flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
-        <AdminSidebar></AdminSidebar>
-        <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
-          <h1 className='text-4xl text-[#22333B]'>
-            Welcome {`${adminData.admin[0].first_name} ${adminData.admin[0].last_name}`}&#33;
-          </h1>
-          <div className='flex flex-col md:flex-wrap md:flex-row gap-2 w-full'>
-            <CountWrapper>
-              <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-sky-500'>
-                <HiUsers className='text-xl text-white' />
-              </div>
-              <div className='flex flex-col pl-8 sm:pl-3'>
-                <span className='text-sm text-[#B29B80]'>Total Users</span>
-                <span className='text-xl text-center text-white font-semibold'>{data.getUserCount}</span>
-              </div>
-            </CountWrapper>
-            <CountWrapper>
-              <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-orange-500'>
-                <HiUserGroup className='text-2xl text-white' />
-              </div>
-              <div className='flex flex-col pl-8 sm:pl-3'>
-                <span className='text-sm text-[#B29B80]'>Total Artists</span>
-                <span className='text-xl text-center text-white font-semibold'>{data.getArtistCount}</span>
-              </div>
-            </CountWrapper>
-            <CountWrapper>
-              <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-green-500'>
-                <BsSoundwave className='text-2xl text-white' />
-              </div>
-              <div className='flex flex-col pl-8 sm:pl-3'>
-                <span className='text-sm text-[#B29B80]'>Total Albums</span>
-                <span className='text-xl text-center text-white font-semibold'>{data.getAlbumCount}</span>
-              </div>
-            </CountWrapper>
-            <CountWrapper>
-              <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-yellow-500'>
-                <PiMusicNotesFill className='text-2xl text-white' />
-              </div>
-              <div className='flex flex-col pl-8 sm:pl-3'>
-                <span className='text-sm text-[#B29B80]'>Total Songs</span>
-                <span className='text-xl text-center text-white font-semibold'>{data.getSongCount}</span>
-              </div>
-            </CountWrapper>
-            <CountWrapper>
-              <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-red-500'>
-                <BsMusicPlayerFill className='text-xl text-white' />
-              </div>
-              <div className='flex flex-col pl-8 sm:pl-3'>
-                <span className='text-sm text-[#B29B80]'>Total Playlists</span>
-                <span className='text-xl text-center text-white font-semibold'>{data.getPlaylistCount}</span>
-              </div>
-            </CountWrapper>
-          </div>
-          <div className='h-80 bg-[#22333B] rounded-sm p-4'>
-            <span className='text-lg text-[#C6AC8E]'>Total Count Analysis</span>
-            <ResponsiveContainer width='100%' height='100%'>
-              <BarChart width={500} height={500} data={countData} margin={{ top: 30, right: 20, left: -20, bottom: 20 }}>
-                <CartesianGrid strokeDasharray='0' vertical={false} stroke='#C6AC8E' />
-                <XAxis dataKey='name' stroke='#C6AC8E' />
-                <YAxis stroke='#C6AC8E' />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey='count' fill='#C6AC8E' barSize={80} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
-            <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-              <span className='text-lg pt-4 text-[#C6AC8E]'>User Profile</span>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart width={400} height={400}>
-                  <Pie
-                    data={userGenderData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {userGenderData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
+  if (data && adminData && userData && artistData && songData) {
+    return (
+      <>
+        <main className='flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
+          <AdminSidebar></AdminSidebar>
+          <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
+            <h1 className='text-4xl text-[#22333B]'>
+              Welcome {`${adminData.admin[0].first_name} ${adminData.admin[0].last_name}`}&#33;
+            </h1>
+            <div className='flex flex-col md:flex-wrap md:flex-row gap-2 w-full'>
+              <CountWrapper>
+                <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-sky-500'>
+                  <HiUsers className='text-xl text-white' />
+                </div>
+                <div className='flex flex-col pl-8 sm:pl-3'>
+                  <span className='text-sm text-[#B29B80]'>Total Users</span>
+                  <span className='text-xl text-center text-white font-semibold'>{data.getUserCount}</span>
+                </div>
+              </CountWrapper>
+              <CountWrapper>
+                <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-orange-500'>
+                  <HiUserGroup className='text-2xl text-white' />
+                </div>
+                <div className='flex flex-col pl-8 sm:pl-3'>
+                  <span className='text-sm text-[#B29B80]'>Total Artists</span>
+                  <span className='text-xl text-center text-white font-semibold'>{data.getArtistCount}</span>
+                </div>
+              </CountWrapper>
+              <CountWrapper>
+                <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-green-500'>
+                  <BsSoundwave className='text-2xl text-white' />
+                </div>
+                <div className='flex flex-col pl-8 sm:pl-3'>
+                  <span className='text-sm text-[#B29B80]'>Total Albums</span>
+                  <span className='text-xl text-center text-white font-semibold'>{data.getAlbumCount}</span>
+                </div>
+              </CountWrapper>
+              <CountWrapper>
+                <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-yellow-500'>
+                  <PiMusicNotesFill className='text-2xl text-white' />
+                </div>
+                <div className='flex flex-col pl-8 sm:pl-3'>
+                  <span className='text-sm text-[#B29B80]'>Total Songs</span>
+                  <span className='text-xl text-center text-white font-semibold'>{data.getSongCount}</span>
+                </div>
+              </CountWrapper>
+              <CountWrapper>
+                <div className='flex items-center justify-center min-h-10 min-w-10 rounded-full bg-red-500'>
+                  <BsMusicPlayerFill className='text-xl text-white' />
+                </div>
+                <div className='flex flex-col pl-8 sm:pl-3'>
+                  <span className='text-sm text-[#B29B80]'>Total Playlists</span>
+                  <span className='text-xl text-center text-white font-semibold'>{data.getPlaylistCount}</span>
+                </div>
+              </CountWrapper>
+            </div>
+            <div className='h-80 bg-[#22333B] rounded-sm p-4'>
+              <span className='text-lg text-[#C6AC8E]'>Total Count Analysis</span>
+              <ResponsiveContainer width='100%' height='100%'>
+                <BarChart width={500} height={500} data={countData} margin={{ top: 30, right: 20, left: -20, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray='0' vertical={false} stroke='#C6AC8E' />
+                  <XAxis dataKey='name' stroke='#C6AC8E' />
+                  <YAxis stroke='#C6AC8E' />
+                  <Tooltip />
                   <Legend />
-                </PieChart>
+                  <Bar dataKey='count' fill='#C6AC8E' barSize={80} />
+                </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-              <span className='text-lg pt-4 text-[#C6AC8E]'>Artist Profile</span>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart width={400} height={400}>
-                  <Pie
-                    data={artistGenderData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {artistGenderData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-              <span className='text-lg pt-4 text-[#C6AC8E]'>Songs Language</span>
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart width={400} height={400}>
-                  <Pie
-                    data={songLanguageData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {songLanguageData.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={['#EAb308', '#EF4444'][index % 2]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
+            <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
+              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 text-[#C6AC8E]'>User Profile</span>
+                <ResponsiveContainer width='100%' height='100%'>
+                  <PieChart width={400} height={400}>
+                    <Pie
+                      data={userGenderData}
+                      cx='50%'
+                      cy='50%'
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={100}
+                      fill='#8884d8'
+                      dataKey='value'
+                    >
+                      {userGenderData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 text-[#C6AC8E]'>Artist Profile</span>
+                <ResponsiveContainer width='100%' height='100%'>
+                  <PieChart width={400} height={400}>
+                    <Pie
+                      data={artistGenderData}
+                      cx='50%'
+                      cy='50%'
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={100}
+                      fill='#8884d8'
+                      dataKey='value'
+                    >
+                      {artistGenderData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 text-[#C6AC8E]'>Songs Language</span>
+                <ResponsiveContainer width='100%' height='100%'>
+                  <PieChart width={400} height={400}>
+                    <Pie
+                      data={songLanguageData}
+                      cx='50%'
+                      cy='50%'
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={100}
+                      fill='#8884d8'
+                      dataKey='value'
+                    >
+                      {songLanguageData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={['#EAb308', '#EF4444'][index % 2]} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
-        </div>
-      </main>
-    </>
-  );
+        </main>
+      </>
+    );
+  }
 }
 
 interface CountWrapperProps {
