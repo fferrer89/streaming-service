@@ -1,10 +1,11 @@
 'use client'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
-import { PiMusicNotesFill } from "react-icons/pi";
+import { PiMusicNotesFill } from 'react-icons/pi';
+import DeleteModal from '@/components/admin/DeleteModal';
 
 interface SongRef {
   _ref: string;
@@ -26,6 +27,9 @@ interface Songs {
 }
 
 const SongList: React.FC = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [songId, setSongId] = useState('');
+  const [songTitle, setSongTitle] = useState('');
   const { data, loading, error } = useQuery(queries.GET_SONGS, { fetchPolicy: 'cache-and-network' });
   const [removeSong] = useMutation(queries.REMOVE_SONG, {
     update(cache, { data: { removeSong } }) {
@@ -62,12 +66,20 @@ const SongList: React.FC = () => {
     document.title = 'Dashboard | Sounds 54';
   }, []);
 
-  const handleUserDelete = (songId: string) => {
+  const handleSongDelete = () => {
     removeSong({
       variables: {
         songId: songId
       }
     });
+
+    setOpenModal(false);
+  };
+
+  const handleModal = (songId: string, songTitle: string) => {
+    setSongId(songId);
+    setSongTitle(songTitle)
+    setOpenModal(true);
   };
 
   if (loading) {
@@ -93,16 +105,24 @@ const SongList: React.FC = () => {
                 <div key={song._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
                   <PiMusicNotesFill className='w-16 h-16 mb-4' />
                   <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{song.title}</h5>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Genre: {song.genre}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Likes: {song.likes}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Language: {song.language}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Release Date: {date(song.release_date)}</span>
-                  <span className='text-sm text-[#C6AC8E]'>Written By: {song.writtenBy}</span>
-                  <button onClick={() => handleUserDelete(song._id)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Genre: {(song.genre) ? song.genre : '-'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Likes: {(song.likes) ? song.likes : '-'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Language: {(song.language) ? song.language : '-'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Release Date: {(song.release_date) ? date(song.release_date) : '-'}</span>
+                  <span className='text-sm text-[#C6AC8E]'>Written By: {(song.writtenBy) ? song.writtenBy : '-'}</span>
+                  <button onClick={() => handleModal(song._id, song.title)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
                 </div>
               ))}
             </div>
           </div>
+          {openModal &&
+            <DeleteModal open={openModal} item={`song ${songTitle}`} onClose={() => setOpenModal(false)}>
+              <div className='flex gap-4'>
+                <button onClick={handleSongDelete} className='w-full mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                <button className='w-full mt-6 px-4 py-2 text-sm text-white bg-neutral-700 shadow rounded-md hover:bg-neutral-800' onClick={() => setOpenModal(false)}>Cancel</button>
+              </div>
+            </DeleteModal>
+          }
         </main>
       </>
     );

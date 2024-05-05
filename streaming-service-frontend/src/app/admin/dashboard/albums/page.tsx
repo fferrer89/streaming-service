@@ -1,10 +1,11 @@
 'use client'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
 import { BsSoundwave } from 'react-icons/bs';
+import DeleteModal from '@/components/admin/DeleteModal';
 
 interface AlbumRef {
   _ref: string;
@@ -25,6 +26,9 @@ interface Albums {
 }
 
 const AlbumList: React.FC = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [albumId, setAlbumId] = useState('');
+  const [albumTitle, setAlbumTitle] = useState('');
   const { data, loading, error } = useQuery(queries.GET_ALBUMS, { fetchPolicy: 'cache-and-network' });
   const [removeAlbum] = useMutation(queries.REMOVE_ALBUM, {
     update(cache, { data: { removeAlbum } }) {
@@ -61,12 +65,20 @@ const AlbumList: React.FC = () => {
     document.title = 'Dashboard | Sounds 54';
   }, []);
 
-  const handleAlbumDelete = (albumId: string) => {
+  const handleAlbumDelete = () => {
     removeAlbum({
       variables: {
         id: albumId
       }
     });
+
+    setOpenModal(false);
+  };
+
+  const handleModal = (albumId: string, albumTitle: string) => {
+    setAlbumId(albumId);
+    setAlbumTitle(albumTitle)
+    setOpenModal(true);
   };
 
   if (loading) {
@@ -96,11 +108,19 @@ const AlbumList: React.FC = () => {
                   <span className='text-sm mb-2 text-[#C6AC8E]'>Songs: {album.total_songs}</span>
                   <span className='text-sm mb-2 text-[#C6AC8E]'>Release: {date(album.release_date)}</span>
                   <span className='text-sm text-[#C6AC8E]'>Created: {date(album.created_date)}</span>
-                  <button onClick={() => handleAlbumDelete(album._id)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                  <button onClick={() => handleModal(album._id, album.title)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
                 </div>
               ))}
             </div>
           </div>
+          {openModal &&
+            <DeleteModal open={openModal} item={`album ${albumTitle}`} onClose={() => setOpenModal(false)}>
+              <div className='flex gap-4'>
+                <button onClick={handleAlbumDelete} className='w-full mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                <button className='w-full mt-6 px-4 py-2 text-sm text-white bg-neutral-700 shadow rounded-md hover:bg-neutral-800' onClick={() => setOpenModal(false)}>Cancel</button>
+              </div>
+            </DeleteModal>
+          }
         </main>
       </>
     );

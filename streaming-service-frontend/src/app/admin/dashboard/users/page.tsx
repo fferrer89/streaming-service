@@ -1,10 +1,11 @@
 'use client'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
 import { FaUserAlt } from 'react-icons/fa';
+import DeleteModal from '@/components/admin/DeleteModal';
 
 interface UserRef {
   _ref: string;
@@ -25,6 +26,9 @@ interface Users {
 }
 
 const UserList: React.FC = () => {
+  const [openModal, setOpenModal] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [userName, setUserName] = useState('');
   const { data, loading, error } = useQuery(queries.GET_USERS, { fetchPolicy: 'cache-and-network' });
   const [removeUser] = useMutation(queries.REMOVE_USER, {
     update(cache, { data: { removeUser } }) {
@@ -55,12 +59,20 @@ const UserList: React.FC = () => {
     document.title = 'Dashboard | Sounds 54';
   }, []);
 
-  const handleUserDelete = (userId: string) => {
+  const handleUserDelete = () => {
     removeUser({
       variables: {
         userId: userId
       }
     });
+
+    setOpenModal(false);
+  };
+
+  const handleModal = (userId: string, userName: string) => {
+    setUserId(userId);
+    setUserName(userName)
+    setOpenModal(true);
   };
 
   if (loading) {
@@ -88,12 +100,20 @@ const UserList: React.FC = () => {
                   <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{user.display_name}</h5>
                   <span className='text-sm mb-2 text-[#C6AC8E]'>{`${user.first_name} ${user.last_name}`}</span>
                   <span className='text-sm mb-2 text-[#C6AC8E]'>{user.email}</span>
-                  <span className='text-sm text-[#C6AC8E]'>{user.gender}</span>
-                  <button onClick={() => handleUserDelete(user._id)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                  <span className='text-sm text-[#C6AC8E]'>{(user.gender) ? user.gender : '-'}</span>
+                  <button onClick={() => handleModal(user._id, `${user.first_name} ${user.last_name}`)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
                 </div>
               ))}
             </div>
           </div>
+          {openModal &&
+            <DeleteModal open={openModal} item={`user ${userName}`} onClose={() => setOpenModal(false)}>
+              <div className='flex gap-4'>
+                <button onClick={handleUserDelete} className='w-full mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                <button className='w-full mt-6 px-4 py-2 text-sm text-white bg-neutral-700 shadow rounded-md hover:bg-neutral-800' onClick={() => setOpenModal(false)}>Cancel</button>
+              </div>
+            </DeleteModal>
+          }
         </main>
       </>
     );
