@@ -119,20 +119,20 @@ type Mutation {
         description: String!,
         release_date: Date!,
         artists: [ID!],
-        songs: [ID!],
+        songs: [ID],
         genres: [MusicGenre!]!,
         visibility: Visibility!
     ): Album
 
     editAlbum(
         _id: ID!,
-        album_type: String,
+        album_type: AlbumType,
         cover_image_url: ID,
         title: String,
         description: String,
         release_date: Date,
-        genres: [String!],
-        visibility: String
+        genres: [MusicGenre!],
+        visibility: Visibility
     ): Album
 
     #    FIXME what is the intended behavior of this operation?
