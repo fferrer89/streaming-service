@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@apollo/client";
 import queries from "@/utils/queries";
 import { useForm } from "react-hook-form";
+import { useDispatch } from 'react-redux';
+import { register_re } from '@/utils/redux/features/user/userSlice';
 
 export default function Signup() {
   const router = useRouter();
@@ -17,12 +19,15 @@ export default function Signup() {
   const [role, setRole] = useState();
   const [userError, setUserError] = useState(false);
   const [artistError, setArtistError] = useState(false);
+  const dispatch = useDispatch();
 
   const [registerUser] = useMutation(queries.REGISTER_USER, {
-    onCompleted: () => {
+    onCompleted: (data) => {
+      const { user, token } = data.registerUser;
       setUserError(false);
-      document.getElementById("register").reset();
-      router.push("/login");
+      document.getElementById('register').reset();
+      dispatch(register_re({ user, token, expiresIn: 3600, userType: 'user' }));
+      router.push('/');
     },
     onError(error) {
       setUserError(true);
@@ -30,10 +35,12 @@ export default function Signup() {
   });
 
   const [registerArtist] = useMutation(queries.REGISTER_ARTIST, {
-    onCompleted: () => {
+    onCompleted: (data) => {
+      const { artist, token } = data.registerArtist;
       setArtistError(false);
-      document.getElementById("register").reset();
-      router.push("/login");
+      document.getElementById('register').reset();
+      dispatch(register_re({ user: artist, token, expiresIn: 3600, userType: 'artist' }));
+      router.push('/artist/dashboard');
     },
     onError(error) {
       setArtistError(true);
