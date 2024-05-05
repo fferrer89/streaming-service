@@ -203,7 +203,6 @@ const GET_ARTIST_BY_ID = gql`
       first_name
       last_name
       display_name
-
     }
   }
 `;
@@ -217,6 +216,7 @@ const GET_ALBUMS_BY_ARTIST = gql`
       description
       release_date
       visibility
+      cover_image_url
       genres
       songs {
         _id
@@ -302,7 +302,8 @@ const ADD_ALBUM = gql`
       release_date: $release_date
       visibility: $visibility
       genres: $genres
-      artists: $artists) {
+      artists: $artists
+    ) {
       _id
       title
       album_type
@@ -333,8 +334,94 @@ const EDIT_ALBUM = gql`
       description: $description
       release_date: $release_date
       visibility: $visibility
-      genres: $genres) {
+      genres: $genres
+    ) {
       _id
+    }
+  }
+`;
+
+const GET_ALBUM_BY_ID = gql`
+  query query($id: ID!) {
+    getAlbumById(_id: $id) {
+      _id
+      album_type
+      artists {
+        _id
+        display_name
+      }
+      cover_image_url
+      created_date
+      description
+      genres
+      last_updated
+      liked_by {
+        artists
+        users
+      }
+      likes
+      release_date
+      songs {
+        _id
+        title
+      }
+      title
+      total_duration
+      visibility
+    }
+  }
+`;
+
+const GET_SONGS_BY_ARTIST = gql`
+  query query($artistId: String!) {
+    getSongsByArtistID(artistId: $artistId) {
+      _id
+      album {
+        _id
+        title
+      }
+      artists {
+        _id
+        display_name
+      }
+      cover_image_url
+      duration
+      genre
+      language
+      likes
+      lyrics
+      producers
+      release_date
+      song_url
+      title
+      writtenBy
+    }
+  }
+`;
+
+const GET_SONG_BY_ID = gql`
+  query query($id: ID!) {
+    getSongById(_id: $id) {
+      _id
+      album {
+        _id
+        title
+      }
+      artists {
+        _id
+        display_name
+      }
+      cover_image_url
+      duration
+      genre
+      language
+      likes
+      lyrics
+      producers
+      release_date
+      song_url
+      title
+      writtenBy
     }
   }
 `;
@@ -360,7 +447,10 @@ const queries = {
   GET_ARTIST_BY_ID,
   GET_ALBUMS_BY_ARTIST,
   ADD_ALBUM,
-  EDIT_ALBUM
+  EDIT_ALBUM,
+  GET_ALBUM_BY_ID,
+  GET_SONGS_BY_ARTIST,
+  GET_SONG_BY_ID,
 };
 
 export default queries;
