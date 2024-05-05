@@ -18,6 +18,11 @@ export async function createAlbum(prevState, formData) {
         errors.push(e);
     }
     try {
+        release_date = validation.dateTimeString(release_date, 'release_date', true);
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
         album_type = validation.checkString(album_type, 'album_type');
     } catch (e) {
         errors.push(e);
@@ -28,6 +33,7 @@ export async function createAlbum(prevState, formData) {
         errors.push(e);
     }
     try {
+        // FIXME: allow multiple genres
         genres = validation.checkString(genres, 'genres');
         genres = [genres]
     } catch (e) {
@@ -39,6 +45,7 @@ export async function createAlbum(prevState, formData) {
         errors.push(e);
     }
     try {
+        // FIXME: allow multiple artists
         artistId = validation.checkId(artistId, 'artistId');
         artists = [artistId]
     } catch (e) {
@@ -75,6 +82,13 @@ export async function updateAlbum(prevState, formData) {
     try {
         if (title) {
             title = validation.checkString(title, 'title');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (release_date) {
+            release_date = validation.dateTimeString(release_date, 'release_date', true);
         }
     } catch (e) {
         errors.push(e);
@@ -201,12 +215,13 @@ export async function createSong(prevState, formData) {
         errors.push(e);
     }
     try {
-        // TODO: Release date
+        release_date = validation.dateTimeString(release_date, 'release_date', true);
     } catch (e) {
         errors.push(e);
     }
     try {
-        // TODO: artists
+        artists = validation.checkIdArray(artists, 'artists');
+
     } catch (e) {
         errors.push(e);
     }
@@ -259,7 +274,7 @@ export async function updateSong(prevState, formData) {
     }
     try {
         if (duration) {
-            // TODO: Validate duration
+            duration = validation.checkNumber(duration, 'duration');
         }
     } catch (e) {
         errors.push(e);
@@ -301,14 +316,14 @@ export async function updateSong(prevState, formData) {
     }
     try {
         if (release_date) {
-            // TODO: Release date
+            release_date = validation.dateTimeString(release_date, 'release_date', true);
         }
     } catch (e) {
         errors.push(e);
     }
     try {
         if (artists) {
-            // TODO: artists
+            artists = validation.checkIdArray(artists, 'artists');
         }
     } catch (e) {
         errors.push(e);
