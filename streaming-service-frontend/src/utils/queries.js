@@ -200,9 +200,36 @@ const GET_ARTIST_BY_ID = gql`
   query query($id: ID!) {
     getArtistById(_id: $id) {
       _id
-      first_name
-      last_name
+      created_date
+      date_of_birth
       display_name
+      email
+      first_name
+      followers {
+        artists {
+          _id
+          display_name
+        }
+        users {
+          _id
+          display_name
+        }
+      }
+      following {
+        artists {
+          display_name
+          _id
+        }
+        users {
+          _id
+          display_name
+        }
+      }
+      gender
+      genres
+      last_name
+      password_changed_date
+      profile_image_url
     }
   }
 `;
@@ -426,6 +453,40 @@ const GET_SONG_BY_ID = gql`
   }
 `;
 
+const EDIT_ARTIST = gql`
+  mutation mutation(
+    $artistId: ID!
+    $firstName: String
+    $lastName: String
+    $displayName: String
+    $email: String
+    $password: String
+    $genres: [MusicGenre]
+  ) {
+    editArtist(
+      artistId: $artistId
+      first_name: $firstName
+      last_name: $lastName
+      display_name: $displayName
+      email: $email
+      password: $password
+      genres: $genres
+    ) {
+      _id
+      created_date
+      date_of_birth
+      display_name
+      email
+      first_name
+      gender
+      genres
+      last_name
+      password_changed_date
+      profile_image_url
+    }
+  }
+`;
+
 const queries = {
   REGISTER_USER,
   REGISTER_ARTIST,
@@ -451,6 +512,7 @@ const queries = {
   GET_ALBUM_BY_ID,
   GET_SONGS_BY_ARTIST,
   GET_SONG_BY_ID,
+  EDIT_ARTIST,
 };
 
 export default queries;
