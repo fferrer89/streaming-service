@@ -2,24 +2,25 @@ import { ObjectId } from "mongodb";
 
 const exportedMethods = {
   checkId(id, varName) {
-    if (!id) throw `You must provide an id for ${varName}`;
-    if (typeof id !== "string") throw `${varName} must be a string`;
-    id = id.trim();
-    if (id.length === 0)
-      throw `${varName} cannot be an empty string or just spaces`;
-    if (!ObjectId.isValid(id)) throw `invalid object ID for ${varName} field`;
+    id = this.checkString(id, varName);
+    if (!ObjectId.isValid(id)) {
+      throw new TypeError(`${varName} must be a valid bson ObjectId`);
+    }
     return id;
   },
-
-  checkString(strVal, varName) {
-    if (!strVal) throw `You must supply a ${varName}!`;
-    if (typeof strVal !== "string") throw `${varName} must be a string!`;
-    strVal = strVal.trim();
-    if (strVal.length === 0)
-      throw `${varName} cannot be an empty string or string with just spaces`;
-    if (!isNaN(strVal))
-      throw ` ${strVal} is not a valid value for ${varName} as it only contains digits`;
-    return strVal;
+  checkString(varVal, varName) {
+    if (varVal === undefined) {
+      throw new TypeError(`${varName} must be provided`);
+    }
+    if (typeof varVal !== 'string') {
+      throw new TypeError(`${varName} must be a string`);
+    }
+    if (varVal.trim() === '') {
+      throw new RangeError(`${varName} can not be an empty string`);
+    }
+    if (!isNaN(varVal))
+      throw new RangeError(`${varVal} is not a valid value for ${varName} as it only contains digits`);
+    return varVal.trim();
   },
   checkNumber(varVal, varName, canBeNegative = false) {
     if (varVal === undefined) {
@@ -49,6 +50,60 @@ const exportedMethods = {
     }
     return arr;
   },
+  checkBoolean(varVal, varName) {
+    if (varVal === undefined) {
+      throw new TypeError(`${varName} must be provided`);
+    }
+    if (typeof varVal !== 'boolean') {
+      throw new TypeError(`${varName} must be a boolean (true or false)`);
+    }
+    return varVal;
+  },
+  /**
+   * Takes {@link arrayVal} and validates that it is a valid array and that all its elements have the correct data type.
+   *
+   * This validation function can only take an array whose elements are of the same primitive data type (boolean, number,
+   * string, bsonObjectId).The original array can contain one or more elements whose data type is an Array, but the
+   * inner array data type elements must be the same data type as the outer array elements.
+   *
+   * Correct examples of {@link arrayVal}:
+   * - ['John', 'Mary', 'Lui', ['Frank', 'Jonas']];
+   * - [true, false, false]
+   * - [11.1, [9, 99.1, 3], 7]
+   * - []
+   *
+   * @param {string} arrayName the array variable name
+   * @param {*[]} arrayVal the array to be validated whose elements have the same data type
+   * @param {string} elementsType  the data type of the array elements, which must be unique for all the elements
+   * @return {*[]} the original array whose elements have been trimmed and checked for validity
+   */
+  checkArray(arrayVal, arrayName, elementsType) {
+    if (arrayVal === undefined) {
+      throw new TypeError(`${arrayName} must be provided`);
+    }
+    if (!(arrayVal instanceof Array)) {
+      throw new TypeError(`${arrayName} must be an array`);
+    }
+    let array = []; // Copy of the original array with its elements trimmed and checked for validity
+    const ERROR_MESSAGE_TYPE = `All elements in ${arrayName}`
+    arrayVal.forEach((element) => {
+      if (element instanceof Array) {
+        array.push(this.checkArray(element, arrayName.concat('-inner'), elementsType));
+      } else if (elementsType === 'boolean') {
+        array.push(this.checkBoolean(element, ERROR_MESSAGE_TYPE));
+      } else if (elementsType === 'number') {
+        array.push(this.checkNumber(element, ERROR_MESSAGE_TYPE));
+      } else if (elementsType === 'string') {
+        array.push(this.checkString(element, ERROR_MESSAGE_TYPE));
+      } else if (elementsType === 'bsonObjectId') {
+        array.push(this.checkId(element, ERROR_MESSAGE_TYPE));
+      } else {
+        throw new Error(`${elementsType} is an unrecognized data type. Available data types are boolean, number, string, array, and object`);
+      }
+    })
+    return array;
+  },
+
   checkIdArray(arr, varName) {
     //We will allow an empty array for this,
     //if it's not empty, we will make sure all tags are strings

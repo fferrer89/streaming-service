@@ -308,37 +308,37 @@ export async function createSong(prevState, formData) {
   try {
     title = validation.checkString(title, "title");
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   try {
     song_url = await httpClientReqs.uploadFile(song_url);
   } catch (error) {
     errors.push(
-      `Failed to upload song mp3 file - ${error?.message} - ${error?.cause}`
+      `Failed to upload song mp3 file - ${error?.message}`
     );
   }
   try {
     cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
   } catch (error) {
     errors.push(
-      `Failed to upload cover image file - ${error?.message} - ${error?.cause}`
+      `Failed to upload cover image file - ${error?.message}`
     );
   }
   try {
     writtenBy = validation.checkString(writtenBy, "writtenBy");
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   try {
     producers = validation.checkString(producers, "producers");
     producers = producers.split(';');
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   try {
     genre = validation.checkString(genre, "genre");
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   try {
     release_date = validation.dateTimeString(
@@ -347,36 +347,45 @@ export async function createSong(prevState, formData) {
       true
     );
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   try {
     artistId = validation.checkId(artistId, "artistId");
     artists = [artistId];
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
 
   // Optional fields
   try {
-    if (album !== null && album !== undefined) {
+    if (album !== null && album !== undefined && album?.trim() !== '') {
       album = validation.checkId(album, "album");
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   try {
-    if (duration !== null && duration !== undefined) {
-      duration = validation.checkNumber(duration, "duration");
+    if (duration !== null && duration !== undefined && duration?.trim() !== '') {
+      duration = validation.checkNumber(parseInt(duration, 10), "duration");
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   try {
-    if (lyrics !== null && lyrics !== undefined) {
+    if (lyrics !== null && lyrics !== undefined && lyrics?.trim() !== '') {
       lyrics = validation.checkString(lyrics, "lyrics");
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
+  }
+  if (album === '') {
+    album = undefined
+  }
+  if (duration === '') {
+    duration = undefined
+  }
+  if (lyrics === '') {
+    lyrics = undefined
   }
 
   if (errors.length > 0) {
@@ -402,6 +411,7 @@ export async function createSong(prevState, formData) {
       });
       return { song: data?.addSong };
     } catch (e) {
+      errors.push(`here:`);
       errors.push(e?.message);
       return { errorMessages: errors };
     }

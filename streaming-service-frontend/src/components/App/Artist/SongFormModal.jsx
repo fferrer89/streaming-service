@@ -78,7 +78,13 @@ export default function SongFormModal({actionData, action, artistSongs, setShowM
                         </label>
                         <input type="date" id="release_date" name="release_date" required
                                className="border border-gray-300 rounded-md p-2 w-full"/>
-
+                    </div>
+                    <div className="mb-4">
+                        <label htmlFor="duration" className="block text-gray-700 font-semibold mb-2">
+                            Song Duration
+                        </label>
+                        <input type="number" id="duration" name="duration"
+                               className="border border-gray-300 rounded-md p-2 w-full"/>
                     </div>
                     <div className="mb-4">
                         <label htmlFor="genre" className="block text-gray-700 font-semibold mb-2">
