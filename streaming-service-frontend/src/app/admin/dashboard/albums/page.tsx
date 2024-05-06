@@ -6,6 +6,7 @@ import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
 import { BsSoundwave } from 'react-icons/bs';
 import DeleteModal from '@/components/admin/DeleteModal';
+import Image from 'next/image';
 
 interface AlbumRef {
   _ref: string;
@@ -23,6 +24,8 @@ interface Albums {
   total_songs: string;
   release_date: string;
   created_date: string;
+  cover_image_url: string;
+  visibility: string;
 }
 
 const AlbumList: React.FC = () => {
@@ -106,12 +109,16 @@ const AlbumList: React.FC = () => {
             <div className='flex flex-col md:flex-wrap md:flex-row gap-6 w-full'>
               {data.albums.map((album: Albums) => (
                 <div key={album._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
-                  <BsSoundwave className='w-16 h-16 mb-4 rounded-full' />
+                  {(album.cover_image_url) ?
+                    <Image src={album.cover_image_url} alt='Album Cover' width={100} height={100} className='mb-4 rounded-full' /> :
+                    <BsSoundwave className='w-16 h-16 mb-4 rounded-full' />
+                  }
                   <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{album.title}</h5>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>{(album.album_type) ? album.album_type : '-'}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Songs: {(album.total_songs) ? album.total_songs : '-'}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Release: {(album.release_date) ? date(album.release_date) : '-'}</span>
-                  <span className='text-sm text-[#C6AC8E]'>Created: {(album.created_date) ? date(album.created_date) : '-'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>{(album.album_type) ? album.album_type : '--'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Songs: {album.total_songs}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Released: {(album.release_date) ? date(album.release_date) : '--'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Created: {(album.created_date) ? date(album.created_date) : '--'}</span>
+                  <span className='text-sm text-[#C6AC8E]'>Visibility: {(album.visibility) ? album.visibility : '--'}</span>
                   <button onClick={() => handleModal(album._id, album.title)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
                 </div>
               ))}
