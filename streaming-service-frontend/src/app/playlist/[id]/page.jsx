@@ -35,7 +35,7 @@ export default function Playlist({ params }) {
               className="flex flex-row justify-between"
               style={{ paddingBottom: "2.5rem" }}
             >
-              <p className="text-lg">Song</p>
+              <p className="text-lg px-5">Song</p>
               <p>Album</p>
               <p>Duration</p>
             </div>

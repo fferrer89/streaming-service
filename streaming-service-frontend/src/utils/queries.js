@@ -177,7 +177,7 @@ const GET_SONGS = gql`
 `;
 
 const GET_PLAYLISTS_BY_OWNER = gql`
-  query query {
+  query query($userId: userId) {
     getPlaylistsByOwner(userId: $userId) {
       _id
       created_date
@@ -332,8 +332,6 @@ const ADD_ALBUM = gql`
       genres: $genres
       artists: $artists
     ) {
-      artists: $artists
-    ) {
       _id
     }
   }
@@ -358,7 +356,6 @@ const EDIT_ALBUM = gql`
       release_date: $release_date
       visibility: $visibility
       genres: $genres
-    
     ) {
       _id
     }
@@ -616,40 +613,6 @@ const EDIT_ARTIST = gql`
   }
 `;
 
-const EDIT_ARTIST = gql`
-  mutation mutation(
-    $artistId: ID!
-    $firstName: String
-    $lastName: String
-    $displayName: String
-    $email: String
-    $password: String
-    $genres: [MusicGenre]
-  ) {
-    editArtist(
-      artistId: $artistId
-      first_name: $firstName
-      last_name: $lastName
-      display_name: $displayName
-      email: $email
-      password: $password
-      genres: $genres
-    ) {
-      _id
-      created_date
-      date_of_birth
-      display_name
-      email
-      first_name
-      gender
-      genres
-      last_name
-      password_changed_date
-      profile_image_url
-    }
-  }
-`;
-
 const GET_SONG_BY_TITLE = gql`
   query GetSongsByTitle($searchTerm: String!) {
     getSongsByTitle(searchTerm: $searchTerm) {
@@ -706,7 +669,7 @@ const queries = {
   GET_SONG_BY_ID,
   ADD_SONG,
   EDIT_SONG,
-  EDIT_ARTIST,,
+  EDIT_ARTIST,
   TOGGLE_PLAYLIST,
   GET_PLAYLIST,
   EDIT_PLAYLIST,
