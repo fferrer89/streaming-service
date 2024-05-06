@@ -1,4 +1,3 @@
-// Home.tsx
 'use client';
 import React from "react";
 import { Separator } from "@/components/ui/separator";
@@ -22,15 +21,9 @@ const albums = [
 const Home: React.FC = () => {
     const dispatch = useDispatch();
 
-    const handlePlay = (songId: string) => {
-        dispatch(playSong({
-            id: parseInt(songId),
-            title: "Sample Song",
-            artist: "Sample Artist",
-            duration: 180,
-            currentTime: 0,
-        }));
-    };
+    // const handlePlay = () => {
+    //     dispatch(song);
+    // };
 
   return (
     <div
@@ -56,7 +49,7 @@ const Home: React.FC = () => {
           <Separator className="w-[97%]" />
           <InfiniteCarousel
             items={albums.map((album) => (
-              <Card onClick={()=>{handlePlay(album.id.toString())}} key={album.id} image={album.image} songId={album.id.toString()} />
+              <Card onClick={()=>{}} key={album.id} image={album.image} songId={album.id.toString()} />
             ))}
             speed={0.4}
             direction="left"

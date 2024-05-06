@@ -3,6 +3,7 @@ import { GraphQLError } from 'graphql';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
 
+
 export const userResolvers = {
   Query: {
     users: async (_, args, context) => {
@@ -49,7 +50,7 @@ export const userResolvers = {
     },
   },
   Mutation: {
-    registerUser: async (_, args) => {
+    registerUser: async (_, args, context) => {
       try {
         const existingUser = await User.findOne({ email: args.email });
         if (existingUser) {
@@ -78,6 +79,9 @@ export const userResolvers = {
           'user',
           savedUser.first_name
         );
+
+        await context.redisClient.del('users');
+
         return { user: savedUser, token };
       } catch (error) {
         throw new GraphQLError(`Error Registering user: ${error.message}`, {
@@ -87,24 +91,21 @@ export const userResolvers = {
     },
     loginUser: async (_, args) => {
       try {
-        const user = await User.findOne({ email: args.email }).select(
-          '+password'
-        );
+        const user = await User.findOne({ email: args.email }).select('+password');
+        console.log('User:', user);
         if (!user) {
           throw new GraphQLError('Invalid email or password.');
         }
-
-        const isPasswordCorrect = await user.isPasswordCorrect(
-          args.password,
-          user.password
-        );
-
+    
+        console.log('Entered password:', args.password);
+        console.log('Hashed password:', user.password);
+        const isPasswordCorrect = await user.isPasswordCorrect(args.password, user.password);
+        console.log('Password correct:', isPasswordCorrect);
         if (!isPasswordCorrect) {
           throw new GraphQLError('Invalid email or password.');
         }
-
+    
         const token = generateToken(user._id, 'USER', user.first_name);
-
         return { user, token };
       } catch (error) {
         throw error;

@@ -12,12 +12,14 @@ import Grid from 'gridfs-stream';
 import fs from 'fs';
 import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
+
 import SongFile from '../models/songFileModel.js';
 
 await mongoose.connect('mongodb://127.0.0.1:27017/streaming-service', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
+
 
 const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 const uploadSong = async (filePath, albumTitle, songTitle) => {
@@ -78,6 +80,26 @@ const users = [
     gender: 'FEMALE',
     profile_image_url: new mongoose.Types.ObjectId(),
   },
+  {
+    first_name: 'Alice',
+    last_name: 'Smith',
+    display_name: 'alicesmith',
+    email: 'alice@example.com',
+    password: 'Password789$',
+    date_of_birth: '01/01/1988',
+    gender: 'FEMALE',
+    profile_image_url: 'https://picsum.photos/200/200?random=16',
+  },
+  {
+    first_name: 'Bob',
+    last_name: 'Johnson',
+    display_name: 'bobjohnson',
+    email: 'bob@example.com',
+    password: 'Password000$',
+    date_of_birth: '01/01/1992',
+    gender: 'MALE',
+    profile_image_url: 'https://picsum.photos/200/200?random=17',
+  },
 ];
 
 const artists = [
@@ -114,6 +136,7 @@ const SmithMr = {
   date_of_birth: '01/01/1940',
   gender: 'MALE',
   genres: ['COUNTRY'],
+
 };
 
 const BillHobson = {
@@ -203,6 +226,7 @@ const AudioKofee = {
   gender: 'MALE',
   genres: ['ELECTRONIC', 'SYNTH_POP'],
 };
+
 
 const johnAlbum = {
   album_type: 'SINGLE',
@@ -758,7 +782,7 @@ const playlists = [
     description: 'Playlist 1',
     liked_users: [],
     title: 'Playlist 1',
-    owner: null,
+    owner: null, // Assign the first user as the owner
     songs: [],
     visibility: 'PUBLIC',
   },
@@ -766,7 +790,7 @@ const playlists = [
     description: 'Playlist 2',
     liked_users: [],
     title: 'Playlist 2',
-    owner: null,
+    owner: null, // Assign the second user as the owner
     songs: [],
     visibility: 'PRIVATE',
   },
@@ -856,6 +880,18 @@ async function seed() {
 
     const createdSongs = await Song.create(songsWithAlbumsAndArtists);
 
+    for (let song of createdSongs) {
+      const randomAlbumIndex = Math.floor(Math.random() * createdAlbums.length);
+      song.album = createdAlbums[randomAlbumIndex]._id;
+      await Song.findByIdAndUpdate(song._id, { album: song.album });
+    }
+
+    for (let album of createdAlbums) {
+      const randomArtistIndex = Math.floor(Math.random() * createdArtists.length);
+      album.artists = [{ artistId: createdArtists[randomArtistIndex]._id }];
+      await Album.findByIdAndUpdate(album._id, { artists: album.artists });
+    }
+
     for (let album of createdAlbums) {
       const albumSongs = createdSongs.filter((song) =>
         song.album.equals(album._id)
@@ -880,7 +916,7 @@ async function seed() {
       )
     );
 
-    //populating followes and following for artists and user
+    // Populating followers and following for artists and users
     const aids = createdArtists.map((artist) => artist._id);
     for (let currentArtist of createdArtists) {
       const otherArtists = createdArtists.filter(
@@ -936,13 +972,25 @@ async function seed() {
       song.artists = createdArtists.map((artist) => artist._id);
     }
 
-    await Playlist.create(playlists);
+    for (let playlist of playlists) {
+      playlist.songs = createdSongs.map((song) => song._id);
+      playlist.liked_users = createdUsers.map((user) => user._id);
+    }
+
+    if (createdUsers.length >= 2) {
+      playlists[0].owner = createdUsers[0];
+      playlists[1].owner = createdUsers[1];
+    } else {
+      console.error('Not enough users created to assign owners to playlists');
+    }
+
+    const createdPlaylists = await Playlist.create(playlists);
+
     await ListeningHistory.create(listeningHistory);
     await Album.create(albums);
     await Song.create(songs);
 
     for (let data of customData) {
-      //console.log(data.artist);
       let cArtist = await Artist.create(data.artist);
 
       let cAlbum = await Album.create(data.album);
@@ -984,5 +1032,4 @@ async function seed() {
     mongoose.connection.close();
   }
 }
-
 await seed();

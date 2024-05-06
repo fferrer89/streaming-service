@@ -38,32 +38,20 @@ export const playlistResolvers = {
         return playlist;
     },
 
-    getPlaylistsByTitle: async(_, args, context)=>{
-        let{searchTerm} = args; 
-        
-        searchTerm =  songsHelpers.emptyValidation(searchTerm, "Search Term");
-
-        let playlists = await Playlists.find({
-          title: { $regex: new RegExp(searchTerm, 'i') }
-        });
-
-        let filteredPlaylist = playlists.filter((playlist)=>{ //will give different playlist if user is logged in; 
-          if(context.decoded && context.decoded.id && context.decoded.id === playlist.owner.toString()){ // if user is logged in then return playlist where ower id matches;
-              return true; 
-          }
-          else{
-            if(playlist.visibility == "PUBLIC"){ //if not logged in then return only public playlist
-                return true;
-            }
-            return false;
-          }
-        });
-
-        if (filteredPlaylist.length < 1) {
-          songsHelpers.notFoundWrapper('Playlist not not found');
-        }
-        return filteredPlaylist;
-    },
+      getPlaylistsByTitle: async (_, args, context) => {
+        let { searchTerm } = args;
+        searchTerm = songsHelpers.emptyValidation(searchTerm, 'Search Term');
+        let playlists = await Playlists.find({ title: { $regex: new RegExp(searchTerm, 'i') } });
+      
+        return playlists.map(playlist => ({
+          ...playlist._doc,
+          owner: playlist.owner ? {
+            _id: playlist.owner._id,
+            display_name: playlist.owner.display_name
+          } : []
+        }));
+      },
+    
     getMostLikedPlaylists: async (_, { limit = 10 }, contextValue) => {
       try {
         const mostLikedPlaylist= await Playlists.find({visibility:"PUBLIC"})

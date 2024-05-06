@@ -2,11 +2,13 @@
 import React, { ReactNode, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../utils/redux/store';
-import { login } from '../../utils/redux/features/user/userSlice';
-import { playSong } from '../../utils/redux/features/song/songSlice';
+
 import Sidebar from '@/components/App/sidebar/sidebar';
 import SPlayer from '@/components/views/dashboard/footer-player';
 import { useRouter } from 'next/navigation'
+import "../globals.css";
+import { ApolloWrapper } from "../ApolloWrapper";
+
  
 
 interface LayoutProps {
@@ -18,30 +20,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     const router = useRouter();
     const { loggedIn } = useSelector((state: RootState) => state.user);
   
-    // useEffect(() => {
-    //   if (!loggedIn) {
-    //     router.push('/login');
-    //   }
-    // }, [loggedIn, router]);
+    useEffect(() => {
+      if (!loggedIn) {
+        console.log('not logged in:', loggedIn);
+        router.push('/login');
+      }
+    }, [loggedIn, router]);
   
-    const handleLogin = () => {
-      dispatch(login(true));
-      dispatch(playSong({
-        id: 1,
-        title: "Sample Song",
-        artist: "Sample Artist",
-        duration: 180,
-        currentTime: 0,
-      }));
-    };
+   
   
-    // if (!loggedIn) {
-    //   return null;
-    // }
+    if (!loggedIn) {
+      return null;
+    }
   
     return (
+        <ApolloWrapper>
       <div className="flex flex-col h-screen items-start justify-start">
-        <div className="flex flex-row h-full w-full">
+        <div className="flex flex-row h-screen w-screen">
           <div className="w-fit h-full block top-0 left-0 z-50">
             <Sidebar />
           </div>
@@ -51,6 +46,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </main>
         </div>
       </div>
+        </ApolloWrapper>
     );
   };
   
