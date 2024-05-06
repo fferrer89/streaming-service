@@ -12,7 +12,8 @@ export async function createAlbum(prevState, formData) {
     description = formData.get('description');
     genres = formData.getAll('genres');
     visibility = formData.get('visibility');
-    artistId = formData.get('artistId');
+    artistId = formData.get('artistId'); // [ID] -> FIXME: Can be multiple artists
+    //songs = formData.getAll('songs'); // [ID] -> TODO songs
     cover_image_url = formData.get('cover_image_url');
     try {
         title = validation.checkString(title, 'title');
@@ -185,9 +186,10 @@ export async function deleteAlbum(albumId) {
 }
 
 export async function createSong(prevState, formData) {
-    let title, song_url, cover_image_url, writtenBy, producers, genre, release_date, artists, album;
+    let title, duration, song_url, cover_image_url, writtenBy, producers, genre, release_date, artists, lyrics, album;
     let errors = [];
     title = formData.get('title');
+    duration = formData.get('duration');
     song_url = formData.get('song_url'); // ID
     cover_image_url = formData.get('cover_image_url'); // ID
     writtenBy = formData.get('writtenBy');
@@ -195,6 +197,7 @@ export async function createSong(prevState, formData) {
     genre = formData.get('genre'); // MusicGenre
     release_date = formData.get('release_date');
     artists = formData.get('artists'); // [ID]
+    lyrics = formData.get('lyrics'); // String
     album = formData.get('album'); // ID
     try {
         title = validation.checkString(title, 'title');
@@ -242,6 +245,21 @@ export async function createSong(prevState, formData) {
     } catch (e) {
         errors.push(e);
     }
+    // Optional fields
+    try {
+        if (duration) {
+            duration = validation.checkNumber(duration, 'duration');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
+    try {
+        if (lyrics) {
+            lyrics = validation.checkString(lyrics, 'lyrics');
+        }
+    } catch (e) {
+        errors.push(e);
+    }
 
     if (errors.length > 0) {
         return {errorMessages: errors};
@@ -250,7 +268,8 @@ export async function createSong(prevState, formData) {
             const client = getClient();
             const {data}  = await client.mutate({
                 mutation: queries.ADD_SONG,
-                variables: { title, song_url, cover_image_url, writtenBy, producers, genre, release_date, artists, album },
+                variables: { title, duration, song_url, cover_image_url, writtenBy, producers, genre,
+                    release_date, artists, lyrics, album },
             });
             return {song: data?.addSong};
         } catch (e) {

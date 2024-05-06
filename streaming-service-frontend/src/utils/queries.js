@@ -450,6 +450,7 @@ const GET_SONG_BY_ID = gql`
 const ADD_SONG = gql`
   mutation addSong(
     $title: String!
+    $duration: Int
     $song_url: ID!
     $cover_image_url: ID!
     $writtenBy: String!
@@ -457,10 +458,12 @@ const ADD_SONG = gql`
     $genre: MusicGenre!
     $release_date: Date!
     $artists: [ID!]!
+    $lyrics: String
     $album: ID
   ) {
     addSong(
       title: $title
+      duration: $duration
       song_url: $song_url
       cover_image_url: $cover_image_url
       writtenBy: $writtenBy
@@ -468,6 +471,7 @@ const ADD_SONG = gql`
       genre: $genre
       release_date: $release_date
       artists: $artists
+      lyrics: $lyrics
       album: $album
     ) {
       _id
