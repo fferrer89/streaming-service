@@ -73,6 +73,10 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
+  if (adminError || error || userError || artistError || songError) {
+    return <div>Error: {adminError?.message || error?.message || userError?.message || artistError?.message || songError?.message}</div>
+  }
+
   if (data && adminData && userData && artistData && songData) {
     countData = [
       {
@@ -101,7 +105,7 @@ const AdminDashboard: React.FC = () => {
         fill: '#EF4444'
       }
     ];
-  
+
     let userFemaleCount = 0;
     let userMaleCount = 0;
     let userOtherCount = 0;
@@ -116,13 +120,13 @@ const AdminDashboard: React.FC = () => {
         }
       }
     });
-  
+
     userGenderData = [
       { name: 'Female', value: userFemaleCount },
       { name: 'Male', value: userMaleCount },
       { name: 'Other', value: userOtherCount }
     ];
-  
+
     let artistFemaleCount = 0;
     let artistMaleCount = 0;
     let artistOtherCount = 0;
@@ -137,13 +141,13 @@ const AdminDashboard: React.FC = () => {
         }
       }
     });
-  
+
     artistGenderData = [
       { name: 'Female', value: artistFemaleCount },
       { name: 'Male', value: artistMaleCount },
       { name: 'Other', value: artistOtherCount }
     ];
-  
+
     let songEnglishCount = 0;
     let songOtherCount = 0;
     songData.songs.forEach((song: Song) => {
@@ -155,12 +159,12 @@ const AdminDashboard: React.FC = () => {
         }
       }
     });
-  
+
     songLanguageData = [
       { name: 'English', value: songEnglishCount },
       { name: 'Other', value: songOtherCount }
     ];
-    
+
     return (
       <>
         <main className='flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
@@ -231,7 +235,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 text-[#C6AC8E]'>User Profile</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>User Profile</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -253,7 +257,7 @@ const AdminDashboard: React.FC = () => {
                 </ResponsiveContainer>
               </div>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 text-[#C6AC8E]'>Artist Profile</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>Artist Profile</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -275,7 +279,7 @@ const AdminDashboard: React.FC = () => {
                 </ResponsiveContainer>
               </div>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 text-[#C6AC8E]'>Songs Language</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>Songs Language</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
