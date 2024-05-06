@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import helmet from 'helmet';
 
 dotenv.config({ path: './.env' });
 import environment from './config/config.js';
@@ -46,7 +47,7 @@ const server = new ApolloServer({
         `[GRAPHQL] -- Operation = ${req.body.operationName} -- Status = ${res.statusCode}`
       );
     }
-    // will bypass authentication middelware for login, register and playground
+    // will bypass authentication middleware for login, register and playground
     if (
       // Uncomment this part to disable authentication on all queries and mutations
       req.body.operationName.toLowerCase() !== 'mutation' &&
@@ -110,9 +111,19 @@ try {
     //TODO need to add auth middleware for express
     const app = express();
     app.use(express.json());
-    app.use(morgan('dev'));
     app.use(cors());
     //app.use(authenticateToken);
+
+    app.use(helmet.contentSecurityPolicy({
+      directives: {
+        defaultSrc: ["'self'"],
+        imgSrc: ["'self'", 'http://localhost:4000/image', 'data:'],
+      },
+    }));
+    
+    // Move morgan middleware here
+    app.use(morgan('dev'));
+
     app.use(attachRedisClient);
 
     app.use('/file', fileRoutes);
@@ -128,10 +139,6 @@ try {
       `🚀 Server ready at http://localhost:4000${server.graphqlPath}`
     );
     console.log('-------------------------------------------------');
-    // console.log('');
-    // console.log('-------------------------------------------------');
-    // console.log(`🚀  Server ready at: ${url}`);
-    // console.log('-------------------------------------------------');
   } else {
     throw new Error(`Failed connecting to MongoDB`);
   }
