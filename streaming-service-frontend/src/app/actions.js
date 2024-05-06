@@ -289,20 +289,22 @@ export async function createSong(prevState, formData) {
     genre,
     release_date,
     artists,
+    artistId,
     lyrics,
     album;
   let errors = [];
   title = formData.get("title");
   duration = formData.get("duration");
-  song_url = formData.get("song_url"); // ID
-  cover_image_url = formData.get("cover_image_url"); // ID
+  song_url = formData.get("song_url");
+  cover_image_url = formData.get("cover_image_url");
   writtenBy = formData.get("writtenBy");
-  producers = formData.get("producers"); // [String]
-  genre = formData.get("genre"); // MusicGenre
+  producers = formData.get("producers");
+  genre = formData.get("genre");
   release_date = formData.get("release_date");
-  artists = formData.get("artists"); // [ID]
-  lyrics = formData.get("lyrics"); // String
-  album = formData.get("album"); // ID
+  artistId = formData.get("artistId");
+  // artists = formData.get("artists");
+  lyrics = formData.get("lyrics");
+  album = formData.get("album");
   try {
     title = validation.checkString(title, "title");
   } catch (e) {
@@ -328,7 +330,8 @@ export async function createSong(prevState, formData) {
     errors.push(e);
   }
   try {
-    producers = validation.checkStringArray(producers, "producers");
+    producers = validation.checkString(producers, "producers");
+    producers = producers.split(';');
   } catch (e) {
     errors.push(e);
   }
@@ -347,25 +350,29 @@ export async function createSong(prevState, formData) {
     errors.push(e);
   }
   try {
-    artists = validation.checkIdArray(artists, "artists");
+    artistId = validation.checkId(artistId, "artistId");
+    artists = [artistId];
   } catch (e) {
     errors.push(e);
   }
-  try {
-    album = validation.checkId(album, "album");
-  } catch (e) {
-    errors.push(e);
-  }
+
   // Optional fields
   try {
-    if (duration) {
+    if (album !== null && album !== undefined) {
+      album = validation.checkId(album, "album");
+    }
+  } catch (e) {
+    errors.push(e);
+  }
+  try {
+    if (duration !== null && duration !== undefined) {
       duration = validation.checkNumber(duration, "duration");
     }
   } catch (e) {
     errors.push(e);
   }
   try {
-    if (lyrics) {
+    if (lyrics !== null && lyrics !== undefined) {
       lyrics = validation.checkString(lyrics, "lyrics");
     }
   } catch (e) {

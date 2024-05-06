@@ -1,10 +1,17 @@
 import React, {useEffect, useRef, useState} from "react";
 import {MusicGenres} from "@/utils/helpers";
+import {useQuery} from "@apollo/client";
+import queries from "@/utils/queries";
 
-export default function SongFormModal({actionData, action, setShowModal, artistId, albumData, refetch}) {
+export default function SongFormModal({actionData, action, artistSongs, setShowModal, artistId, refetch}) {
     const hasPageBeenRendered = useRef(false);
     const formElement = useRef();
     const [addModalStatus, setAddModalStatus] = useState('open');
+    const {
+        data: artistAlbums,
+    } = useQuery(queries.GET_ALBUMS_BY_ARTIST, {
+        variables: { artistId: artistId },
+    });
 
     const updateAddModalStatus = () => {
         if (addModalStatus === 'open') {
@@ -112,14 +119,14 @@ export default function SongFormModal({actionData, action, setShowModal, artistI
                         <label htmlFor="album" className="block text-gray-700 font-semibold mb-2">
                             Album
                         </label>
-                        <select name='album' id='album' form='dialog-form-song' required
+                        <select name='album' id='album' form='dialog-form-song'
                                 className="border border-gray-300 rounded-md p-2 w-full">
                             <>
                                 <option key='default-album-msg' value=""
                                         defaultValue='--Please choose an album--'>
                                     --Please choose an album--
                                 </option>
-                                {albumData?.getAlbumsByArtist?.map((album) => {
+                                {artistAlbums?.getAlbumsByArtist?.map((album) => {
                                     return (<option key={album?._id} value={album?._id}>{album?.title}</option>)
                                 })}
                             </>
@@ -130,7 +137,7 @@ export default function SongFormModal({actionData, action, setShowModal, artistI
                         <label htmlFor="cover_image_url" className="block text-gray-700 font-semibold mb-2">
                             Cover Image Upload
                         </label>
-                        <input type="file" id="cover_image_url" name="cover_image_url" required
+                        <input type="file" id="cover_image_url" name="cover_image_url" required accept='image/*'
                                className="border border-gray-300 rounded-md p-2 w-full"/>
                     </div>
 
@@ -138,7 +145,7 @@ export default function SongFormModal({actionData, action, setShowModal, artistI
                         <label htmlFor="song_url" className="block text-gray-700 font-semibold mb-2">
                             Song Upload
                         </label>
-                        <input type="file" id="song_url" name="song_url" required
+                        <input type="file" id="song_url" name="song_url" required accept='audio/*'
                                className="border border-gray-300 rounded-md p-2 w-full"/>
                     </div>
 
