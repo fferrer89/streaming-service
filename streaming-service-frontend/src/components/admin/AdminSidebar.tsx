@@ -6,9 +6,16 @@ import { HiOutlineViewGrid, HiUsers, HiUserGroup, HiOutlineLogout } from 'react-
 import { BsSoundwave } from 'react-icons/bs';
 import { PiMusicNotesFill } from 'react-icons/pi';
 import { usePathname } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { logout } from '@/utils/redux/features/user/userSlice';
 
 const AdminSideBar: React.FC = () => {
   const pathname = usePathname();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   return (
     <div className='flex flex-col min-w-60 px-4 py-2 bg-[#22333B]'>
@@ -39,10 +46,10 @@ const AdminSideBar: React.FC = () => {
         </Link>
       </div>
       <div className='border-t-2 border-zinc-600'>
-        <Link href='/login/admin' className='flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0]'>
+        <div onClick={handleLogout} className='flex items-center gap-4 text-lg px-3 py-2 rounded-sm hover:bg-[#38474F] hover:text-[#D7C5B0] cursor-pointer'>
           <HiOutlineLogout fontSize={24} color='#dc2626' />
           <span className='text-base text-red-600'>Log out</span>
-        </Link>
+        </div>
       </div>
     </div>
   );

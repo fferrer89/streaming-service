@@ -3,6 +3,9 @@ import React, { ReactNode, useEffect } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
 import { useQuery } from '@apollo/client';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/utils/redux/store';
+import { useRouter } from 'next/navigation';
 import { HiUsers, HiUserGroup } from 'react-icons/hi';
 import { BsSoundwave } from 'react-icons/bs';
 import { PiMusicNotesFill } from 'react-icons/pi';
@@ -52,6 +55,8 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 };
 
 const AdminDashboard: React.FC = () => {
+  const router = useRouter();
+  const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const { data: adminData, loading: adminLoading, error: adminError } = useQuery(queries.GET_ADMIN, { fetchPolicy: 'cache-and-network' });
   const { data, loading, error } = useQuery(queries.GET_COUNT, { fetchPolicy: 'cache-and-network' });
   const { data: userData, loading: userLoading, error: userError } = useQuery(queries.GET_USERS, { fetchPolicy: 'cache-and-network' })
@@ -61,6 +66,27 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     document.title = 'Dashboard | Sounds 54';
   }, []);
+
+  useEffect(() => {
+    if (loggedIn && userType === 'user') {
+      router.push('/sound');
+    } else if (loggedIn && userType === 'artist') {
+      router.push('/artist');
+    } else if (!loggedIn || userType !== 'admin') {
+      router.push('/login/admin');
+    }
+  }, [loggedIn, router]);
+
+  if (!loggedIn || userType !== 'admin') {
+    return (
+      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
+        <span className='mr-2'>Loading</span>
+        <span className='animate-bounce'>.</span>
+        <span className='animate-bounce delay-75'>.</span>
+        <span className='animate-bounce delay-200'>.</span>
+      </div>
+    );
+  }
 
   if (adminLoading || loading || userLoading || artistLoading || songLoading) {
     return (

@@ -12,14 +12,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body > 
-      <ApolloWrapper>
-        <Provider store={store}>
-          {children}
-        </Provider>
-        </ApolloWrapper>
-       </body>
-    </html>
+    <ApolloWrapper>
+      <Provider store={store}>
+        {children}
+      </Provider>
+    </ApolloWrapper>
   );
 }
