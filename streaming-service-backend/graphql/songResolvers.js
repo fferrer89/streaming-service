@@ -360,121 +360,41 @@ export const songResolvers = {
       }
     },
     editSong: async (_, args, context) => {
-      let queryObject = {};
-      songHelper.validObjectId(args.songId);
-      let songExist = await Songs.findById(args.songId);
-      if (!songExist) {
-        songHelper.notFoundWrapper('Song not found');
-      } else {
-        //Are the valid user to edit the song?
-        let validUser = false;
-        for (let i = 0; i < songExist.artists.length; i++) {
-          if (
-            context &&
-            context.decoded &&
-            context.decoded.id == songExist.artists[i].toString()
-          ) {
-            console.log(context.decoded.id, songExist.artists[i].toString());
-            validUser = true;
-          }
-        }
-        if (context && context.decoded && context.decoded.role === 'admin') {
-          validUser = true;
-        }
-        validUser = true;
-        if (!validUser) {
-          songHelper.unAuthorizedWrapper();
-        }
-      }
-
-      if (args.duration) {
-        if (duration <= 0)
-          songHelper.badUserInputWrapper(
-            "Duration can't less than or equal to 0"
-          );
-        queryObject.duration = args.duration;
-      }
-
-      if (args.song_url) {
-        //queryObject.song_url = songHelper.validURL(args.song_url);
-        songHelper.validObjectId(args.song_url.trim());
-        const song = await SongFile.findOne({
-          fileId: args.song_url.trim(),
-        });
-        if (!song) {
-          songHelper.notFoundWrapper('Song file not found with given url');
-        }
-      }
-
-      if (args.cover_image_url) {
-        //queryObject.cover_image_url = songHelper.validURL(args.cover_image_url);
-        songHelper.validObjectId(args.cover_image_url.trim());
-        const cover = await SongFile.findOne({
-          fileId: args.cover_image_url.trim(),
-        });
-        if (!cover) {
-          songHelper.notFoundWrapper(
-            'Cover Image file not found with given url'
-          );
-        }
-      }
-
-      if (args.writtenBy) {
-        queryObject.writtenBy = songHelper.emptyValidation(
-          args.writtenBy,
-          "Writer' name"
-        );
-        const alphaRegex = /^[a-zA-Z\s]+$/;
-        if (!alphaRegex.test(queryObject.writtenBy))
-          songHelper.badUserInputWrapper("Writer's name can only have letters");
-      }
-      if (args.genre) {
-        queryObject.genre = songHelper.validGenre(args.genre);
-      }
-      if (args.release_date) {
-        queryObject.release_date = songHelper.validDate(
-          args.release_date,
-          'Release date'
-        );
-      }
-
-      if (args.title) {
-        queryObject.title = songHelper.emptyValidation(args.title, 'Title');
-        const alphaNumericRegex = /^[a-zA-Z0-9\s]+$/;
-        if (!alphaNumericRegex.test(queryObject.title))
-          songHelper.badUserInputWrapper(
-            'Title name can only have letters and digits'
-          );
-      }
-
-      if (args.artists && args.artists.length > 0) {
-        //check if artist exists;
-        for (let i = 0; i < args.artists.length; i++) {
-          let id = songHelper.emptyValidation(args.artists[i], 'Artist id');
-          songHelper.validObjectId(id);
-          let artistExist = await Artist.findById(id);
-          if (!artistExist) {
-            songHelper.badUserInputWrapper(
-              'Artist Id is incorrect, Artist not found.'
-            );
-          }
-        }
-        queryObject.artists = args.artists;
-      }
-      if (args.producers && args.producers.length > 0) {
-        queryObject.producers = args.producers;
-      }
-      let { songId } = args;
       try {
-        songHelper.validObjectId(songId);
-        let songEdited = await Songs.findByIdAndUpdate(
-          args.songId,
-          { $set: queryObject },
-          { new: true }
-        );
-        return songEdited;
+        // Extract the input parameters from the arguments
+        const {
+          songId,
+          title,
+          duration,
+          song_url,
+          cover_image_url,
+          writtenBy,
+          producers,
+          genre,
+          release_date,
+          artists,
+        } = args;
+
+        const existingSong = await Songs.findById(songId);
+        if (!existingSong) {
+          throw new Error('Song not found');
+        }
+
+        if (title) existingSong.title = title;
+        if (duration) existingSong.duration = duration;
+        if (song_url) existingSong.song_url = song_url;
+        if (cover_image_url) existingSong.cover_image_url = cover_image_url;
+        if (writtenBy) existingSong.writtenBy = writtenBy;
+        if (producers) existingSong.producers = producers;
+        if (genre) existingSong.genre = genre;
+        if (release_date) existingSong.release_date = release_date;
+        if (artists) existingSong.artists = artists;
+
+        const updatedSong = await existingSong.save();
+
+        return updatedSong;
       } catch (error) {
-        songHelper.badUserInputWrapper(error.message);
+        throw new GraphQLError(error.message);
       }
     },
     removeSong: async (_, args, context) => {
@@ -508,11 +428,41 @@ export const songResolvers = {
 
         return removedS;
       } catch (error) {
-        console.error('Error removing song:', error);
         throw new GraphQLError(error.message);
       }
     },
-    toggleLikeSong: async (args) => {},
+    toggleLikeSong: async (_, { _id, songId }, context) => {
+      try {
+        const user = await User.findById(_id);
+        if (!user) {
+          throw new Error('User not found');
+        }
+
+        const likedIndex = user.liked_songs.findIndex(
+          (song) => song._id.toString() === songId
+        );
+        if (likedIndex !== -1) {
+          user.liked_songs.splice(likedIndex, 1);
+        } else {
+          user.liked_songs.push(songId);
+        }
+
+        await user.save();
+
+        const song = await Songs.findById(songId);
+        if (!song) {
+          throw new Error('Song not found');
+        }
+
+        song.likes = user.liked_songs.length;
+
+        const updatedSong = await song.save();
+
+        return updatedSong;
+      } catch (error) {
+        throw new GraphQLError(error.message);
+      }
+    },
     uploadSongFile: async (_, args) => {
       try {
         const { filename, mimetype, encoding, createReadStream } =
