@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import axios from "axios";
 import queries from "@/utils/queries";
@@ -6,14 +6,20 @@ import { MusicGenres } from "@/utils/helpers";
 import { useFormState } from "react-dom";
 import { createAlbum, updateAlbum } from "@/app/actions.js";
 import { useQuery } from "@apollo/client";
+import { useSelector } from "react-redux";
+
 const initialState = {
-  message: null,
+  errorMessages: null,
 };
 
 const CreateAlbumModal: React.FC<{
   setShowModal: (show: boolean) => void;
-  artistId: string;
-}> = ({ setShowModal, artistId }) => {
+  setSuccessModalOpen: (show: boolean) => void;
+  refetch: any;
+}> = ({ setShowModal, setSuccessModalOpen, refetch }) => {
+  const artistId = useSelector(
+    (state: { user: { userId: string | null } }) => state.user.userId
+  );
   const [albumData, setAlbumData] = useState({
     album_type: "ALBUM",
     title: "",
@@ -28,14 +34,17 @@ const CreateAlbumModal: React.FC<{
   const [coverImageFile, setCoverImageFile] = useState(null);
   const [error, setError] = useState("");
   const {
-    loading,
-    songsError,
+    loading: songsloading,
+    error: songsError,
     data: songsData,
   } = useQuery(queries.GET_SONGS_BY_ARTIST, {
-    variables: { artistId: "6637f1095b8e3013e644d7f4" },
+    variables: { artistId: artistId },
   });
-  console.log(`--------------- ${songsData}`);
-  //const [addAlbum] = useMutation(queries.ADD_ALBUM);
+  const {
+    loading: artistsLoading,
+    error: artistsError,
+    data: artistsData,
+  } = useQuery(queries.GET_ARTISTS);
   const [createAlbumFormState, createAlbumFormAction] = useFormState(
     createAlbum,
     initialState
@@ -82,14 +91,26 @@ const CreateAlbumModal: React.FC<{
 
   const handleSubmit = async () => {
     try {
+      albumData.artists.push(artistId);
       await createAlbumFormAction(albumData);
-      console.log("New album created:", createAlbumFormState.result);
-      //setShowModal(false);
     } catch (error) {
       console.error("Error creating new album:", error);
-      setError(error.message);
+      setError("Error creating new album, server responded error");
+      return;
     }
   };
+
+  useEffect(() => {
+    if (
+      createAlbumFormState &&
+      createAlbumFormState.album &&
+      createAlbumFormState.album._id
+    ) {
+      setShowModal(false);
+      setSuccessModalOpen(true);
+      refetch();
+    }
+  }, [createAlbumFormState]);
 
   const uploadFile = async (file) => {
     try {
@@ -107,6 +128,7 @@ const CreateAlbumModal: React.FC<{
       );
 
       const id = response.data.fileId;
+      console.log(`File Successfully Uploaded ${id}`);
       setAlbumData({ ...albumData, coverImageUrl: id });
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -125,14 +147,17 @@ const CreateAlbumModal: React.FC<{
     }));
   };
 
-  if (loading) {
+  if (artistsLoading || songsloading) {
     return <div>Loading Songs</div>;
   }
 
   if (songsError) {
-    return <div>Error Loading Songs</div>;
+    return <div>Error Loading Songs List</div>;
   }
-
+  if (songsError) {
+    return <div>Error Loading Artist List</div>;
+  }
+  console.log(artistsData);
   return (
     <div className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center">
       <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -140,23 +165,8 @@ const CreateAlbumModal: React.FC<{
         <div>
           <h2 className="text-2xl font-semibold mb-4">New Album Details</h2>
         </div>
-        {createAlbumFormState && createAlbumFormState?.errorMessages && (
-          <div
-            class="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
-            role="alert"
-          >
-            {createAlbumFormState?.errorMessages?.map((msg, index) => {
-              return (
-                <p className="error" key={index}>
-                  {msg}
-                </p>
-              );
-            })}
-          </div>
-        )}
 
         <div className="p-1 text-black overflow-y-auto h-6/12">
-          {/* Album form fields */}
           <div className="mb-4">
             <label
               htmlFor="album_type"
@@ -306,7 +316,53 @@ const CreateAlbumModal: React.FC<{
                 ))}
             </select>
           </div>
-          {/* Additional input fields */}
+          <div className="mb-4">
+            <label
+              htmlFor="artists"
+              className="block text-gray-700 font-semibold mb-2"
+            >
+              Artists
+            </label>
+            <select
+              id="artists"
+              name="artists"
+              value={albumData.artists}
+              onChange={handleSongChange}
+              className="border border-gray-300 rounded-md p-2 w-full"
+              multiple
+            >
+              {artistsData.artists
+                .filter((artist) => artist._id !== artistId)
+                .map((artist) => (
+                  <option key={artist._id} value={artist._id}>
+                    {artist.display_name}
+                  </option>
+                ))}
+            </select>
+          </div>
+          {createAlbumFormState && createAlbumFormState?.errorMessages && (
+            <div
+              className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
+              role="alert"
+            >
+              {createAlbumFormState?.errorMessages?.map((msg, index) => {
+                return (
+                  <p className="error" key={index}>
+                    {msg}
+                  </p>
+                );
+              })}
+            </div>
+          )}
+          {error && (
+            <div
+              className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
+              role="alert"
+            >
+              {" "}
+              <div className="error">{error}</div>
+            </div>
+          )}
           <button
             onClick={handleSubmit}
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none mr-2"

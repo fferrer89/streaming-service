@@ -6,6 +6,7 @@ import queries from "@/utils/queries";
 import axios from "axios";
 import CreateAlbumModal from "@/components/App/Artist/CreateAlbumModel";
 import { useSelector } from "react-redux";
+import SuccessModal from "@/components/App/Artist/SuccessModal";
 type ResultType = {
   albums: { name: string; link: string }[];
 };
@@ -18,10 +19,15 @@ const ArtistAlbums: React.FC = () => {
     data: artistAlbums,
     loading,
     error,
+    refetch,
   } = useQuery(queries.GET_ALBUMS_BY_ARTIST, {
     variables: { artistId: artistId },
   });
   const [showModal, setShowModal] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const handleSuccessModalClose = () => {
+    setSuccessModalOpen(false);
+  };
 
   if (loading) {
     return <div>Loading</div>;
@@ -54,7 +60,15 @@ const ArtistAlbums: React.FC = () => {
       {showModal && (
         <CreateAlbumModal
           setShowModal={setShowModal}
-          artistId={"66373395c1d1c8b5f7724c65"}
+          setSuccessModalOpen={setSuccessModalOpen}
+          refetch={refetch}
+        />
+      )}
+      {successModalOpen && (
+        <SuccessModal
+          isSuccess={true}
+          message={"Album Successfully Created"}
+          onClose={handleSuccessModalClose}
         />
       )}
 

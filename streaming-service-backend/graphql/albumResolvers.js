@@ -19,7 +19,7 @@ export const albumResolvers = {
       const ids = songIds.map((song) => song.songId);
       const songs = await Song.find({ _id: { $in: ids } });
       return songs;
-    }
+    },
   },
   Query: {
     albums: async () => {
@@ -156,7 +156,18 @@ export const albumResolvers = {
         const artistIds = artists && artists.map((artistId) => ({ artistId }));
 
         const songIds = songs && songs.map((songId) => ({ songId }));
-
+        for (const s of songs) {
+          const songData = await Song.findById(s);
+          if (!songData) {
+            songsHelpers.notFoundWrapper(`Song not found with ID ${s}`);
+          }
+        }
+        for (const a of artists) {
+          const artistData = await Artist.findById(a);
+          if (!artistData) {
+            songsHelpers.notFoundWrapper(`Artist not found with ID ${a}`);
+          }
+        }
         const newAlbum = new Album({
           title,
           description,
@@ -170,6 +181,14 @@ export const albumResolvers = {
         });
 
         const savedAlbum = await newAlbum.save();
+
+        for (const s of songs) {
+          const songData = await Song.findOne({
+            _id: new mongoose.Types.ObjectId(s),
+          });
+          songData.album = savedAlbum.id;
+          songData.save();
+        }
 
         return savedAlbum;
       } catch (error) {
@@ -209,14 +228,13 @@ export const albumResolvers = {
         }
         album.songs
           ? album.songs.push({
-            songId: new mongoose.Types.ObjectId(songId.trim()),
-          })
+              songId: new mongoose.Types.ObjectId(songId.trim()),
+            })
           : (album.songs = [
-            { songId: new mongoose.Types.ObjectId(songId.trim()) },
-          ]);
+              { songId: new mongoose.Types.ObjectId(songId.trim()) },
+            ]);
         const savedAlbum = await album.save();
-
-        song.album = new mongoose.Types.ObjectId(songId.trim());
+        song.album = new mongoose.Types.ObjectId(_id.trim());
         await song.save();
         return savedAlbum;
       } catch (error) {
@@ -229,30 +247,39 @@ export const albumResolvers = {
       try {
         validateMogoObjID(_id.trim(), 'album Id');
         validateMogoObjID(songId.trim(), 'song Id');
+
         const album = await Album.findById({
           _id: new mongoose.Types.ObjectId(_id.trim()),
         });
         if (!album) {
           songsHelpers.notFoundWrapper('Album Not Found');
         }
-        const song = await Song.findById(songId.trim());
-        if (!song) {
+
+        const songIndex = album.songs.findIndex(
+          (song) => song.songId.toString() === songId.trim()
+        );
+        if (songIndex === -1) {
           songsHelpers.notFoundWrapper('Song Not Found');
         }
-        album.songs &&
-          album.songs.pop({
-            songId: new mongoose.Types.ObjectId(songId.trim()),
-          });
+
+        album.songs.splice(songIndex, 1);
+
         const savedAlbum = await album.save();
-        song.album = null;
-        await song.save();
+
+        const song = await Song.findById(songId.trim());
+        if (song) {
+          song.album = null;
+          await song.save();
+        }
+
         return savedAlbum;
       } catch (error) {
         throw new GraphQLError(
-          `Error removing song from album album: ${error.message}`
+          `Error removing song from album: ${error.message}`
         );
       }
     },
+
     addArtistToAlbum: async (_, { _id, artistId }, contextValue) => {
       try {
         validateMogoObjID(_id.trim(), 'album Id');
@@ -269,11 +296,11 @@ export const albumResolvers = {
         }
         album.artists
           ? album.artists.push({
-            artistId: new mongoose.Types.ObjectId(artistId.trim()),
-          })
+              artistId: new mongoose.Types.ObjectId(artistId.trim()),
+            })
           : (album.artists = [
-            { artistId: new mongoose.Types.ObjectId(artistId.trim()) },
-          ]);
+              { artistId: new mongoose.Types.ObjectId(artistId.trim()) },
+            ]);
         const savedAlbum = await album.save();
 
         return savedAlbum;
@@ -293,14 +320,13 @@ export const albumResolvers = {
         if (!album) {
           songsHelpers.notFoundWrapper('Album Not Found');
         }
-        const artist = await Artist.findById(artistId.trim());
-        if (!artist) {
-          songsHelpers.notFoundWrapper('artist Not Found');
+        const artistIndex = album.artists.findIndex(
+          (artist) => artist.artistId.toString() === artistId.trim()
+        );
+        if (artistIndex === -1) {
+          songsHelpers.notFoundWrapper('Artist Not Found in Album');
         }
-        album.artists &&
-          album.artists.pop({
-            artistId: new mongoose.Types.ObjectId(artistId.trim()),
-          });
+        album.artists.splice(artistIndex, 1); // Remove the artist at artistIndex
         const savedAlbum = await album.save();
         return savedAlbum;
       } catch (error) {
@@ -309,6 +335,7 @@ export const albumResolvers = {
         );
       }
     },
+
     removeAlbum: async (_, { _id }, contextValue) => {
       try {
         validateMogoObjID(_id.trim(), 'album id');

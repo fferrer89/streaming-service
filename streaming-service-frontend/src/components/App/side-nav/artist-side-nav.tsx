@@ -1,11 +1,11 @@
-"use client";
-import React from "react";
-
-import Link from "next/link";
-import styles from "./page.module.css";
-import Image from "next/image";
-import { IoMusicalNotesOutline } from "react-icons/io5";
-import { RiFolderMusicLine } from "react-icons/ri";
+'use client';
+import React from 'react';
+import LogoutButton from '../Artist/LogoutButton';
+import Link from 'next/link';
+import styles from './page.module.css';
+import Image from 'next/image';
+import { IoMusicalNotesOutline } from 'react-icons/io5';
+import { RiFolderMusicLine } from 'react-icons/ri';
 
 const ArtistSideNav: React.FC = () => {
   /**
@@ -15,7 +15,7 @@ const ArtistSideNav: React.FC = () => {
   return (
     <section className={styles.sideNav}>
       <header>
-        <Link href={"/artist/profile"}>
+        <Link href={'/artist/profile'}>
           <Image
             src="/img/ellipse.png"
             width={45}
@@ -23,11 +23,12 @@ const ArtistSideNav: React.FC = () => {
             alt="Profile image"
           />
         </Link>
+        <LogoutButton />
       </header>
       <nav>
         <ul>
           <li className="flex items-center hover:bg-stone-500 px-2 py-1 rounded-md">
-            <Link href={"/artist"}>
+            <Link href={'/artist'}>
               <Image
                 src="/icons/home-white.png"
                 width={30}
@@ -35,10 +36,10 @@ const ArtistSideNav: React.FC = () => {
                 alt="Home icon"
               />
             </Link>
-            <Link href={"/artist"}>Home</Link>
+            <Link href={'/artist'}>Home</Link>
           </li>
           <li className="flex items-center hover:bg-stone-500 px-2 py-1 rounded-md">
-            <Link href={"/artist/search"}>
+            <Link href={'/artist/search'}>
               <Image
                 src="/icons/search-white.png"
                 width={30}
@@ -46,7 +47,7 @@ const ArtistSideNav: React.FC = () => {
                 alt="Search icon"
               />
             </Link>
-            <Link href={"/artist/search"}>Search</Link>
+            <Link href={'/artist/search'}>Search</Link>
           </li>
           <li className="flex items-center hover:bg-stone-500 px-2 py-1 rounded-md">
             <div className="flex items-center">

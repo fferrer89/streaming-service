@@ -1,9 +1,10 @@
 "use server"; // Server Render Environment
 import validation from "../utils/validations";
 import queries from "../utils/queries";
-import { getClient } from "../utils";
+import apolloClient from "../utils";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { useMutation } from "@apollo/client";
 export async function createAlbum(prevState, formData) {
   let title,
     release_date,
@@ -12,7 +13,8 @@ export async function createAlbum(prevState, formData) {
     genres,
     visibility,
     songs,
-    artists;
+    artists,
+    cover_image_url;
   let errors = [];
   title = formData.title;
   release_date = formData.release_date;
@@ -23,6 +25,7 @@ export async function createAlbum(prevState, formData) {
   visibility = formData.visibility;
   artists = formData.artists;
   songs = formData.songs;
+  cover_image_url = formData.coverImageUrl;
   try {
     title = validation.checkString(title, "title");
   } catch (e) {
@@ -66,12 +69,17 @@ export async function createAlbum(prevState, formData) {
   } catch (e) {
     errors.push(e);
   }
-
+  try {
+    cover_image_url = validation.checkId(cover_image_url, "cover_image_url");
+    // artists = [artistId];
+  } catch (e) {
+    errors.push(e);
+  }
   if (errors.length > 0) {
     return { errorMessages: errors };
   } else {
     try {
-      const client = getClient();
+      const client = apolloClient;
       const { data } = await client.mutate({
         mutation: queries.ADD_ALBUM,
         variables: {
@@ -83,12 +91,13 @@ export async function createAlbum(prevState, formData) {
           visibility,
           artists,
           songs,
+          cover_image_url,
         },
         // https://www.apollographql.com/docs/react/data/mutations/#updating-local-data
       });
       return { album: data?.addAlbum };
     } catch (e) {
-      return { errorMessages: errors };
+      return { errorMessages: [e.message] };
     }
   }
 }

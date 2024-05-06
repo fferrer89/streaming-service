@@ -38,14 +38,15 @@ export const songResolvers = {
     getSongsByTitle: async (_, args, context) => {
       let { searchTerm: term } = args;
       term = songHelper.emptyValidation(term, 'Title');
-      
-      let songs = await Songs.find({ title: { $regex: new RegExp(`^${term}`, 'i') } });
-      return songs.map(song => ({
+
+      let songs = await Songs.find({
+        title: { $regex: new RegExp(`^${term}`, 'i') },
+      });
+      return songs.map((song) => ({
         ...song._doc,
         song_url: song.song_url || '', // Provide an empty string if song_url is null or undefined
       }));
     },
-    
 
     getSongsByAlbumID: async (_, args, context) => {
       let { albumId } = args;
@@ -208,7 +209,7 @@ export const songResolvers = {
         songHelper.validObjectId(albumId);
         let album = await Album.findById(albumId);
         if (!album) {
-          songHelper.notFoundWrapper('Album not found');
+          songHelper.notFoundWrapper(`Album not found ${albumId}`);
         }
         album._id = album._id.toString();
         album.artists =

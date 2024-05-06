@@ -843,6 +843,9 @@ let customData = [
 
 async function seed() {
   try {
+    console.log(
+      '------------------------  Strated Clearing Current Database  -------------------------'
+    );
     await Admin.deleteMany({});
     await User.deleteMany({});
     await Artist.deleteMany({});
@@ -853,7 +856,14 @@ async function seed() {
 
     const filesCollection = mongoose.connection.db.collection('fs.files');
     await filesCollection.deleteMany({});
+    const filesChunksCollection =
+      mongoose.connection.db.collection('fs.chunks');
+    await filesChunksCollection.deleteMany({});
+    await SongFile.deleteMany({});
 
+    console.log(
+      '------------------------  Inserting Sample Images  -------------------------'
+    );
     const sampleAlbumImageId = await uploadSong(
       `./utils/img`,
       null,
@@ -904,6 +914,9 @@ async function seed() {
       fileId: sampleSongImageId,
     });
 
+    console.log(
+      '------------------------  Inserting dummy Data without song files  -------------------------'
+    );
     const createAdmin = await Admin.create(admin);
     const newUsers = users.map((user) => ({
       ...user,
@@ -1049,6 +1062,9 @@ async function seed() {
     await Album.create(albums);
     await Song.create(songs);
 
+    console.log(
+      '------------------------  Inserting custom data with song files  -------------------------'
+    );
     for (let data of customData) {
       let cArtist = await Artist.create(data.artist);
 
@@ -1060,7 +1076,7 @@ async function seed() {
         'download.jpeg'
       );
       cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
-      await cAlbum.save();
+
       for (let song of data.songs) {
         let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
         console.log(`Song path : ${songPath}`);
@@ -1081,10 +1097,14 @@ async function seed() {
         song.song_url = songId;
         song.cover_image_url = new mongoose.Types.ObjectId(imageId);
         let cSong = await Song.create(song);
+        cAlbum.songs.push({ songId: cSong._id });
+        await cAlbum.save();
       }
     }
 
-    console.log('Database seeded successfully!');
+    console.log(
+      '------------------------  Database seeded successfully  -------------------------'
+    );
   } catch (error) {
     console.error('Error seeding database:', error);
   } finally {

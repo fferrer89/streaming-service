@@ -2,24 +2,23 @@ import { ObjectId } from "mongodb";
 
 const exportedMethods = {
   checkId(id, varName) {
-    if (!id) throw `Error: You must provide an id for ${varName}`;
-    if (typeof id !== "string") throw `Error: ${varName} must be a string`;
+    if (!id) throw `You must provide an id for ${varName}`;
+    if (typeof id !== "string") throw `${varName} must be a string`;
     id = id.trim();
     if (id.length === 0)
-      throw `Error: ${varName} cannot be an empty string or just spaces`;
-    if (!ObjectId.isValid(id))
-      throw `Error: invalid object ID for ${varName} field`;
+      throw `${varName} cannot be an empty string or just spaces`;
+    if (!ObjectId.isValid(id)) throw `invalid object ID for ${varName} field`;
     return id;
   },
 
   checkString(strVal, varName) {
-    if (!strVal) throw `Error: You must supply a ${varName}!`;
-    if (typeof strVal !== "string") throw `Error: ${varName} must be a string!`;
+    if (!strVal) throw `You must supply a ${varName}!`;
+    if (typeof strVal !== "string") throw `${varName} must be a string!`;
     strVal = strVal.trim();
     if (strVal.length === 0)
-      throw `Error: ${varName} cannot be an empty string or string with just spaces`;
+      throw `${varName} cannot be an empty string or string with just spaces`;
     if (!isNaN(strVal))
-      throw `Error: ${strVal} is not a valid value for ${varName} as it only contains digits`;
+      throw ` ${strVal} is not a valid value for ${varName} as it only contains digits`;
     return strVal;
   },
   checkNumber(varVal, varName, canBeNegative = false) {
@@ -39,6 +38,9 @@ const exportedMethods = {
     //if it's not empty, we will make sure all tags are strings
     if (!arr || !Array.isArray(arr))
       throw `You must provide an array of ${varName}`;
+
+    if (arr.length <= 0)
+      throw `You must select at least one value for ${varName}`;
     for (let i in arr) {
       if (typeof arr[i] !== "string" || arr[i].trim().length === 0) {
         throw `One or more elements in ${varName} array is not a string or is an empty string`;
@@ -119,24 +121,22 @@ const exportedMethods = {
     //We will allow an empty array for this,
     //if it's not empty, we will make sure all tags are strings
     if (!arr || !Array.isArray(arr) || arr.length <= 0)
-      throw `Error: You must select ${varName}`;
+      throw `You must select ${varName}`;
     for (let i in arr) {
       if (!ObjectId.isValid(arr[i].trim()))
-        throw `Error: invalid object ID in ${varName} array`;
+        throw `invalid object ID in ${varName} array`;
       arr[i] = arr[i].trim();
     }
 
     return arr;
   },
   checkDate(dateString, varName) {
-    if (!dateString) throw `Error: You must provide a ${varName}`;
+    if (!dateString) throw `You must provide a ${varName}`;
 
-    // Parse the date string
     const date = new Date(dateString);
 
-    // Check if the parsed date is a valid date
     if (isNaN(date.getTime())) {
-      throw `Error: Invalid date format for ${varName}`;
+      throw `Invalid date format for ${varName}`;
     }
 
     return date;

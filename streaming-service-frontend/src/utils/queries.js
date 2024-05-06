@@ -314,26 +314,24 @@ const REMOVE_PLAYLIST = gql`
 `;
 const ADD_ALBUM = gql`
   mutation AddAlbum(
-    $albumType: AlbumType!
+    $album_type: AlbumType!
     $title: String!
     $cover_image_url: ID
     $description: String!
-    $releaseDate: Date!
+    $release_date: Date!
     $genres: [MusicGenre!]!
     $visibility: Visibility!
-    $coverImageUrl: ID
     $artists: [ID!]
     $songs: [ID]
   ) {
     addAlbum(
-      album_type: $albumType
+      album_type: $album_type
       title: $title
       cover_image_url: $cover_image_url
       description: $description
-      release_date: $releaseDate
+      release_date: $release_date
       genres: $genres
       visibility: $visibility
-      cover_image_url: $coverImageUrl
       artists: $artists
       songs: $songs
     ) {
@@ -410,10 +408,13 @@ const GET_ALBUM_BY_ID = gql`
       songs {
         _id
         title
+        cover_image_url
       }
       title
       total_duration
       visibility
+      total_songs
+      likes
     }
   }
 `;
@@ -566,6 +567,41 @@ const EDIT_ARTIST = gql`
   }
 `;
 
+const REMOVE_SONG_FROM_ALBUM = gql`
+  mutation RemoveSongFromAlbum($id: ID!, $songId: ID!) {
+    removeSongFromAlbum(_id: $id, songId: $songId) {
+      _id
+      title
+    }
+  }
+`;
+const REMOVE_ARTIST_FROM_ALBUM = gql`
+  mutation RemoveArtistFromAlbum($id: ID!, $artistId: ID!) {
+    removeArtistFromAlbum(_id: $id, artistId: $artistId) {
+      _id
+      title
+    }
+  }
+`;
+
+const ADD_SONG_TO_ALBUM = gql`
+  mutation AddSongToAlbum($id: ID!, $songId: ID!) {
+    addSongToAlbum(_id: $id, songId: $songId) {
+      _id
+      title
+    }
+  }
+`;
+
+const ADD_ARTIST_TO_ALBUM = gql`
+  mutation AddArtistToAlbum($id: ID!, $artistId: ID!) {
+    addArtistToAlbum(_id: $id, artistId: $artistId) {
+      _id
+      title
+    }
+  }
+`;
+
 const queries = {
   REGISTER_USER,
   REGISTER_ARTIST,
@@ -594,6 +630,10 @@ const queries = {
   ADD_SONG,
   EDIT_SONG,
   EDIT_ARTIST,
+  REMOVE_SONG_FROM_ALBUM,
+  REMOVE_ARTIST_FROM_ALBUM,
+  ADD_SONG_TO_ALBUM,
+  ADD_ARTIST_TO_ALBUM,
 };
 
 export default queries;

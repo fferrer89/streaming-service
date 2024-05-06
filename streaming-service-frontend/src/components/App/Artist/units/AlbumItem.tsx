@@ -1,5 +1,5 @@
-import React from "react";
-import Link from "next/link";
+import React from 'react';
+import Link from 'next/link';
 interface Song {
   _id: string;
 }
@@ -25,7 +25,7 @@ const AlbumItem: React.FC<AlbumProps> = ({ album }) => {
     <div className="flex justify-center items-center">
       <Link
         href={albumLink}
-        className="flex-shrink-0 h-fit w-[200px] m-4 rounded p-4 shadow-lg transition-all duration-700 hover:scale-105 flex flex-col items-center justify-center"
+        className="flex-shrink-0 h-[150px] w-[150px] m-4 rounded p-4 shadow-lg transition-all duration-700 hover:scale-105 flex flex-col items-center justify-center"
       >
         <div className="relative">
           <img
