@@ -1,7 +1,7 @@
 import {deleteAlbum} from "../../../app/actions";
 
 export default function MenuControls({albumData, setShowAddFormDialog, setShowEditFormDialog,
-                                         currentArticleId, setCurrentArticleId, objectId
+                                         currentArticleId, setCurrentArticleId, objectId, refetch
                                      }) {
     return (
             <menu className='controls-menu'>
@@ -22,6 +22,7 @@ export default function MenuControls({albumData, setShowAddFormDialog, setShowEd
                                 console.log(data?.album?._id)
                                 console.log(data?.errorMessages?.[0])
                                 setCurrentArticleId(objectId); // Store article ID
+                                refetch()
                             }}>
                         Delete
                     </button>

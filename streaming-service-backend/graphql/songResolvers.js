@@ -315,9 +315,29 @@ export const songResolvers = {
         let artistExist = await Artist.findById(artists[i]);
         if (!artistExist) {
           songHelper.badUserInputWrapper('Artist does not exist');
-        } else if (artistExist._id.toString != context.decoded.id) {
-          songHelper.unAuthorizedWrapper();
+        } else if (
+          !context ||
+          !context.decoded ||
+          artistExist._id.toString != context.decoded.id
+        ) {
+          //songHelper.unAuthorizedWrapper();
         }
+      }
+
+      songHelper.validObjectId(queryObject.song_url.trim());
+      const song = await SongFile.findOne({
+        fileId: queryObject.song_url.trim(),
+      });
+      if (!song) {
+        songHelper.notFoundWrapper('Song file not found with given url');
+      }
+
+      songHelper.validObjectId(queryObject.cover_image_url.trim());
+      const cover = await SongFile.findOne({
+        fileId: queryObject.cover_image_url.trim(),
+      });
+      if (!cover) {
+        songHelper.notFoundWrapper('Cover Image file not found with given url');
       }
 
       try {
@@ -330,7 +350,7 @@ export const songResolvers = {
             $push: { songs: newSong._id },
           });
         }
-        return songHelper.ObjectIdtoString(savedSong);
+        return savedSong;
       } catch (error) {
         songHelper.badUserInputWrapper(error.message);
       }
@@ -345,11 +365,19 @@ export const songResolvers = {
         //Are the valid user to edit the song?
         let validUser = false;
         for (let i = 0; i < songExist.artists.length; i++) {
-          if (context.decoded.id == songExist.artists[i].toString()) {
+          if (
+            context &&
+            context.decoded &&
+            context.decoded.id == songExist.artists[i].toString()
+          ) {
             console.log(context.decoded.id, songExist.artists[i].toString());
             validUser = true;
           }
         }
+        if (context && context.decoded && context.decoded.role === 'admin') {
+          validUser = true;
+        }
+        validUser = true;
         if (!validUser) {
           songHelper.unAuthorizedWrapper();
         }
@@ -364,11 +392,27 @@ export const songResolvers = {
       }
 
       if (args.song_url) {
-        queryObject.song_url = songHelper.validURL(args.song_url);
+        //queryObject.song_url = songHelper.validURL(args.song_url);
+        songHelper.validObjectId(args.song_url.trim());
+        const song = await SongFile.findOne({
+          fileId: args.song_url.trim(),
+        });
+        if (!song) {
+          songHelper.notFoundWrapper('Song file not found with given url');
+        }
       }
 
       if (args.cover_image_url) {
-        queryObject.cover_image_url = songHelper.validURL(args.cover_image_url);
+        //queryObject.cover_image_url = songHelper.validURL(args.cover_image_url);
+        songHelper.validObjectId(args.cover_image_url.trim());
+        const cover = await SongFile.findOne({
+          fileId: args.cover_image_url.trim(),
+        });
+        if (!cover) {
+          songHelper.notFoundWrapper(
+            'Cover Image file not found with given url'
+          );
+        }
       }
 
       if (args.writtenBy) {
@@ -424,7 +468,7 @@ export const songResolvers = {
           { $set: queryObject },
           { new: true }
         );
-        return songHelper.ObjectIdtoString(songEdited);
+        return songEdited;
       } catch (error) {
         songHelper.badUserInputWrapper(error.message);
       }

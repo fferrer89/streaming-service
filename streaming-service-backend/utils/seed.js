@@ -13,18 +13,18 @@ import fs from 'fs';
 import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
 
-await mongoose.connect(
-  'mongodb+srv://marcos:WXgAl20LBjRb49b8@cluster0.ofr2q.mongodb.net/streaming-service?retryWrites=true&w=majority&appName=Cluster0',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+import SongFile from '../models/songFileModel.js';
+
+await mongoose.connect('mongodb://127.0.0.1:27017/streaming-service', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 
 const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 const uploadSong = async (filePath, albumTitle, songTitle) => {
   try {
-    filePath = `${filePath}/${songTitle}.mp3`.replaceAll(' ', '_');
+    filePath = `${filePath}/${songTitle}`.replaceAll(' ', '_');
     const readableStream = fs.createReadStream(filePath);
 
     const uploadStream = bucket.openUploadStream(songTitle);
@@ -52,7 +52,6 @@ const uploadSong = async (filePath, albumTitle, songTitle) => {
     throw error;
   }
 };
-
 const admin = {
   first_name: 'Han',
   last_name: 'Solo',
@@ -69,7 +68,7 @@ const users = [
     password: 'Password123$',
     date_of_birth: '01/01/1990',
     gender: 'MALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=1',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
   {
     first_name: 'Jane',
@@ -79,7 +78,7 @@ const users = [
     password: 'Password456$',
     date_of_birth: '01/01/1995',
     gender: 'FEMALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=2',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
   {
     first_name: 'Alice',
@@ -112,7 +111,7 @@ const artists = [
     password: 'Password456#',
     date_of_birth: '01/01/1940',
     gender: 'MALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=3',
+    profile_image_url: new mongoose.Types.ObjectId(),
     genres: ['REGGAE'],
   },
   {
@@ -123,7 +122,7 @@ const artists = [
     password: 'Password456@',
     date_of_birth: '01/01/1980',
     gender: 'FEMALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=4',
+    profile_image_url: new mongoose.Types.ObjectId(),
     genres: ['POP', 'SOUL'],
   },
 ];
@@ -137,7 +136,7 @@ const SmithMr = {
   date_of_birth: '01/01/1940',
   gender: 'MALE',
   genres: ['COUNTRY'],
-  profile_image_url: 'https://picsum.photos/200/200?random=7',
+
 };
 
 const BillHobson = {
@@ -149,7 +148,6 @@ const BillHobson = {
   date_of_birth: '01/01/1980',
   gender: 'MALE',
   genres: ['ROCK'],
-  profile_image_url: 'https://picsum.photos/200/200?random=8',
 };
 
 const JohnDoe = {
@@ -161,7 +159,6 @@ const JohnDoe = {
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['POP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=9',
 };
 
 const AldousIchnite = {
@@ -173,7 +170,6 @@ const AldousIchnite = {
   date_of_birth: '01/01/1999',
   gender: 'MALE',
   genres: ['ELECTRONIC'],
-  profile_image_url: 'https://picsum.photos/200/200?random=10',
 };
 
 const DanaSchechter = {
@@ -185,7 +181,6 @@ const DanaSchechter = {
   date_of_birth: '01/01/1999',
   gender: 'FEMALE',
   genres: ['INDIE_POP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=11',
 };
 
 const MiamiSlice = {
@@ -197,7 +192,6 @@ const MiamiSlice = {
   date_of_birth: '01/01/2001',
   gender: 'FEMALE',
   genres: ['DISCO', 'HOUSE', 'DANCE'],
-  profile_image_url: 'https://picsum.photos/200/200?random=12',
 };
 
 const TripleHere = {
@@ -209,7 +203,6 @@ const TripleHere = {
   date_of_birth: '01/01/2001',
   gender: 'MALE',
   genres: ['SYNTH_POP', 'TRIP_HOP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=13',
 };
 
 const KetsaMia = {
@@ -221,7 +214,6 @@ const KetsaMia = {
   date_of_birth: '01/01/1980',
   gender: 'FEMALE',
   genres: ['SYNTH_POP', 'HIP_HOP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=14',
 };
 
 const AudioKofee = {
@@ -233,7 +225,6 @@ const AudioKofee = {
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['ELECTRONIC', 'SYNTH_POP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=15',
 };
 
 
@@ -339,7 +330,7 @@ const audioAlbum = {
 const albums = [
   {
     album_type: 'ALBUM',
-    cover_image_url: 'https://picsum.photos/200/200?random=5',
+    cover_image_url: new mongoose.Types.ObjectId(),
     title: 'Greatest Hits',
     description: 'Best hits of all time',
     release_date: new Date('2020-01-01'),
@@ -351,7 +342,7 @@ const albums = [
   },
   {
     album_type: 'SINGLE',
-    cover_image_url: 'https://picsum.photos/200/200?random=6',
+    cover_image_url: new mongoose.Types.ObjectId(),
     title: 'Single Track',
     description: 'A single track',
     release_date: new Date('2021-05-01'),
@@ -1004,6 +995,12 @@ async function seed() {
 
       let cAlbum = await Album.create(data.album);
       cAlbum.artists = [{ artistId: cArtist._id }];
+      const imageId = await uploadSong(
+        `./utils/songData/${data.album.title}`,
+        data.album.title,
+        'download.jpeg'
+      );
+      cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
       await cAlbum.save();
       for (let song of data.songs) {
         let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
@@ -1011,9 +1008,15 @@ async function seed() {
         const songId = await uploadSong(
           `./utils/songData/${data.album.title}`,
           data.album.title,
-          song.title
+          `${song.title}.mp3`
         );
         console.log(songId);
+        let fSong = await SongFile.create({
+          filename: song.title,
+          mimetype: 'audio/mpeg',
+          uploadDate: new Date(),
+          fileId: songId,
+        });
         song.artists = [cArtist._id];
         song.album = cAlbum._id;
         song.song_url = songId;
