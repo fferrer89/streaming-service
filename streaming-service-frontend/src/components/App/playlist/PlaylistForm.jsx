@@ -104,8 +104,12 @@ export const PlayListForm = ({
           id="visibility"
         >
           {visibilityOptions &&
-            visibilityOptions.map((visibility) => {
-              return <option value={visibility}>{visibility}</option>;
+            visibilityOptions.map((visibility, index) => {
+              return (
+                <option key={index} value={visibility}>
+                  {visibility}
+                </option>
+              );
             })}
           ;
         </select>

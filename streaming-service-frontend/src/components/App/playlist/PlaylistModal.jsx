@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { RxCross1 } from "react-icons/rx";
+
 export const PlayListModal = ({ modalId, Icon, CustomForm, FormData }) => {
   const [onSubmitMessage, setOnSubmitMessage] = useState("");
   return (
@@ -22,8 +24,16 @@ export const PlayListModal = ({ modalId, Icon, CustomForm, FormData }) => {
                     marginRight: "3rem",
                   }}
                 >
-                  <button className="" onClick={() => setOnSubmitMessage("")}>
-                    ✕
+                  <button
+                    className=""
+                    style={{
+                      backgroundColor: "#fafafa",
+                      padding: "0.5rem",
+                      borderRadius: "100px",
+                    }}
+                    onClick={() => setOnSubmitMessage("")}
+                  >
+                    <RxCross1 size={"18px"} />
                   </button>
                 </div>
               </form>

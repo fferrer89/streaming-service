@@ -232,6 +232,16 @@ export const playlistResolvers = {
           'you are not authorised to update this playlist'
         );
 
+      let alreadyInPlaylist;
+      for (let i = 0; i < playlistExist.songs.length; i++) {
+        if (playlistExist.songs[i] == songExist._id) {
+          alreadyInPlaylist = true;
+        }
+      }
+      if (alreadyInPlaylist) {
+        songsHelpers.badUserInputWrapper('This song already in the playlist');
+      }
+
       try {
         console.log(playlistExist);
         playlistExist.songs.push(new Types.ObjectId(songId));

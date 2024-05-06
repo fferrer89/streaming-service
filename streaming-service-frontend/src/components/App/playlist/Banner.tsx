@@ -8,6 +8,7 @@ import { client } from "../../../utils/playlistHelper";
 import queries from "../../../utils/queries";
 import { EditPlaylistModal } from "./EditPlaylistModal";
 import { AddPlaylistModal } from "./AddPlaylistModal";
+import { FloatingAddButton } from "./AddSong";
 
 interface BannaerProp {
   playlist: {
@@ -45,7 +46,6 @@ export const PlayListBanner: React.FC<BannaerProp> = ({ playlist }) => {
   if (error) {
     console.log(error);
   }
-  console.log();
 
   return (
     <div
@@ -73,7 +73,7 @@ export const PlayListBanner: React.FC<BannaerProp> = ({ playlist }) => {
         <div className="flex items-center justify-between px-3">
           <div
             className="flex text-white justify-center items-center px-2  rounded-md w-fit"
-            style={{ backgroundColor: "#cacccb" }}
+            style={{ backgroundColor: "#36630b" }}
           >
             <p className="text-md" style={{ marginRight: "0.4rem" }}>
               {playlist.likes}
