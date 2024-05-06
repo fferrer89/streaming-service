@@ -2,6 +2,7 @@
 import React from 'react';
 import { Separator } from "@/components/ui/separator";
 import ArtistItem from './units/artists';
+import { getImageUrl } from '@/utils/tools/images';
 
 interface ArtistProps {
   _id: string;
@@ -18,10 +19,7 @@ interface ArtistsProps {
 
 const Artists: React.FC<ArtistsProps> = ({ artists }) => {
 
-    const getImageUrl = (id: string) => {
-       
-        return `http://localhost:4000/file/image/${id}`;
-    };
+    
     
   return (
     <div

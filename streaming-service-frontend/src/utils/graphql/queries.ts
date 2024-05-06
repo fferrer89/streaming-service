@@ -13,6 +13,8 @@ export const FeedQuery = gql`
       producers
       release_date
       album {
+        _id 
+        title
         cover_image_url
       }
       song_url
@@ -20,9 +22,12 @@ export const FeedQuery = gql`
       writtenBy
       cover_image_url
       artists {
+        _id
         display_name
+        profile_image_url
       }
     }
+
     getMostFollowedArtists {
       created_date
       date_of_birth
@@ -34,6 +39,44 @@ export const FeedQuery = gql`
       genres
       last_name
       profile_image_url
+    }
+  }
+`;
+
+
+export const GetUserLikedSongs = gql`
+query GetUserLikedSongs($userId: String!) {
+  getUserLikedSongs(userId: $userId) {
+    _id 
+    title 
+    duration 
+    song_url 
+    writtenBy 
+    producers 
+    language 
+    genre 
+    lyrics 
+    release_date 
+    album {
+        _id 
+        title 
+        cover_image_url 
+    } 
+    artists {
+        _id 
+        display_name 
+        profile_image_url 
+    } 
+  }
+}
+`;
+
+export const GetUserPlaylists = gql`
+  query GetUserPlaylists($userId: ID!) {
+    getPlaylistsByOwner(userId: $userId) {
+      _id
+      description
+      title
     }
   }
 `;

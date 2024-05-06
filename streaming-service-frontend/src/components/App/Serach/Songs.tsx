@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import SongItem from './units/song';
 import { useDispatch } from 'react-redux';
 import { playSong } from '@/utils/redux/features/song/songSlice';
+import { getImageUrl } from '@/utils/tools/images';
 
 interface SongProps {
     _id: string;
@@ -15,7 +16,7 @@ interface SongProps {
     language: string;
     genre: string;
     lyrics: string;
-    release_date: Date;
+    release_date: string;
     album: {
       _id: string;
       title: string;
@@ -36,12 +37,9 @@ const Songs: React.FC<SongsProps> = ({ songs }) => {
     const dispatch = useDispatch();
 
     function PlaySong(song: SongProps) {
-        dispatch(playSong({ ...song, currentTime: 0 }));
+        dispatch(playSong({ song: song , currentTime: 0 }));
     }
-    const getImageUrl = (id: string) => {
-       
-        return `http://localhost:4000/file/image/${id}`;
-    };
+  
     return (
         <div
         className="flex flex-col w-[1050px] h-[500px] gap-3 p-0 bg-white rounded-lg overflow-hidden relative"

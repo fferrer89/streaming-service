@@ -25,8 +25,8 @@ const Personal: React.FC = () => {
           </div>
         </div>
       </div>
-        <Playlists/>
         <Songs/>
+        <Playlists/>
     </div>
   );
 };

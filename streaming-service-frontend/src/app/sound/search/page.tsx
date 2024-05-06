@@ -78,7 +78,7 @@ type ResultType = {
     language: string;
     genre: string;
     lyrics: string;
-    release_date: Date;
+    release_date: string;
     album: {
         _id: string;
         title: string;

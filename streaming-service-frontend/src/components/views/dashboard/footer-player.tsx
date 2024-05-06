@@ -24,7 +24,7 @@ const SPlayer: React.FC = () => {
 
   useEffect(() => {
     if (currentSong) {
-      setCurrentTime(currentSong.currentTime);
+      setCurrentTime(SongTime);
       if (audioRef.current) {
         const songUrl = `http://localhost:4000/file/song/stream/${currentSong.song_url}`;
         audioRef.current.src = songUrl;
@@ -45,7 +45,7 @@ const SPlayer: React.FC = () => {
         audioRef.current?.pause();
 
       } else {
-        dispatch(playSong(currentSong));
+        dispatch(playSong({song: currentSong, currentTime: audioRef.current?.currentTime || 0}));
       }
     }
   };
