@@ -16,7 +16,6 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
-  path: string;
   role: string;
 }
 
@@ -74,7 +73,6 @@ const Signup: React.FC = () => {
           lastName: data.lastName,
           displayName: data.displayName,
           email: data.email,
-          profileImageUrl: "example.com",
           password: data.password,
         }
       });
