@@ -1,10 +1,11 @@
 "use server"; // Server Render Environment
 import validation from "../utils/validations";
 import queries from "../utils/queries";
-import apolloClient from "../utils";
+import {getClient} from "@/utils";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { useMutation } from "@apollo/client";
+import httpClientReqs from "@/utils/http-client-reqs";
 export async function createAlbum(prevState, formData) {
   let title,
     release_date,
