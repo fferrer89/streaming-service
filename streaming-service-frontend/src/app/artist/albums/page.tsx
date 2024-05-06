@@ -1,22 +1,28 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Albums from "@/components/App/Artist/Albums";
-import Playlists from "@/components/App/Serach/Playlists";
-import Songs from "@/components/App/Serach/Songs";
-import { useQuery } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client";
 import queries from "@/utils/queries";
+import axios from "axios";
+import CreateAlbumModal from "@/components/App/Artist/CreateAlbumModel";
+import { useSelector } from "react-redux";
 type ResultType = {
   albums: { name: string; link: string }[];
 };
 
 const ArtistAlbums: React.FC = () => {
+  const artistId = useSelector(
+    (state: { user: { userId: string | null } }) => state.user.userId
+  );
   const {
     data: artistAlbums,
     loading,
     error,
   } = useQuery(queries.GET_ALBUMS_BY_ARTIST, {
-    variables: { artistId: "6637c7d293c8bab5a20dd40a" },
+    variables: { artistId: artistId },
   });
+  const [showModal, setShowModal] = useState(false);
+
   if (loading) {
     return <div>Loading</div>;
   }
@@ -45,6 +51,19 @@ const ArtistAlbums: React.FC = () => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <CreateAlbumModal
+          setShowModal={setShowModal}
+          artistId={"66373395c1d1c8b5f7724c65"}
+        />
+      )}
+
+      <button
+        onClick={() => setShowModal(true)}
+        className="bg-stone-300 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+      >
+        Create New Album
+      </button>
       <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
         <Albums albums={artistAlbums.getAlbumsByArtist} />
       </div>

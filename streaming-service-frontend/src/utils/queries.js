@@ -313,27 +313,51 @@ const REMOVE_PLAYLIST = gql`
   }
 `;
 const ADD_ALBUM = gql`
-  mutation addAlbum(
+  mutation AddAlbum(
+    $albumType: AlbumType!
     $title: String!
-    $album_type: AlbumType!
     $cover_image_url: ID
     $description: String!
-    $release_date: Date!
-    $visibility: Visibility!
+    $releaseDate: Date!
     $genres: [MusicGenre!]!
+    $visibility: Visibility!
+    $coverImageUrl: ID
     $artists: [ID!]
+    $songs: [ID]
   ) {
     addAlbum(
+      album_type: $albumType
       title: $title
-      album_type: $album_type
       cover_image_url: $cover_image_url
       description: $description
-      release_date: $release_date
-      visibility: $visibility
+      release_date: $releaseDate
       genres: $genres
+      visibility: $visibility
+      cover_image_url: $coverImageUrl
       artists: $artists
+      songs: $songs
     ) {
       _id
+      album_type
+      total_songs
+      cover_image_url
+      title
+      description
+      release_date
+      created_date
+      last_updated
+      artists {
+        _id
+        display_name
+      }
+      songs {
+        _id
+        title
+      }
+      genres
+      likes
+      total_duration
+      visibility
     }
   }
 `;

@@ -15,7 +15,7 @@ const ArtistAlbum: React.FC<{ params: { id: string } }> = ({ params }) => {
     loading,
     error,
   } = useQuery(queries.GET_ARTIST_BY_ID, {
-    variables: { id: "66373394c1d1c8b5f7724c29" },
+    variables: { id: "6637f1095b8e3013e644d7f4" },
   });
   if (loading) {
     return <div>Loading</div>;

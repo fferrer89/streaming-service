@@ -5,14 +5,17 @@ import Playlists from "@/components/App/Serach/Playlists";
 import Songs from "@/components/App/Artist/Songs";
 import { useQuery } from "@apollo/client";
 import queries from "@/utils/queries";
-
+import { useSelector } from "react-redux";
 const ArtistSongs: React.FC = () => {
+  const artistId = useSelector(
+    (state: { user: { userId: string | null } }) => state.user.userId
+  );
   const {
     data: artistSongs,
     loading,
     error,
   } = useQuery(queries.GET_SONGS_BY_ARTIST, {
-    variables: { artistId: "6637c7d293c8bab5a20dd40a" },
+    variables: { artistId: artistId },
   });
   if (loading) {
     return <div>Loading</div>;
