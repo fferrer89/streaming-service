@@ -117,20 +117,19 @@ export default function AlbumFormDialog({method, actionData, action,
                         </li>
                         <li>
                             <label>
-                                Genre:
-                                <select name='genres' id='genres' form='dialog-form-album'>
-                                    {albumData?.genre ?
+                                Genres:
+                                <select name='genres' id='genres' form='dialog-form-album' multiple>
+                                    {albumData?.genres ?
                                         (
                                             <>
-                                                <option key={albumData?.genre} value={albumData?.genre}
-                                                        defaultValue={albumData?.genre}>
-                                                    {albumData?.genre}
-                                                </option>
                                                 {MusicGenres
-                                                    .filter((genre) => genre !== albumData?.genre)
-                                                    .map((genre) => (
-                                                        <option key={genre}
-                                                                value={genre}>{genre}</option>))
+                                                    .map((genre) => {
+                                                        if (albumData?.genres?.includes(genre)) {
+                                                            return <option key={genre} selected value={genre}>{genre}</option>
+                                                        } else {
+                                                            return <option key={genre} value={genre}>{genre}</option>
+                                                        }
+                                                    })
                                                 }
                                             </>
                                         ) :

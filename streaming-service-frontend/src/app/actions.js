@@ -10,7 +10,7 @@ export async function createAlbum(prevState, formData) {
     release_date = formData.get('release_date');
     album_type = formData.get('album_type');
     description = formData.get('description');
-    genres = formData.get('genres');
+    genres = formData.getAll('genres');
     visibility = formData.get('visibility');
     artistId = formData.get('artistId');
     cover_image_url = formData.get('cover_image_url');
@@ -35,8 +35,7 @@ export async function createAlbum(prevState, formData) {
         errors.push(e);
     }
     try {
-        genres = validation.checkString(genres, 'genres');
-        genres = [genres]
+        genres = validation.checkStringArray(genres, 'genres');
     } catch (e) {
         errors.push(e);
     }
@@ -82,7 +81,7 @@ export async function updateAlbum(prevState, formData) {
     release_date = formData.get('release_date');
     album_type = formData.get('album_type');
     description = formData.get('description');
-    genres = formData.get('genres');
+    genres = formData.getAll('genres');
     visibility = formData.get('visibility');
     artistId = formData.get('artistId');
     cover_image_url = formData.get('cover_image_url');
@@ -116,8 +115,7 @@ export async function updateAlbum(prevState, formData) {
     }
     try {
         if (genres) {
-            genres = validation.checkString(genres, 'genres');
-            genres = [genres]
+            genres = validation.checkStringArray(genres, 'genres');
         }
     } catch (e) {
         errors.push(e);

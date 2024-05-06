@@ -51,7 +51,7 @@ export default function Artist({params}) {
                                                   title: album?.title,
                                                   release_date: album?.release_date,
                                                   album_type: album?.album_type,
-                                                  genre: album?.genres?.[0],
+                                                  genres: album?.genres,
                                                   visibility: album?.visibility,
                                                   description: album?.description
                                               }}
@@ -84,6 +84,7 @@ export default function Artist({params}) {
                             <dd>
                                 <time dateTime={album?.release_date}>{album?.release_date}</time>
                             </dd>
+                            {album?.genres.map((genre) => <p key={genre}>{genre}</p>)}
                         </dl>
                     </article>
                 )))}
