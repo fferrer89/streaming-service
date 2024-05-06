@@ -25,10 +25,12 @@ const ArtistSongs: React.FC = () => {
     variables: { artistId: artistId },
   });
   const [showSongModal, setShowSongModal] = useState(false);
+  // @ts-ignore
   const [createSongFormState, createSongFormAction] = useFormState(createSong, initialState);
   if (loading) {
     return <div>Loading</div>;
   }
+  // @ts-ignore
   return (
     <div
       className="flex-col h-full p-5 gap-5  w-full rounded-lg  flex items-center relative self-stretch"
@@ -58,7 +60,7 @@ const ArtistSongs: React.FC = () => {
           <SongFormModal
               actionData={createSongFormState}
               action={createSongFormAction}
-              albumData={artistSongs} // Fixme
+              artistSongs={artistSongs}
               setShowModal={setShowSongModal}
               artistId={artistId}
               refetch={refetch}
