@@ -228,8 +228,7 @@ const GET_ARTIST_BY_ID = gql`
       gender
       genres
       last_name
-      password_changed_date
-      profile_image_url
+      display_name
     }
   }
 `;
@@ -333,6 +332,8 @@ const ADD_ALBUM = gql`
       genres: $genres
       artists: $artists
     ) {
+      artists: $artists
+    ) {
       _id
     }
   }
@@ -357,6 +358,7 @@ const EDIT_ALBUM = gql`
       release_date: $release_date
       visibility: $visibility
       genres: $genres
+    
     ) {
       _id
     }
@@ -508,6 +510,78 @@ const EDIT_SONG = gql`
   }
 `;
 
+const TOGGLE_PLAYLIST = gql`
+  mutation ToggleLikePlaylist($playlistId: ID!) {
+    toggleLikePlaylist(playlistId: $playlistId) {
+      likes
+    }
+  }
+`;
+
+const GET_PLAYLIST = gql`
+  query GetPlaylistById($id: ID!) {
+    getPlaylistById(_id: $id) {
+      visibility
+      isOwner
+      songs {
+        _id
+        title
+        album {
+          _id
+          title
+        }
+        cover_image_url
+        duration
+      }
+      likes
+      description
+      owner {
+        first_name
+      }
+      created_date
+      _id
+      title
+      isLiked
+    }
+  }
+`;
+
+const EDIT_PLAYLIST = gql`
+  mutation EditPlaylist(
+    $title: String
+    $description: String
+    $visibility: String
+    $playlistId: ID!
+  ) {
+    editPlaylist(
+      title: $title
+      description: $description
+      visibility: $visibility
+      playlistId: $playlistId
+    ) {
+      _id
+      title
+    }
+  }
+`;
+
+const CREATE_PLAYLIST = gql`
+  mutation CreatePlaylist(
+    $description: String!
+    $title: String!
+    $visibility: String!
+  ) {
+    createPlaylist(
+      description: $description
+      title: $title
+      visibility: $visibility
+    ) {
+      _id
+      title
+    }
+  }
+`;
+
 const EDIT_ARTIST = gql`
   mutation mutation(
     $artistId: ID!
@@ -569,7 +643,11 @@ const queries = {
   GET_SONG_BY_ID,
   ADD_SONG,
   EDIT_SONG,
-  EDIT_ARTIST,
+  EDIT_ARTIST,,
+  TOGGLE_PLAYLIST,
+  GET_PLAYLIST,
+  EDIT_PLAYLIST,
+  CREATE_PLAYLIST,
 };
 
 export default queries;

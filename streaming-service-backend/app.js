@@ -60,7 +60,7 @@ const server = new ApolloServer({
       req.body.operationName !== 'loginAdmin'
     ) {
       const token = req.headers.authorization || '';
-      return { redisClient };
+      // return { redisClient };
       try {
         var decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.exp <= Math.floor(Date.now() / 1000)) {

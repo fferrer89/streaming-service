@@ -8,7 +8,7 @@ import Sidebar from "../../../components/App/sidebar/sidebar";
 import SPlayer from "../../../components/views/dashboard/footer-player";
 
 import { useRouter } from "next/navigation";
-import "../globals.css";
+// import "../globals.css";
 import { ApolloWrapper } from "../../ApolloWrapper";
 
 interface LayoutProps {
