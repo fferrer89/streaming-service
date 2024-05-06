@@ -86,6 +86,10 @@ const ArtistList: React.FC = () => {
     );
   }
 
+  if (error) {
+    return <div>Error: {error?.message}</div>
+  }
+
   if (data) {
     return (
       <>
