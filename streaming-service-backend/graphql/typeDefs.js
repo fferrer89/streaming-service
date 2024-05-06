@@ -145,12 +145,12 @@ type Mutation {
 
     addSong(
         title: String!,
-        duration: Int!,
+        duration: Int,
         song_url: ID!,
         cover_image_url: ID!,
         writtenBy: String!,
         producers: [String!]!,
-        genre: String!,
+        genre: MusicGenre!,
         release_date: Date!,
         artists:[ID!]!,
         lyrics:String,
@@ -165,7 +165,7 @@ type Mutation {
         cover_image_url: ID,
         writtenBy: String,
         producers: [String!],
-        genre: String,
+        genre: MusicGenre,
         release_date: Date,
         artists:[ID!]
     ): Song
@@ -217,7 +217,7 @@ type User {
     password_changed_date: Date
     date_of_birth: String
     gender: String
-    profile_image_url: String!
+    profile_image_url: ID
     liked_songs: [LikedSong]!
 }
 
@@ -261,7 +261,7 @@ type Album {
     _id: ID!
     album_type: String!
     total_songs: Int!
-    cover_image_url: String
+    cover_image_url: ID
     title: String!
     description: String!
     release_date: Date!

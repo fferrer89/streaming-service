@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import {AlbumTypes, MusicGenres, Visibilities} from "../../utils/helpers";
 
 export default function AlbumFormDialog({method, actionData, action,
-                                            setShowFormDialog, albumData, artistId}) {
+                                            setShowFormDialog, albumData, artistId, refetch}) {
     // Add & Edit Modal Hooks
     const hasPageBeenRendered = useRef(false);
     const formElement = useRef();
@@ -28,6 +28,7 @@ export default function AlbumFormDialog({method, actionData, action,
                 formElement.current.reset();
                 setAddModalStatus('');
                 setShowFormDialog(false);
+                refetch()
             }
         }
         delete actionData?.album;
@@ -42,7 +43,8 @@ export default function AlbumFormDialog({method, actionData, action,
                             onClick={(event) => {
                                 event.preventDefault();
                                 setAddModalStatus('');
-                                updateAddModalStatus()
+                                updateAddModalStatus();
+                                refetch()
                             }}
                     >
                         X
@@ -115,20 +117,19 @@ export default function AlbumFormDialog({method, actionData, action,
                         </li>
                         <li>
                             <label>
-                                Genre:
-                                <select name='genres' id='genres' form='dialog-form-album'>
-                                    {albumData?.genre ?
+                                Genres:
+                                <select name='genres' id='genres' form='dialog-form-album' multiple>
+                                    {albumData?.genres ?
                                         (
                                             <>
-                                                <option key={albumData?.genre} value={albumData?.genre}
-                                                        defaultValue={albumData?.genre}>
-                                                    {albumData?.genre}
-                                                </option>
                                                 {MusicGenres
-                                                    .filter((genre) => genre !== albumData?.genre)
-                                                    .map((genre) => (
-                                                        <option key={genre}
-                                                                value={genre}>{genre}</option>))
+                                                    .map((genre) => {
+                                                        if (albumData?.genres?.includes(genre)) {
+                                                            return <option key={genre} selected value={genre}>{genre}</option>
+                                                        } else {
+                                                            return <option key={genre} value={genre}>{genre}</option>
+                                                        }
+                                                    })
                                                 }
                                             </>
                                         ) :
@@ -181,6 +182,12 @@ export default function AlbumFormDialog({method, actionData, action,
                                         )
                                     }
                                 </select>
+                            </label>
+                        </li>
+                        <li>
+                            <label>
+                                Cover Image:
+                                <input type='file' id='cover_image_url' name='cover_image_url'/>
                             </label>
                         </li>
                     </ul>

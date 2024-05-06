@@ -14,18 +14,18 @@ import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
 import axios from 'axios';
 
-await mongoose.connect(
-  'mongodb+srv://marcos:WXgAl20LBjRb49b8@cluster0.ofr2q.mongodb.net/streaming-service?retryWrites=true&w=majority&appName=Cluster0',
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+import SongFile from '../models/songFileModel.js';
+
+await mongoose.connect('mongodb://127.0.0.1:27017/streaming-service', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
 
 const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 const uploadSong = async (filePath, albumTitle, songTitle) => {
   try {
-    filePath = `${filePath}/${songTitle}.mp3`.replaceAll(' ', '_');
+    filePath = `${filePath}/${songTitle}`.replaceAll(' ', '_');
     const readableStream = fs.createReadStream(filePath);
 
     const uploadStream = bucket.openUploadStream(songTitle);
@@ -1057,6 +1057,12 @@ async function seed() {
 
       let cAlbum = await Album.create(data.album);
       cAlbum.artists = [{ artistId: cArtist._id }];
+      const imageId = await uploadSong(
+        `./utils/songData/${data.album.title}`,
+        data.album.title,
+        'download.jpeg'
+      );
+      cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
       await cAlbum.save();
       for (let song of data.songs) {
         let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
@@ -1064,9 +1070,15 @@ async function seed() {
         const songId = await uploadSong(
           `./utils/songData/${data.album.title}`,
           data.album.title,
-          song.title
+          `${song.title}.mp3`
         );
         console.log(songId);
+        let fSong = await SongFile.create({
+          filename: song.title,
+          mimetype: 'audio/mpeg',
+          uploadDate: new Date(),
+          fileId: songId,
+        });
         song.artists = [cArtist._id];
         song.album = cAlbum._id;
         song.song_url = songId;

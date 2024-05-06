@@ -3,7 +3,7 @@ import {useQuery} from "@apollo/client";
 import queries from "../../../utils/queries";
 import Image from "next/image";
 import {useState} from "react";
-
+import { useSuspenseQuery } from "@apollo/experimental-nextjs-app-support/ssr";
 import {useFormState as useFormState} from 'react-dom';
 import {createAlbum, updateAlbum} from "../../actions";
 import AddItem from "../../../components/views/add-item";
@@ -14,8 +14,8 @@ const initialState = {
     message: null
 };
 export default function Artist({params}) {
-    const { data:artistAlbums, loading, error } = useQuery(queries.GET_ALBUMS_BY_ARTIST,
-        {variables: { artistId: params.id }});
+    const { data:artistAlbums, loading, error, refetch} = useQuery(queries.GET_ALBUMS_BY_ARTIST,
+        {variables: { artistId: params.id }, fetchPolicy: 'network-only'});
     const [createAlbumFormState, createAlbumFormAction] = useFormState(createAlbum, initialState);
     const [updateAlbumFormState, updateAlbumFormAction] = useFormState(updateAlbum, initialState);
     // const [deleteAlbumFormState, deleteAlbumFormAction] = useFormState(deleteAlbum, initialState);
@@ -32,7 +32,9 @@ export default function Artist({params}) {
                                                     actionData={createAlbumFormState}
                                                     action={createAlbumFormAction}
                                                     artistId={params?.id}
-                                                    setShowFormDialog={setShowAddFormDialog}/>)}
+                                                    setShowFormDialog={setShowAddFormDialog}
+                                                    refetch={refetch}
+            />)}
             <div className='element-list-container'>
                 {artistAlbums?.getAlbumsByArtist && artistAlbums?.getAlbumsByArtist?.length > 0 &&
                     (artistAlbums?.getAlbumsByArtist?.map(album => (
@@ -49,10 +51,12 @@ export default function Artist({params}) {
                                                   title: album?.title,
                                                   release_date: album?.release_date,
                                                   album_type: album?.album_type,
-                                                  genre: album?.genres?.[0],
+                                                  genres: album?.genres,
                                                   visibility: album?.visibility,
                                                   description: album?.description
-                                              }}/>)}
+                                              }}
+                                              refetch={refetch}
+                            />)}
 
                         {/*MenuControls including the 'Delete' and 'Edit' modal dialogs*/}
 
@@ -61,7 +65,8 @@ export default function Artist({params}) {
                                       setShowEditFormDialog={setShowEditFormDialog}
                                       setCurrentArticleId={setCurrentArticleId}
                                       currentArticleId={currentArticleId}
-                                      objectId={album?._id}/>
+                                      objectId={album?._id}
+                                      refetch={refetch}/>
                         <Image
                             // src={album?.cover_image_url ?? '/img/placeholder-album.png'}
                             src='/img/placeholder-album.png'
@@ -79,6 +84,7 @@ export default function Artist({params}) {
                             <dd>
                                 <time dateTime={album?.release_date}>{album?.release_date}</time>
                             </dd>
+                            {album?.genres.map((genre) => <p key={genre}>{genre}</p>)}
                         </dl>
                     </article>
                 )))}
