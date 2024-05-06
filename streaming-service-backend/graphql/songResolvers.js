@@ -9,6 +9,9 @@ import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
 import { GridFSBucket } from 'mongodb';
 import SongFile from '../models/songFileModel.js';
 import mongoose from 'mongoose';
+import { GraphQLError } from 'graphql';
+import Playlist from '../models/playlistModel.js';
+
 export const songResolvers = {
   Query: {
     songs: async (_, args, context) => {
@@ -475,73 +478,39 @@ export const songResolvers = {
       }
     },
     removeSong: async (_, args, context) => {
-      //Song id
-      let { songId } = args;
-      songId = songHelper.emptyValidation(songId, 'song id');
-      let songExist;
       try {
-        songExist = await Songs.findById(songId);
-        if (!songExist) {
-          songHelper.notFoundWrapper('Song not found');
+        let songId = songHelper.emptyValidation(args.songId, 'songId');
+        songId = songHelper.validObjectId(args.songId, 'songId');
+        songId = new Types.ObjectId(songId);
+        const existingSong = await Songs.findById(songId);
+        if (!existingSong) {
+          songHelper.notFoundWrapper('Song Not Found');
         }
-      } catch (error) {
-        songHelper.notFoundWrapper(error); //Incase findById throws array for invalid objectId.
-      }
-      //Check if user requesting delete is one of the artist;
-      let validUser = false;
-      for (let i = 0; i < songExist.artists.length; i++) {
-        if (context.decoded.id == songExist.artists[i].toString()) {
-          console.log(context.decoded.id, songExist.artists[i].toString());
-          validUser = true;
-        }
-      }
-      if (!validUser) {
-        songHelper.unAuthorizedWrapper();
-      }
 
-      //Remove song from song Collection.
-      try {
-        let songDel = await Songs.deleteOne({
-          _id: new Types.ObjectId(songId),
-        });
-      } catch (error) {
-        songHelper.serverSideErrorWrapper(
-          'Something went wrong, could not delete song'
+        await Album.updateMany(
+          { 'songs.songId': songId },
+          { $pull: { songs: { songId } } }
         );
-      }
 
-      //Remoce song from Album Colleciton.
-      try {
-        let songDel = await Album.findByIdAndUpdate(songExist.album, {
-          $pull: { songs: songExist._id },
-        });
-      } catch (error) {
-        songHelper.serverSideErrorWrapper(
-          'Something went wrong, could not delete song from album'
+        await ListenHistory.deleteMany({ songId });
+
+        await Playlist.updateMany(
+          { songs: songId },
+          { $pull: { songs: songId } }
         );
-      }
 
-      //Remove song from User collection.
-      try {
-        let songDel = await User.updateMany(
-          { liked_songs: { $eq: songExist._id } },
-          { $pull: { liked_songs: songExist._id } }
+        await User.updateMany(
+          { liked_songs: songId },
+          { $pull: { liked_songs: songId } }
         );
-      } catch (error) {
-        console.log(error);
-      }
 
-      //Set Deleted field to true in listening history Collection.
-      try {
-        let sonfDel = await ListenHistory.updateMany(
-          { songId: songExist._id },
-          { deleted: true }
-        );
-      } catch (error) {
-        console.log(error);
-      }
+        const removedS = await Songs.findByIdAndDelete(songId);
 
-      return songExist;
+        return removedS;
+      } catch (error) {
+        console.error('Error removing song:', error);
+        throw new GraphQLError(error.message);
+      }
     },
     toggleLikeSong: async (args) => {},
     uploadSongFile: async (_, args) => {
