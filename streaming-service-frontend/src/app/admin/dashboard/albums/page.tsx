@@ -4,6 +4,9 @@ import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/utils/redux/store';
+import { useRouter } from 'next/navigation';
 import { BsSoundwave } from 'react-icons/bs';
 import DeleteModal from '@/components/admin/DeleteModal';
 import Image from 'next/image';
@@ -29,10 +32,13 @@ interface Albums {
 }
 
 const AlbumList: React.FC = () => {
+  const router = useRouter();
+  const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const [openModal, setOpenModal] = useState(false);
   const [albumId, setAlbumId] = useState('');
   const [albumTitle, setAlbumTitle] = useState('');
   const { data, loading, error } = useQuery(queries.GET_ALBUMS, { fetchPolicy: 'cache-and-network' });
+
   const [removeAlbum] = useMutation(queries.REMOVE_ALBUM, {
     update(cache, { data: { removeAlbum } }) {
       cache.modify({
@@ -58,15 +64,19 @@ const AlbumList: React.FC = () => {
     refetchQueries: [{ query: queries.GET_ALBUMS }]
   });
 
-  const date = (date: string) => {
-    date = date.split('T')[0];
-    let newDate = date.split('-');
-    return `${newDate[1]}-${newDate[2]}-${newDate[0]}`;
-  };
+  useEffect(() => {
+    document.title = 'Admin - Dashboard | Sounds 54';
+  }, []);
 
   useEffect(() => {
-    document.title = 'Dashboard | Sounds 54';
-  }, []);
+    if (loggedIn && userType === 'user') {
+      router.push('/sound');
+    } else if (loggedIn && userType === 'artist') {
+      router.push('/artist');
+    } else if (!loggedIn || userType !== 'admin') {
+      router.push('/login/admin');
+    }
+  }, [loggedIn, router]);
 
   const handleAlbumDelete = () => {
     removeAlbum({
@@ -76,6 +86,23 @@ const AlbumList: React.FC = () => {
     });
 
     setOpenModal(false);
+  };
+
+  if (!loggedIn || userType !== 'admin') {
+    return (
+      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
+        <span className='mr-2'>Loading</span>
+        <span className='animate-bounce'>.</span>
+        <span className='animate-bounce delay-75'>.</span>
+        <span className='animate-bounce delay-200'>.</span>
+      </div>
+    );
+  }
+
+  const date = (date: string) => {
+    date = date.split('T')[0];
+    let newDate = date.split('-');
+    return `${newDate[1]}-${newDate[2]}-${newDate[0]}`;
   };
 
   const handleModal = (albumId: string, albumTitle: string) => {
@@ -107,21 +134,24 @@ const AlbumList: React.FC = () => {
           <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
             <h1 className='text-4xl text-[#22333B]'>Albums</h1>
             <div className='flex flex-col md:flex-wrap md:flex-row gap-6 w-full'>
-              {data.albums.map((album: Albums) => (
-                <div key={album._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
-                  {(album.cover_image_url) ?
-                    <Image src={album.cover_image_url} alt='Album Cover' width={100} height={100} className='mb-4 rounded-full' /> :
-                    <BsSoundwave className='w-16 h-16 mb-4 rounded-full' />
-                  }
-                  <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{album.title}</h5>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>{(album.album_type) ? album.album_type : '--'}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Songs: {album.total_songs}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Released: {(album.release_date) ? date(album.release_date) : '--'}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Created: {(album.created_date) ? date(album.created_date) : '--'}</span>
-                  <span className='text-sm text-[#C6AC8E]'>Visibility: {(album.visibility) ? album.visibility : '--'}</span>
-                  <button onClick={() => handleModal(album._id, album.title)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
-                </div>
-              ))}
+              {(data.albums.length > 0) ?
+                (data.albums.map((album: Albums) => (
+                  <div key={album._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
+                    {(album.cover_image_url) ?
+                      <Image src={`/file/download/${album.cover_image_url}`} alt='Album Cover' width={100} height={100} className='mb-4 rounded-full' /> :
+                      <BsSoundwave className='w-[100px] h-[100px] mb-4 rounded-full' />
+                    }
+                    <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{album.title}</h5>
+                    <span className='text-sm mb-2 text-[#C6AC8E]'>{(album.album_type) ? album.album_type : '--'}</span>
+                    <span className='text-sm mb-2 text-[#C6AC8E]'>Songs: {album.total_songs}</span>
+                    <span className='text-sm mb-2 text-[#C6AC8E]'>Released: {(album.release_date) ? date(album.release_date) : '--'}</span>
+                    <span className='text-sm mb-2 text-[#C6AC8E]'>Created: {(album.created_date) ? date(album.created_date) : '--'}</span>
+                    <span className='text-sm text-[#C6AC8E]'>Visibility: {(album.visibility) ? album.visibility : '--'}</span>
+                    <button onClick={() => handleModal(album._id, album.title)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
+                  </div>
+                ))) :
+                <p className='text-lg font-bold'>No Data Available</p>
+              }
             </div>
           </div>
           {openModal &&

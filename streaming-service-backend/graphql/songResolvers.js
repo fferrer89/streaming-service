@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import Songs from '../models/songModel.js';
 import songHelper from '../utils/songsHelpers.js';
 import ListenHistory from '../models/listeningHistoryModel.js';
@@ -12,12 +13,12 @@ import mongoose from 'mongoose';
 export const songResolvers = {
   Query: {
     songs: async (_, args, context) => {
-      let songs = await Songs.find({});
-      if (songs.length == 0) {
-        songHelper.notFoundWrapper('Songs Not found');
+      try {
+        let songs = await Songs.find();
+        return songs;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch songs: ${error.message}`);
       }
-      // no need to convert to string
-      return songs;
     },
     getSongById: async (_, args, context) => {
       let { _id: id } = args;
@@ -38,14 +39,14 @@ export const songResolvers = {
     getSongsByTitle: async (_, args, context) => {
       let { searchTerm: term } = args;
       term = songHelper.emptyValidation(term, 'Title');
-      
+
       let songs = await Songs.find({ title: { $regex: new RegExp(`^${term}`, 'i') } });
       return songs.map(song => ({
         ...song._doc,
         song_url: song.song_url || '', // Provide an empty string if song_url is null or undefined
       }));
     },
-    
+
 
     getSongsByAlbumID: async (_, args, context) => {
       let { albumId } = args;
@@ -498,7 +499,7 @@ export const songResolvers = {
 
       return songExist;
     },
-    toggleLikeSong: async (args) => {},
+    toggleLikeSong: async (args) => { },
     uploadSongFile: async (_, args) => {
       try {
         const { filename, mimetype, encoding, createReadStream } =

@@ -6,6 +6,8 @@ import { useMutation } from '@apollo/client';
 import queries from '@/utils/queries';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/utils/redux/store';
 import { login } from '@/utils/redux/features/user/userSlice';
 
 interface FormData {
@@ -16,13 +18,14 @@ interface FormData {
 
 const Login: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const { handleSubmit, register, formState: { errors } } = useForm<FormData>();
   const [role, setRole] = useState<string | undefined>();
   const [userError, setUserError] = useState<boolean>(false);
   const [artistError, setArtistError] = useState<boolean>(false);
-  const dispatch = useDispatch();
 
-  const [loginUser, { error: userDataError }] = useMutation(queries.LOGIN_USER, {
+  const [loginUser] = useMutation(queries.LOGIN_USER, {
     onCompleted: (data: any) => {
       const { user, token } = data.loginUser;
       setUserError(false);
@@ -35,13 +38,13 @@ const Login: React.FC = () => {
     }
   });
 
-  const [loginArtist, { error: artistDataError }] = useMutation(queries.LOGIN_ARTIST, {
+  const [loginArtist] = useMutation(queries.LOGIN_ARTIST, {
     onCompleted: (data: any) => {
       const { artist, token } = data.loginArtist;
       setArtistError(false);
       (document.getElementById('login') as HTMLFormElement)?.reset();
       dispatch(login({ user: artist, token, expiresIn: 3600, userType: 'artist' }));
-      router.push('/artist/dashboard');
+      router.push('/artist');
     },
     onError(error: any) {
       setArtistError(true);
@@ -52,9 +55,19 @@ const Login: React.FC = () => {
     document.title = 'Login | Sounds 54';
   }, []);
 
-  if (userDataError || artistDataError) {
-    return <div>Error: {userDataError?.message || artistDataError?.message}</div>
-  }
+  useEffect(() => {
+    if (loggedIn && userType === 'admin') {
+      router.push('/admin/dashboard');
+    }
+
+    if (loggedIn && userType === 'user') {
+      router.push('/sound');
+    }
+
+    if (loggedIn && userType === 'artist') {
+      router.push('/artist');
+    }
+  }, [loggedIn, router]);
 
   const handleOnSubmit: SubmitHandler<FormData> = (data, event) => {
     event?.preventDefault();
@@ -79,6 +92,17 @@ const Login: React.FC = () => {
       });
     }
   };
+
+  if (loggedIn && (userType === 'admin' || userType === 'user' || userType === 'artist')) {
+    return (
+      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
+        <span className='mr-2'>Loading</span>
+        <span className='animate-bounce'>.</span>
+        <span className='animate-bounce delay-75'>.</span>
+        <span className='animate-bounce delay-200'>.</span>
+      </div>
+    );
+  }
 
   const ErrorMessage = ({ message }: { message: string }) => (
     <p className='text-sm mt-2 text-red-500 inline-block'>{message}</p>

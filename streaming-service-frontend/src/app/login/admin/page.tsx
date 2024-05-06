@@ -5,6 +5,8 @@ import { useMutation } from '@apollo/client';
 import queries from '@/utils/queries';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/utils/redux/store';
 import { login } from '@/utils/redux/features/user/userSlice';
 
 interface FormData {
@@ -14,11 +16,12 @@ interface FormData {
 
 const AdminLogin: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const { handleSubmit, register } = useForm<FormData>();
   const [adminError, setAdminError] = useState<boolean>(false);
-  const dispatch = useDispatch();
 
-  const [loginAdmin, { error }] = useMutation(queries.LOGIN_ADMIN, {
+  const [loginAdmin] = useMutation(queries.LOGIN_ADMIN, {
     onCompleted: (data: any) => {
       const { admin, token } = data.loginAdmin;
       setAdminError(false);
@@ -35,6 +38,20 @@ const AdminLogin: React.FC = () => {
     document.title = 'Login | Sounds 54';
   }, []);
 
+  useEffect(() => {
+    if (loggedIn && userType === 'admin') {
+      router.push('/admin/dashboard');
+    }
+
+    if (loggedIn && userType === 'user') {
+      router.push('/sound');
+    }
+
+    if (loggedIn && userType === 'artist') {
+      router.push('/artist');
+    }
+  }, [loggedIn, router]);
+
   const handleOnSubmit: SubmitHandler<FormData> = (data, event) => {
     event?.preventDefault();
 
@@ -46,13 +63,20 @@ const AdminLogin: React.FC = () => {
     });
   };
 
+  if (loggedIn && (userType === 'admin' || userType === 'user' || userType === 'artist')) {
+    return (
+      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
+        <span className='mr-2'>Loading</span>
+        <span className='animate-bounce'>.</span>
+        <span className='animate-bounce delay-75'>.</span>
+        <span className='animate-bounce delay-200'>.</span>
+      </div>
+    );
+  }
+
   const ErrorMessage = ({ message }: { message: string }) => (
     <p className='text-sm mt-2 text-red-500 inline-block'>{message}</p>
   );
-
-  if (error) {
-    return <div>Error: {error?.message}</div>
-  }
 
   return (
     <>
