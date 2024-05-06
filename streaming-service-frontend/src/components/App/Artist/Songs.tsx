@@ -17,8 +17,8 @@ const Songs: React.FC<{ songs: any }> = ({ songs }) => {
       <Separator className="w-[95%]" />
 
       <div className="w-full h-full overflow-y-auto grid grid-cols-5 gap-4 p-3">
-        {songs.length > 0 ? (
-          songs.map((song, index) => <SongItem song={song} key={index} />)
+        {songs?.length > 0 ? (
+          songs?.map((song, index) => <SongItem song={song} key={index} />)
         ) : (
           <div className="text-gray-600 text-sm">No Songs</div>
         )}

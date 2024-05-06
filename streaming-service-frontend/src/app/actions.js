@@ -341,11 +341,12 @@ export async function createSong(prevState, formData) {
     errors.push(e?.message);
   }
   try {
-    release_date = validation.dateTimeString(
+    validation.dateTimeString(
       release_date,
       "release_date",
       true
     );
+    release_date = validation.isoToUsDateFormat(release_date, 'release_date');
   } catch (e) {
     errors.push(e?.message);
   }
@@ -411,7 +412,6 @@ export async function createSong(prevState, formData) {
       });
       return { song: data?.addSong };
     } catch (e) {
-      errors.push(`here:`);
       errors.push(e?.message);
       return { errorMessages: errors };
     }
