@@ -70,7 +70,7 @@ const songSchema = new mongoose.Schema({
   },
   cover_image_url: {
     type: mongoose.Schema.Types.ObjectId,
-    required: [true, 'Please provide song URL'],
+    required: false,
     trim: true,
   },
   writtenBy: {

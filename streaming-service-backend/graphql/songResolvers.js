@@ -42,7 +42,7 @@ export const songResolvers = {
       let songs = await Songs.find({ title: { $regex: new RegExp(`^${term}`, 'i') } });
       return songs.map(song => ({
         ...song._doc,
-        song_url: song.song_url || '', // Provide an empty string if song_url is null or undefined
+        song_url: song.song_url || '', 
       }));
     },
     

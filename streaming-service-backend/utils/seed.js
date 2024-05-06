@@ -12,6 +12,7 @@ import Grid from 'gridfs-stream';
 import fs from 'fs';
 import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
+import axios from 'axios';
 
 await mongoose.connect(
   'mongodb+srv://marcos:WXgAl20LBjRb49b8@cluster0.ofr2q.mongodb.net/streaming-service?retryWrites=true&w=majority&appName=Cluster0',
@@ -53,6 +54,41 @@ const uploadSong = async (filePath, albumTitle, songTitle) => {
   }
 };
 
+
+const uploadRandomImage = async () => {
+  try {
+    const response = await axios.get('https://picsum.photos/800', {
+      responseType: 'stream',
+    });
+
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+    const uploadStream = bucket.openUploadStream('randomImage.jpg');
+    const id = uploadStream.id;
+
+    response.data.pipe(uploadStream);
+
+    uploadStream.on('error', (error) => {
+      console.error('Error uploading image:', error);
+      throw error;
+    });
+
+    return new Promise((resolve, reject) => {
+      uploadStream.on('finish', () => {
+        console.log('Image uploaded successfully with ID:', id);
+        resolve(id);
+      });
+
+      uploadStream.on('error', (error) => {
+        console.error('Error uploading image:', error);
+        reject(error);
+      });
+    });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
+
 const admin = {
   first_name: 'Han',
   last_name: 'Solo',
@@ -69,7 +105,7 @@ const users = [
     password: 'Password123$',
     date_of_birth: '01/01/1990',
     gender: 'MALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=1',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
   {
     first_name: 'Jane',
@@ -79,8 +115,9 @@ const users = [
     password: 'Password456$',
     date_of_birth: '01/01/1995',
     gender: 'FEMALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=2',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
+
   {
     first_name: 'Alice',
     last_name: 'Smith',
@@ -89,7 +126,7 @@ const users = [
     password: 'Password789$',
     date_of_birth: '01/01/1988',
     gender: 'FEMALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=16',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
   {
     first_name: 'Bob',
@@ -99,7 +136,7 @@ const users = [
     password: 'Password000$',
     date_of_birth: '01/01/1992',
     gender: 'MALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=17',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
 ];
 
@@ -112,7 +149,7 @@ const artists = [
     password: 'Password456#',
     date_of_birth: '01/01/1940',
     gender: 'MALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=3',
+    profile_image_url: new mongoose.Types.ObjectId(),
     genres: ['REGGAE'],
   },
   {
@@ -123,7 +160,7 @@ const artists = [
     password: 'Password456@',
     date_of_birth: '01/01/1980',
     gender: 'FEMALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=4',
+    profile_image_url: new mongoose.Types.ObjectId(),
     genres: ['POP', 'SOUL'],
   },
 ];
@@ -137,7 +174,7 @@ const SmithMr = {
   date_of_birth: '01/01/1940',
   gender: 'MALE',
   genres: ['COUNTRY'],
-  profile_image_url: 'https://picsum.photos/200/200?random=7',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const BillHobson = {
@@ -149,7 +186,7 @@ const BillHobson = {
   date_of_birth: '01/01/1980',
   gender: 'MALE',
   genres: ['ROCK'],
-  profile_image_url: 'https://picsum.photos/200/200?random=8',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const JohnDoe = {
@@ -161,7 +198,7 @@ const JohnDoe = {
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['POP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=9',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const AldousIchnite = {
@@ -173,7 +210,7 @@ const AldousIchnite = {
   date_of_birth: '01/01/1999',
   gender: 'MALE',
   genres: ['ELECTRONIC'],
-  profile_image_url: 'https://picsum.photos/200/200?random=10',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const DanaSchechter = {
@@ -185,7 +222,7 @@ const DanaSchechter = {
   date_of_birth: '01/01/1999',
   gender: 'FEMALE',
   genres: ['INDIE_POP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=11',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const MiamiSlice = {
@@ -197,7 +234,7 @@ const MiamiSlice = {
   date_of_birth: '01/01/2001',
   gender: 'FEMALE',
   genres: ['DISCO', 'HOUSE', 'DANCE'],
-  profile_image_url: 'https://picsum.photos/200/200?random=12',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const TripleHere = {
@@ -209,7 +246,7 @@ const TripleHere = {
   date_of_birth: '01/01/2001',
   gender: 'MALE',
   genres: ['SYNTH_POP', 'TRIP_HOP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=13',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const KetsaMia = {
@@ -221,7 +258,7 @@ const KetsaMia = {
   date_of_birth: '01/01/1980',
   gender: 'FEMALE',
   genres: ['SYNTH_POP', 'HIP_HOP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=14',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const AudioKofee = {
@@ -233,7 +270,7 @@ const AudioKofee = {
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['ELECTRONIC', 'SYNTH_POP'],
-  profile_image_url: 'https://picsum.photos/200/200?random=15',
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 
@@ -339,7 +376,7 @@ const audioAlbum = {
 const albums = [
   {
     album_type: 'ALBUM',
-    cover_image_url: 'https://picsum.photos/200/200?random=5',
+    cover_image_url: new mongoose.Types.ObjectId(),
     title: 'Greatest Hits',
     description: 'Best hits of all time',
     release_date: new Date('2020-01-01'),
@@ -351,7 +388,7 @@ const albums = [
   },
   {
     album_type: 'SINGLE',
-    cover_image_url: 'https://picsum.photos/200/200?random=6',
+    cover_image_url: new mongoose.Types.ObjectId(),
     title: 'Single Track',
     description: 'A single track',
     release_date: new Date('2021-05-01'),
@@ -870,6 +907,12 @@ async function seed() {
     const createdUsers = await User.create(users);
     const createdArtists = await Artist.create(artists);
 
+    for (let artist of createdArtists) {
+      const imageId = await uploadRandomImage();
+      artist.profile_image_url = imageId;
+      await artist.save();
+    }
+
     const albumsWithArtists = albums.map((album) => ({
       ...album,
       artists: createdArtists.map((artist) => ({ artistId: artist._id })),
@@ -892,12 +935,16 @@ async function seed() {
     for (let song of createdSongs) {
       const randomAlbumIndex = Math.floor(Math.random() * createdAlbums.length);
       song.album = createdAlbums[randomAlbumIndex]._id;
+      let imageId = await uploadRandomImage();
+      song.cover_image_url = imageId;
       await Song.findByIdAndUpdate(song._id, { album: song.album });
     }
 
     for (let album of createdAlbums) {
       const randomArtistIndex = Math.floor(Math.random() * createdArtists.length);
       album.artists = [{ artistId: createdArtists[randomArtistIndex]._id }];
+      let imageId = await uploadRandomImage();
+      album.cover_image_url =  imageId;
       await Album.findByIdAndUpdate(album._id, { artists: album.artists });
     }
 
@@ -943,6 +990,8 @@ async function seed() {
       });
     }
     for (let currentUser of createdUsers) {
+      let imageId = await uploadRandomImage();
+      currentUser.profile_image_url = imageId;
       const otherUsers = createdUsers.filter(
         (user) => user._id.toString() !== currentUser._id.toString()
       );
@@ -959,6 +1008,8 @@ async function seed() {
     }
 
     for (let playlist of playlists) {
+      let imageId = await uploadRandomImage();
+      playlist.cover_image_url = imageId;
       playlist.songs = createdSongs.map((song) => song._id);
     }
 
@@ -994,6 +1045,8 @@ async function seed() {
     }
 
     const createdPlaylists = await Playlist.create(playlists);
+
+   
 
     await ListeningHistory.create(listeningHistory);
     await Album.create(albums);
