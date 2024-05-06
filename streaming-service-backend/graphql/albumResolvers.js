@@ -5,7 +5,6 @@ import Song from '../models/songModel.js';
 import Artist from '../models/artistModel.js';
 import songsHelpers from '../utils/songsHelpers.js';
 import { validateMogoObjID } from '../utils/helpers.js';
-import songHelper from '../utils/songsHelpers.js';
 
 export const albumResolvers = {
   Album: {
@@ -23,42 +22,18 @@ export const albumResolvers = {
     }
   },
   Query: {
-    albums: async (_, args, context) => {
+    albums: async () => {
       try {
-        const cachedAlbums = await context.redisClient.json.get('albums');
-        if (cachedAlbums) {
-          return cachedAlbums;
-        }
-
         const allAlbums = await Album.find();
-        if (allAlbums && allAlbums.length !== 0) {
-          await context.redisClient.json.set('albums', '$', allAlbums);
-          await context.redisClient.EXPIRE('albums', 1800);
-
-          return allAlbums;
-        } else {
-          return [];
-        }
+        return allAlbums;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch albums: ${error.message}`);
       }
     },
-    getAlbumById: async (_, { _id }, context) => {
+    getAlbumById: async (_, { _id }, contextValue) => {
       try {
         validateMogoObjID(_id.trim(), 'album id');
-        const cachedAlbum = await context.redisClient.json.get(`album:${_id}`);
-        if (cachedAlbum) {
-          return cachedAlbum;
-        }
-
         const album = await Album.findById(_id.trim());
-        if (!album) {
-          songHelper.notFoundWrapper('Album not found');
-        }
-
-        await context.redisClient.json.set(`album:${_id}`, '$', album);
-        await context.redisClient.EXPIRE(`album:${_id}`, 1800);
-
         return album;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch album: ${error.message}`);
@@ -203,7 +178,6 @@ export const albumResolvers = {
         });
       }
     },
-
     editAlbum: async (_, args, contextValue) => {
       try {
         const updatedAlbum = await Album.findByIdAndUpdate(
@@ -219,7 +193,6 @@ export const albumResolvers = {
         throw new GraphQLError(`Error updating album: ${error.message}`);
       }
     },
-
     addSongToAlbum: async (_, { _id, songId }, contextValue) => {
       try {
         validateMogoObjID(_id.trim(), 'album Id');
@@ -236,11 +209,11 @@ export const albumResolvers = {
         }
         album.songs
           ? album.songs.push({
-              songId: new mongoose.Types.ObjectId(songId.trim()),
-            })
+            songId: new mongoose.Types.ObjectId(songId.trim()),
+          })
           : (album.songs = [
-              { songId: new mongoose.Types.ObjectId(songId.trim()) },
-            ]);
+            { songId: new mongoose.Types.ObjectId(songId.trim()) },
+          ]);
         const savedAlbum = await album.save();
 
         song.album = new mongoose.Types.ObjectId(songId.trim());
@@ -280,7 +253,6 @@ export const albumResolvers = {
         );
       }
     },
-
     addArtistToAlbum: async (_, { _id, artistId }, contextValue) => {
       try {
         validateMogoObjID(_id.trim(), 'album Id');
@@ -297,11 +269,11 @@ export const albumResolvers = {
         }
         album.artists
           ? album.artists.push({
-              artistId: new mongoose.Types.ObjectId(artistId.trim()),
-            })
+            artistId: new mongoose.Types.ObjectId(artistId.trim()),
+          })
           : (album.artists = [
-              { artistId: new mongoose.Types.ObjectId(artistId.trim()) },
-            ]);
+            { artistId: new mongoose.Types.ObjectId(artistId.trim()) },
+          ]);
         const savedAlbum = await album.save();
 
         return savedAlbum;
@@ -337,13 +309,10 @@ export const albumResolvers = {
         );
       }
     },
-
-    removeAlbum: async (_, { _id }, context) => {
+    removeAlbum: async (_, { _id }, contextValue) => {
       try {
         validateMogoObjID(_id.trim(), 'album id');
         const deletedAlbum = await Album.findByIdAndDelete(_id.trim());
-        await context.redisClient.del(`album:${_id}`);
-        await context.redisClient.del('albums');
         if (!deletedAlbum) {
           throw new Error('Album not found');
         }
