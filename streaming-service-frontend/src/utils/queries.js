@@ -316,6 +316,7 @@ const ADD_ALBUM = gql`
   mutation addAlbum(
     $title: String!
     $album_type: AlbumType!
+    $cover_image_url: ID
     $description: String!
     $release_date: Date!
     $visibility: Visibility!
@@ -325,6 +326,7 @@ const ADD_ALBUM = gql`
     addAlbum(
       title: $title
       album_type: $album_type
+      cover_image_url: $cover_image_url
       description: $description
       release_date: $release_date
       visibility: $visibility
@@ -340,6 +342,7 @@ const EDIT_ALBUM = gql`
     $_id: ID!
     $title: String
     $album_type: AlbumType
+    $cover_image_url: ID
     $description: String
     $release_date: Date
     $visibility: Visibility
@@ -349,6 +352,7 @@ const EDIT_ALBUM = gql`
       _id: $_id
       title: $title
       album_type: $album_type
+      cover_image_url: $cover_image_url
       description: $description
       release_date: $release_date
       visibility: $visibility

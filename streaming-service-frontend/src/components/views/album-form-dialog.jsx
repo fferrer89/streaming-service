@@ -185,6 +185,12 @@ export default function AlbumFormDialog({method, actionData, action,
                                 </select>
                             </label>
                         </li>
+                        <li>
+                            <label>
+                                Cover Image:
+                                <input type='file' id='cover_image_url' name='cover_image_url'/>
+                            </label>
+                        </li>
                     </ul>
                     {actionData && actionData?.errorMessages && (
                         <ul>

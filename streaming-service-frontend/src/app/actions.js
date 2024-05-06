@@ -2,8 +2,9 @@
 import validation from '../utils/validations';
 import queries from "../utils/queries";
 import { getClient } from "../utils";
+import httpClientReqs from "../utils/http-client-reqs";
 export async function createAlbum(prevState, formData) {
-    let title, release_date, album_type, description, genres, visibility, artistId, artists;
+    let title, release_date, album_type, description, genres, visibility, artistId, artists, cover_image_url;
     let errors = [];
     title = formData.get('title');
     release_date = formData.get('release_date');
@@ -12,6 +13,7 @@ export async function createAlbum(prevState, formData) {
     genres = formData.get('genres');
     visibility = formData.get('visibility');
     artistId = formData.get('artistId');
+    cover_image_url = formData.get('cover_image_url');
     try {
         title = validation.checkString(title, 'title');
     } catch (e) {
@@ -33,7 +35,6 @@ export async function createAlbum(prevState, formData) {
         errors.push(e);
     }
     try {
-        // FIXME: allow multiple genres
         genres = validation.checkString(genres, 'genres');
         genres = [genres]
     } catch (e) {
@@ -45,13 +46,18 @@ export async function createAlbum(prevState, formData) {
         errors.push(e);
     }
     try {
-        // FIXME: allow multiple artists
         artistId = validation.checkId(artistId, 'artistId');
         artists = [artistId]
     } catch (e) {
         errors.push(e);
     }
-
+    if (cover_image_url) {
+        try {
+            cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
+        } catch (error) {
+            errors.push(`Failed to upload cover image file - ${error?.message} - ${error?.cause}`);
+        }
+    }
     if (errors.length > 0) {
         return {errorMessages: errors};
     } else {
@@ -59,7 +65,7 @@ export async function createAlbum(prevState, formData) {
             const client = getClient();
             const {data}  = await client.mutate({
                 mutation: queries.ADD_ALBUM,
-                variables: { title, release_date, album_type, description, genres, visibility, artists },
+                variables: { title, release_date, album_type, description, genres, visibility, artists, cover_image_url},
             });
             return {album: data?.addAlbum};
         } catch (e) {
@@ -69,7 +75,7 @@ export async function createAlbum(prevState, formData) {
     }
 }
 export async function updateAlbum(prevState, formData) {
-    let title, release_date, album_type, description, genres, visibility, artistId, artists, albumId;
+    let title, release_date, album_type, description, genres, visibility, artistId, artists, albumId, cover_image_url;
     let errors = [];
     albumId = formData.get('albumId');
     title = formData.get('title');
@@ -79,6 +85,7 @@ export async function updateAlbum(prevState, formData) {
     genres = formData.get('genres');
     visibility = formData.get('visibility');
     artistId = formData.get('artistId');
+    cover_image_url = formData.get('cover_image_url');
     try {
         if (title) {
             title = validation.checkString(title, 'title');
@@ -130,6 +137,13 @@ export async function updateAlbum(prevState, formData) {
     } catch (e) {
         errors.push(e);
     }
+    if (cover_image_url) {
+        try {
+            cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
+        } catch (error) {
+            errors.push(`Failed to upload cover image file - ${error?.message} - ${error?.cause}`);
+        }
+    }
 
     if (errors.length > 0) {
         return {errorMessages: errors};
@@ -138,7 +152,7 @@ export async function updateAlbum(prevState, formData) {
             const client = getClient();
             const {data}  = await client.mutate({
                 mutation: queries.EDIT_ALBUM,
-                variables: {_id:albumId, title, release_date, album_type, description, genres, visibility, artists },
+                variables: {_id:albumId, title, release_date, album_type, description, genres, visibility, artists, cover_image_url },
                 // https://www.apollographql.com/docs/react/data/mutations/#updating-local-data
             });
             return {album: data?.editAlbum};
@@ -190,14 +204,14 @@ export async function createSong(prevState, formData) {
         errors.push(e);
     }
     try {
-        song_url = validation.checkId(song_url, 'song_url');
-    } catch (e) {
-        errors.push(e);
+        song_url = await httpClientReqs.uploadFile(song_url);
+    } catch (error) {
+        errors.push(`Failed to upload song mp3 file - ${error?.message} - ${error?.cause}`);
     }
     try {
-        cover_image_url = validation.checkId(cover_image_url, 'cover_image_url');
-    } catch (e) {
-        errors.push(e);
+        cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
+    } catch (error) {
+        errors.push(`Failed to upload cover image file - ${error?.message} - ${error?.cause}`);
     }
     try {
         writtenBy = validation.checkString(writtenBy, 'writtenBy');
@@ -230,6 +244,7 @@ export async function createSong(prevState, formData) {
     } catch (e) {
         errors.push(e);
     }
+
     if (errors.length > 0) {
         return {errorMessages: errors};
     } else {
@@ -280,18 +295,18 @@ export async function updateSong(prevState, formData) {
         errors.push(e);
     }
     try {
-        if (song_url) {
-            song_url = validation.checkId(song_url, 'song_url');
+        if(song_url) {
+            song_url = await httpClientReqs.uploadFile(song_url);
         }
-    } catch (e) {
-        errors.push(e);
+    } catch (error) {
+        errors.push(`Failed to upload song mp3 file - ${error?.message} - ${error?.cause}`);
     }
     try {
-        if (cover_image_url) {
-            cover_image_url = validation.checkId(cover_image_url, 'cover_image_url');
+        if(cover_image_url) {
+            cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
         }
-    } catch (e) {
-        errors.push(e);
+    } catch (error) {
+        errors.push(`Failed to upload cover image file - ${error?.message} - ${error?.cause}`);
     }
     try {
         if (writtenBy) {
