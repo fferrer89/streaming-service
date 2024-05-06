@@ -96,7 +96,7 @@ const SongList: React.FC = () => {
   if (error) {
     return <div>Error: {error?.message}</div>
   }
-
+  
   if (data) {
     return (
       <>
@@ -109,11 +109,11 @@ const SongList: React.FC = () => {
                 <div key={song._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
                   <PiMusicNotesFill className='w-16 h-16 mb-4' />
                   <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{song.title}</h5>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Genre: {(song.genre) ? song.genre : '-'}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Likes: {(song.likes) ? song.likes : '-'}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Language: {(song.language) ? song.language : '-'}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>Release Date: {(song.release_date) ? date(song.release_date) : '-'}</span>
-                  <span className='text-sm text-[#C6AC8E]'>Written By: {(song.writtenBy) ? song.writtenBy : '-'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Genre: {(song.genre) ? song.genre : '--'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Likes: {(song.likes) ? song.likes : '--'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Language: {(song.language) ? song.language : '--'}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Released: {(song.release_date) ? date(song.release_date) : '--'}</span>
+                  <span className='text-sm text-[#C6AC8E]'>Writer: {(song.writtenBy) ? song.writtenBy : '--'}</span>
                   <button onClick={() => handleModal(song._id, song.title)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
                 </div>
               ))}

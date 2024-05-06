@@ -6,6 +6,7 @@ import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client';
 import { FaUser } from 'react-icons/fa6';
 import DeleteModal from '@/components/admin/DeleteModal';
+import Image from 'next/image';
 
 interface ArtistRef {
   _ref: string;
@@ -23,6 +24,8 @@ interface Artists {
   last_name: string;
   email: string;
   gender: string;
+  profile_image_url: string;
+  date_of_birth: string;
 }
 
 const ArtistList: React.FC = () => {
@@ -100,11 +103,15 @@ const ArtistList: React.FC = () => {
             <div className='flex flex-col md:flex-wrap md:flex-row gap-6 w-full'>
               {data.artists.map((artist: Artists) => (
                 <div key={artist._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
-                  <FaUser className='w-16 h-16 mb-4 rounded-full' />
+                  {(artist.profile_image_url) ?
+                    <Image src={artist.profile_image_url} alt='Artist Profile' width={100} height={100} className='mb-4 rounded-full' /> :
+                    <FaUser className='w-16 h-16 mb-4 rounded-full' />
+                  }
                   <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{artist.display_name}</h5>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>{`${artist.first_name} ${artist.last_name}`}</span>
-                  <span className='text-sm mb-2 text-[#C6AC8E]'>{artist.email}</span>
-                  <span className='text-sm text-[#C6AC8E]'>{artist.gender}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Name: {`${artist.first_name} ${artist.last_name}`}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Email: {artist.email}</span>
+                  <span className='text-sm mb-2 text-[#C6AC8E]'>Gender: {(artist.gender) ? artist.gender : '--'}</span>
+                  <span className='text-sm text-[#C6AC8E]'>DOB: {(artist.date_of_birth) ? artist.date_of_birth : '--'}</span>
                   <button onClick={() => handleModal(artist._id, `${artist.first_name} ${artist.last_name}`)} className='mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
                 </div>
               ))}
