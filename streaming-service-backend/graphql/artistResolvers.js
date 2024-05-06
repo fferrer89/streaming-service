@@ -80,21 +80,12 @@ export const artistResolvers = {
     //working fully - used for search
     getArtistsByName: async (_, args, contextValue) => {
       try {
-        if (
-          !args.name ||
-          typeof args.name !== 'string' ||
-          args.name.trim().length < 3
-        ) {
-          songHelper.badUserInputWrapper(
-            'Please provide at least 3 characters for name input'
-          );
-        }
         const artists = await Artist.find({
           $or: [
             { display_name: { $regex: new RegExp(args.name, 'i') } },
             { first_name: { $regex: new RegExp(args.name, 'i') } },
             { last_name: { $regex: new RegExp(args.name, 'i') } },
-          ]
+          ],
         });
         return artists;
       } catch (error) {
