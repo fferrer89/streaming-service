@@ -208,6 +208,8 @@ export const artistResolvers = {
           savedArtist.first_name
         );
 
+        await context.redisClient.del('artists');
+
         return { artist: savedArtist, token };
       } catch (error) {
         throw new GraphQLError(`Error Registering Artist: ${error.message}`, {
@@ -271,6 +273,8 @@ export const artistResolvers = {
           songHelper.badUserInputWrapper(validationErrors);
         }
         artist = await artist.save();
+
+        await context.redisClient.del('artists');
 
         return artist;
       } catch (err) {

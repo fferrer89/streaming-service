@@ -50,7 +50,7 @@ export const userResolvers = {
     },
   },
   Mutation: {
-    registerUser: async (_, args) => {
+    registerUser: async (_, args, context) => {
       try {
         const existingUser = await User.findOne({ email: args.email });
         if (existingUser) {
@@ -79,6 +79,9 @@ export const userResolvers = {
           'user',
           savedUser.first_name
         );
+
+        await context.redisClient.del('users');
+
         return { user: savedUser, token };
       } catch (error) {
         throw new GraphQLError(`Error Registering user: ${error.message}`, {
