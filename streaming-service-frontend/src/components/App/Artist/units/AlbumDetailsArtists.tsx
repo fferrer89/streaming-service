@@ -146,32 +146,33 @@ const AlbumDetailsArtists: React.FC<{
           role="list"
           className="divide-y divide-gray-200 dark:divide-gray-700"
         >
-          {artists.map((artist: any) => (
-            <li key={artist._id} className="py-3 sm:py-4">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <img
-                    className="w-8 h-8 rounded-full"
-                    src={`http://localhost:4000/file/download/${artist.profile_image_url}`}
-                    alt={artist.display_name}
-                  />
+          {artistData &&
+            artists.map((artist: any) => (
+              <li key={artist._id} className="py-3 sm:py-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <img
+                      className="w-8 h-8 rounded-full"
+                      src={`http://localhost:4000/file/download/${artist.profile_image_url}`}
+                      alt={artist.display_name}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0 ms-4">
+                    <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
+                      {artist.display_name}
+                    </p>
+                  </div>
+                  {artistId !== artist._id && (
+                    <button
+                      className="ml-2 text-sm font-medium text-red-600 hover:text-red-900 focus:outline-none dark:text-red-500"
+                      onClick={() => handleRemoveArtist(artist._id)}
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
-                <div className="flex-1 min-w-0 ms-4">
-                  <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
-                    {artist.display_name}
-                  </p>
-                </div>
-                {artistId !== artist._id && (
-                  <button
-                    className="ml-2 text-sm font-medium text-red-600 hover:text-red-900 focus:outline-none dark:text-red-500"
-                    onClick={() => handleRemoveArtist(artist._id)}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
+              </li>
+            ))}
         </ul>
       </div>
       {showConfirmation && (
