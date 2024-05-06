@@ -13,7 +13,7 @@ const ArtistItem: React.FC<ArtistProps> = ({ _id, display_name, profile_image_ur
     className="m-2 p-2 rounded-lg shadow-md hover:scale-105 transition-transform flex flex-col items-center"
   >
     <img
-      src={"/img/artist-icon.jpeg"}
+      src={profile_image_url}
       alt={display_name}
       className="w-16 h-16 rounded-lg object-cover"
     />

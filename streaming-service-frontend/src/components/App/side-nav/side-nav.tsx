@@ -33,14 +33,16 @@ const SideNav: React.FC = () => {
     return <div>Error: {error.message}</div>;
   }
 
-  const profileImageUrl = data?.getUserById?.profile_image_url ;
+  const profileImageUrl = data?.getUserById?.profile_image_url
+  ? `http://localhost:4000/file/image/${data?.getUserById?.profile_image_url}`
+  : null;
 
 
   return (
     <section className={styles.sideNav}>
       <header>
         <Link href={'/user/profile'}>
-          <Image className=' rounded-full border border-white' src={"/img/ellipse.png"} width={45} height={45} alt='Profile image' />
+          <Image className=' rounded-full border border-white' src={profileImageUrl ? profileImageUrl: "/img/ellipse.png"} width={45} height={45} alt='Profile image' />
         </Link>
       </header>
       <nav>

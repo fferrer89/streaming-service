@@ -14,7 +14,15 @@ interface ArtistsProps {
   artists: ArtistProps[];
 }
 
+
+
 const Artists: React.FC<ArtistsProps> = ({ artists }) => {
+
+    const getImageUrl = (id: string) => {
+       
+        return `http://localhost:4000/file/image/${id}`;
+    };
+    
   return (
     <div
       className="flex flex-col w-[1050px] h-[500px] gap-3 p-0 bg-white rounded-lg overflow-hidden relative"
@@ -33,7 +41,7 @@ const Artists: React.FC<ArtistsProps> = ({ artists }) => {
               key={index}
               _id={artist._id}
               display_name={artist.display_name}
-              profile_image_url={artist.profile_image_url}
+              profile_image_url={artist.profile_image_url ? getImageUrl(artist.profile_image_url) : "/img/artist-icon.jpeg"}
               genres={artist.genres}
             />
           ))

@@ -11,6 +11,7 @@ import Play from "../../Svg/Play";
 import Pause from "../../Svg/Pause";
 import Next from "../../Svg/Next";
 import Repeat from "../../Svg/Repeat";
+import { getImageUrl } from "@/utils/tools/images";
 
 const SPlayer: React.FC = () => {
   const dispatch = useDispatch();
@@ -93,7 +94,7 @@ const SPlayer: React.FC = () => {
       <div className="flex items-center">
         <img
           className="h-10 w-10 mr-4 flex-shrink-0"
-          src={currentSong.artists[0].profile_image_url || "https://picsum.photos/56.webp?random=10"}
+          src={currentSong.album.cover_image_url ? getImageUrl(currentSong.album.cover_image_url) : "/img/music_note.jpeg"}
           alt={currentSong.title}
         />
         <div className="mr-4">

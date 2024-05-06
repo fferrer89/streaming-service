@@ -17,6 +17,7 @@ query SearchQueries($searchTerm: String!) {
       owner {
         _id
         display_name
+        profile_image_url
       }
     }
     getSongsByTitle(searchTerm: $searchTerm) {
@@ -33,6 +34,7 @@ query SearchQueries($searchTerm: String!) {
       album {
         _id
         title
+        cover_image_url
       }
       artists {
         _id
@@ -63,6 +65,7 @@ type ResultType = {
     owner: {
       _id: string;
       display_name: string;
+      profile_image_url: string;
     };
   }[];
   songs: {
@@ -77,8 +80,9 @@ type ResultType = {
     lyrics: string;
     release_date: Date;
     album: {
-      _id: string;
-      title: string;
+        _id: string;
+        title: string;
+        cover_image_url: string;
     };
     artists: {
       _id: string;

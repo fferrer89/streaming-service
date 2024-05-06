@@ -14,6 +14,7 @@ interface Song {
   album: {
     _id: string;
     title: string;
+    cover_image_url: string;
   };
   artists: {
     _id: string;

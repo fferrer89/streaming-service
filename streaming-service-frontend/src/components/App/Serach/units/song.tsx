@@ -42,7 +42,7 @@ const SongItem: React.FC<SongProps> = ({ onClick, ...song }) => {
       >
         <div>
           <Image
-            src={"/img/music_note.jpeg"}
+            src={song.cover_image_url}
             alt={song.title}
             width={50}
             height={50}
