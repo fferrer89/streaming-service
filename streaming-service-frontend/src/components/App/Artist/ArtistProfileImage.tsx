@@ -6,7 +6,7 @@ const ArtistProfileImage: React.FC<{ image_url: any }> = ({
   size,
 }) => {
   const iurl = image_url
-    ? `http://localhost:4000/file/download/${image_url}`
+    ? `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${image_url}`
     : "/img/ellipse.png";
   return <img src={iurl} width={size} height={size} alt="Profile image" />;
 };

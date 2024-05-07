@@ -1,6 +1,5 @@
 const getImageUrl = (id: string) => {
-       
-    return `http://localhost:4000/file/download/${id}`;
+  return `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${id}`;
 };
 
-export  {getImageUrl};
+export { getImageUrl };

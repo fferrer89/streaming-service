@@ -12,6 +12,7 @@ type Query {
     getUserById(_id: ID!): User
     getUserFollowers(userId: String!): [User]
     getUserFollowing(userId: String!): [User]
+    getUsersByName(name: String!, limit: Int): [User]
 
     artists: [Artist]
     getArtistById(_id: ID!): Artist
