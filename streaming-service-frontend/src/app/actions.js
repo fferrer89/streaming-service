@@ -362,6 +362,8 @@ export async function createSong(prevState, formData) {
   try {
     if (album !== null && album !== undefined && album?.trim() !== '') {
       album = validation.checkId(album, "album");
+    } else {
+      album = undefined;
     }
   } catch (e) {
     errors.push(e?.message);
@@ -369,6 +371,8 @@ export async function createSong(prevState, formData) {
   try {
     if (duration !== null && duration !== undefined && duration?.trim() !== '') {
       duration = validation.checkNumber(parseInt(duration, 10), "duration");
+    } else {
+      duration = undefined
     }
   } catch (e) {
     errors.push(e?.message);
@@ -376,18 +380,11 @@ export async function createSong(prevState, formData) {
   try {
     if (lyrics !== null && lyrics !== undefined && lyrics?.trim() !== '') {
       lyrics = validation.checkString(lyrics, "lyrics");
+    } else {
+      lyrics = undefined;
     }
   } catch (e) {
     errors.push(e?.message);
-  }
-  if (album === '') {
-    album = undefined
-  }
-  if (duration === '') {
-    duration = undefined
-  }
-  if (lyrics === '') {
-    lyrics = undefined
   }
 
   if (errors.length > 0) {
@@ -429,6 +426,8 @@ export async function updateSong(prevState, formData) {
     genre,
     release_date,
     artists,
+    artistId,
+    lyrics,
     album;
   let errors = [];
   songId = formData.get("songId");
@@ -440,84 +439,105 @@ export async function updateSong(prevState, formData) {
   producers = formData.get("producers"); // [String]
   genre = formData.get("genre"); // MusicGenre
   release_date = formData.get("release_date");
-  artists = formData.get("artists"); // [ID]
+  // artists = formData.get("artists"); // [ID]
+  artistId = formData.get("artistId");
   // album = formData.get('album'); // ID
+  lyrics = formData.get("lyrics");
+
   try {
     songId = validation.checkId(songId, "songId");
   } catch (e) {
-    errors.push(e);
+    errors.push(e.message);
   }
   try {
     if (title) {
       title = validation.checkString(title, "title");
+    } else {
+      title = undefined;
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e.message);
   }
   try {
-    if (duration) {
-      duration = validation.checkNumber(duration, "duration");
+    if (duration !== null && duration !== undefined && duration?.trim() !== '') {
+      duration = validation.checkNumber(parseInt(duration, 10), "duration");
+    } else {
+      duration = undefined;
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e.message);
   }
   try {
     if (song_url) {
       song_url = await httpClientReqs.uploadFile(song_url);
+    } else {
+      song_url = undefined;
     }
   } catch (error) {
     errors.push(
-      `Failed to upload song mp3 file - ${error?.message} - ${error?.cause}`
+      `Failed to upload song mp3 file - ${error?.message}`
     );
   }
   try {
     if (cover_image_url) {
       cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
+    } else {
+      cover_image_url = undefined
     }
   } catch (error) {
     errors.push(
-      `Failed to upload cover image file - ${error?.message} - ${error?.cause}`
+      `Failed to upload cover image file - ${error?.message}`
     );
   }
   try {
     if (writtenBy) {
       writtenBy = validation.checkString(writtenBy, "writtenBy");
+    } else {
+      writtenBy = undefined;
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e.message);
   }
   try {
     if (producers) {
-      producers = validation.checkStringArray(producers, "producers");
+      producers = validation.checkString(producers, "producers");
+      producers = producers.split(';');
+    } else {
+      producers = undefined;
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e.message);
   }
   try {
     if (genre) {
       genre = validation.checkString(genre, "genre");
+    } else {
+      genre = undefined;
     }
   } catch (e) {
-    errors.push(e);
+    errors.push(e.message);
   }
   try {
     if (release_date) {
-      release_date = validation.dateTimeString(
+      validation.dateTimeString(
         release_date,
         "release_date",
         true
       );
+    } else {
+      release_date = undefined;
     }
+    release_date = validation.isoToUsDateFormat(release_date, 'release_date');
   } catch (e) {
-    errors.push(e);
+    errors.push(e.message);
   }
-  try {
-    if (artists) {
-      artists = validation.checkIdArray(artists, "artists");
-    }
-  } catch (e) {
-    errors.push(e);
-  }
+  // try {
+  //   if (artists) {
+  //     artists = validation.checkIdArray(artists, "artists");
+  //   }
+  // } catch (e) {
+  //   errors.push(e);
+  // }
   if (errors.length > 0) {
     return { errorMessages: errors };
   } else {
@@ -535,7 +555,6 @@ export async function updateSong(prevState, formData) {
           producers,
           genre,
           release_date,
-          artists,
         },
       });
       return { song: data?.editSong };
