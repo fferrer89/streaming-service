@@ -1,9 +1,17 @@
 import React, {useState} from "react";
 import {Separator} from "@/components/ui/separator";
-import {deleteSong} from "@/app/actions";
+import {createSong, deleteSong} from "@/app/actions";
 import {isoToUsDateFormat} from "@/utils/helpers";
-
+import SongFormModal from "@/components/App/Artist/SongFormModal";
+import {useFormState} from "react-dom";
+import {useSelector} from "react-redux";
+const initialState = {
+    message: null
+};
 const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
+    const artistId = useSelector(
+        (state: { user: { userId: string | null } }) => state.user.userId
+    );
     const {
         _id,
         album,
@@ -19,10 +27,12 @@ const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
         song_url,
         title,
         writtenBy,
-    } = songData.getSongById;
+    } = songData?.getSongById;
     let data;
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [errorMessages, setErrorMessages] = useState(null);
+    const [showSongModal, setShowSongModal] = useState(false);
+    const [createSongFormState, createSongFormAction] = useFormState(createSong, initialState);
     const cancelRemoveSong = () => {
         setShowConfirmation(false);
     };
@@ -53,7 +63,24 @@ const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
                     onClick={() => setShowConfirmation(true)}
                     className="bg-stone-300 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow ml-8"
                 >
-                    Delete This song
+                    Delete This Song
+                </button>
+                {showSongModal && (
+                    <SongFormModal
+                        method='patch'
+                        actionData={createSongFormState}
+                        action={createSongFormAction}
+                        songData={songData?.getSongById}
+                        setShowModal={setShowSongModal}
+                        artistId={artistId}
+                        refetch={refetch}
+                    />
+                )}
+                <button
+                    onClick={() => setShowSongModal(true)}
+                    className="bg-stone-300 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+                >
+                    Edit This Song
                 </button>
             </div>
 
@@ -114,9 +141,6 @@ const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
                         </p>
                         <p className="text-sm text-gray-600 mb-2">
                             Release Date: {isoToUsDateFormat(release_date?.substring(0,10), 'release_date')}
-                        </p>
-                        <p className="text-sm text-gray-600 mb-2">
-                            Song URL: <a href={song_url}>{song_url}</a>
                         </p>
                         <p className="text-sm text-gray-600 mb-2">
                             Written By: {writtenBy}

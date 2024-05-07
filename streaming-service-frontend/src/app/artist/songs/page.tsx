@@ -58,9 +58,9 @@ const ArtistSongs: React.FC = () => {
       </div>
       {showSongModal && (
           <SongFormModal
+              method='post'
               actionData={createSongFormState}
               action={createSongFormAction}
-              artistSongs={artistSongs}
               setShowModal={setShowSongModal}
               artistId={artistId}
               refetch={refetch}

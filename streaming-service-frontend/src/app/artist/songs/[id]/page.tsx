@@ -5,6 +5,7 @@ import Playlists from "@/components/App/Serach/Playlists";
 import Songs from "@/components/App/Serach/Songs";
 import { useQuery } from "@apollo/client";
 import queries from "@/utils/queries";
+import {useSelector} from "react-redux";
 
 const ArtistSong: React.FC<{ params: { id: string } }> = ({ params }) => {
   const {
@@ -15,7 +16,6 @@ const ArtistSong: React.FC<{ params: { id: string } }> = ({ params }) => {
   } = useQuery(queries.GET_SONG_BY_ID, {
     variables: { id: params.id },
   });
-  console.log(params.id);
   if (loading) {
     return <div>Loading</div>;
   }
