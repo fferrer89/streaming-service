@@ -18,7 +18,8 @@ import axios from 'axios';
 import SongFile from '../models/songFileModel.js';
 
 await mongoose.connect(
-  'mongodb+srv://user554:BHVTeZOx80QQM7jY@cluster0.bui7i1e.mongodb.net/streaming-service',
+    'mongodb://localhost:27017/streaming-service',
+  // 'mongodb+srv://user554:BHVTeZOx80QQM7jY@cluster0.bui7i1e.mongodb.net/streaming-service',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -28,7 +29,7 @@ await mongoose.connect(
 const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 const uploadSong = async (filePath, albumTitle, songTitle) => {
   try {
-    filePath = `${filePath}/${songTitle}.mp3`.replaceAll(' ', '_');
+    filePath = `${filePath}/${songTitle}`.replaceAll(' ', '_');
     const readableStream = fs.createReadStream(filePath);
 
     const uploadStream = bucket.openUploadStream(songTitle);
@@ -1161,9 +1162,9 @@ async function seed() {
         let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
         console.log(`Song path : ${songPath}`);
         const songId = await uploadSong(
-          `./utils/songData/${data.album.title}`,
+          `./utils/songData/${cAlbum.title}`,
           data.album.title,
-          song.title
+          `${song.title}.mp3`
         );
         console.log(songId);
         song.artists = [cArtist._id];
