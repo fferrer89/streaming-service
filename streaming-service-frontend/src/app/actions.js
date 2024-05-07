@@ -1,7 +1,7 @@
 "use server";
 import validation from "../utils/validations";
 import queries from "../utils/queries";
-import apolloClient  from "@/utils";
+import apolloClient from "@/utils";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { useMutation } from "@apollo/client";
@@ -81,7 +81,6 @@ export async function createAlbum(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-    
       const { data } = await apolloClient.mutate({
         mutation: queries.ADD_ALBUM,
         variables: {
@@ -183,8 +182,7 @@ export async function updateAlbum(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-      
-      const { data } = await client.mutate({
+      const { data } = await apolloClient.mutate({
         mutation: queries.EDIT_ALBUM,
         variables: {
           _id: albumId,
@@ -216,8 +214,7 @@ export async function updateAlbum(prevState, formData) {
       return { errorMessages: errors };
     } else {
       try {
-
-        const { data } = await client.mutate({
+        const { data } = await apolloClient.mutate({
           mutation: queries.EDIT_ALBUM,
           variables: {
             _id: albumId,
@@ -251,8 +248,7 @@ export async function deleteAlbum(albumId) {
     return { errorMessages: errors };
   } else {
     try {
- 
-      const { data } = await client.mutate({
+      const { data } = await apolloClient.mutate({
         mutation: queries.REMOVE_ALBUM,
         variables: { id: albumId },
         // FIXME: REMOVING ALBUM DOES NOT REMOVE IT FROM THE UI
@@ -267,8 +263,7 @@ export async function deleteAlbum(albumId) {
       return { errorMessages: errors };
     } else {
       try {
-
-        const { data } = await client.mutate({
+        const { data } = await apolloClient.mutate({
           mutation: queries.REMOVE_ALBUM,
           variables: { id: albumId },
         });
@@ -314,16 +309,12 @@ export async function createSong(prevState, formData) {
   try {
     song_url = await httpClientReqs.uploadFile(song_url);
   } catch (error) {
-    errors.push(
-      `Failed to upload song mp3 file - ${error?.message}`
-    );
+    errors.push(`Failed to upload song mp3 file - ${error?.message}`);
   }
   try {
     cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
   } catch (error) {
-    errors.push(
-      `Failed to upload cover image file - ${error?.message}`
-    );
+    errors.push(`Failed to upload cover image file - ${error?.message}`);
   }
   try {
     writtenBy = validation.checkString(writtenBy, "writtenBy");
@@ -332,7 +323,7 @@ export async function createSong(prevState, formData) {
   }
   try {
     producers = validation.checkString(producers, "producers");
-    producers = producers.split(';');
+    producers = producers.split(";");
   } catch (e) {
     errors.push(e?.message);
   }
@@ -342,12 +333,8 @@ export async function createSong(prevState, formData) {
     errors.push(e?.message);
   }
   try {
-    validation.dateTimeString(
-      release_date,
-      "release_date",
-      true
-    );
-    release_date = validation.isoToUsDateFormat(release_date, 'release_date');
+    validation.dateTimeString(release_date, "release_date", true);
+    release_date = validation.isoToUsDateFormat(release_date, "release_date");
   } catch (e) {
     errors.push(e?.message);
   }
@@ -360,7 +347,7 @@ export async function createSong(prevState, formData) {
 
   // Optional fields
   try {
-    if (album !== null && album !== undefined && album?.trim() !== '') {
+    if (album !== null && album !== undefined && album?.trim() !== "") {
       album = validation.checkId(album, "album");
     } else {
       album = undefined;
@@ -369,16 +356,20 @@ export async function createSong(prevState, formData) {
     errors.push(e?.message);
   }
   try {
-    if (duration !== null && duration !== undefined && duration?.trim() !== '') {
+    if (
+      duration !== null &&
+      duration !== undefined &&
+      duration?.trim() !== ""
+    ) {
       duration = validation.checkNumber(parseInt(duration, 10), "duration");
     } else {
-      duration = undefined
+      duration = undefined;
     }
   } catch (e) {
     errors.push(e?.message);
   }
   try {
-    if (lyrics !== null && lyrics !== undefined && lyrics?.trim() !== '') {
+    if (lyrics !== null && lyrics !== undefined && lyrics?.trim() !== "") {
       lyrics = validation.checkString(lyrics, "lyrics");
     } else {
       lyrics = undefined;
@@ -391,8 +382,7 @@ export async function createSong(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-
-      const { data } = await client.mutate({
+      const { data } = await apolloClient.mutate({
         mutation: queries.ADD_SONG,
         variables: {
           title,
@@ -459,7 +449,11 @@ export async function updateSong(prevState, formData) {
     errors.push(e.message);
   }
   try {
-    if (duration !== null && duration !== undefined && duration?.trim() !== '') {
+    if (
+      duration !== null &&
+      duration !== undefined &&
+      duration?.trim() !== ""
+    ) {
       duration = validation.checkNumber(parseInt(duration, 10), "duration");
     } else {
       duration = undefined;
@@ -474,20 +468,16 @@ export async function updateSong(prevState, formData) {
       song_url = undefined;
     }
   } catch (error) {
-    errors.push(
-      `Failed to upload song mp3 file - ${error?.message}`
-    );
+    errors.push(`Failed to upload song mp3 file - ${error?.message}`);
   }
   try {
     if (cover_image_url) {
       cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
     } else {
-      cover_image_url = undefined
+      cover_image_url = undefined;
     }
   } catch (error) {
-    errors.push(
-      `Failed to upload cover image file - ${error?.message}`
-    );
+    errors.push(`Failed to upload cover image file - ${error?.message}`);
   }
   try {
     if (writtenBy) {
@@ -501,7 +491,7 @@ export async function updateSong(prevState, formData) {
   try {
     if (producers) {
       producers = validation.checkString(producers, "producers");
-      producers = producers.split(';');
+      producers = producers.split(";");
     } else {
       producers = undefined;
     }
@@ -519,15 +509,11 @@ export async function updateSong(prevState, formData) {
   }
   try {
     if (release_date) {
-      validation.dateTimeString(
-        release_date,
-        "release_date",
-        true
-      );
+      validation.dateTimeString(release_date, "release_date", true);
     } else {
       release_date = undefined;
     }
-    release_date = validation.isoToUsDateFormat(release_date, 'release_date');
+    release_date = validation.isoToUsDateFormat(release_date, "release_date");
   } catch (e) {
     errors.push(e.message);
   }
@@ -542,8 +528,7 @@ export async function updateSong(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-
-      const { data } = await client.mutate({
+      const { data } = await apolloClient.mutate({
         mutation: queries.EDIT_SONG,
         variables: {
           songId,
@@ -575,8 +560,7 @@ export async function deleteSong(songId) {
     return { errorMessages: errors };
   } else {
     try {
-
-      const { data } = await client.mutate({
+      const { data } = await apolloClient.mutate({
         mutation: queries.REMOVE_SONG,
         variables: { songId },
       });

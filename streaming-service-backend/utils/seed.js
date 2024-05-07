@@ -15,8 +15,10 @@ import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
 import axios from 'axios';
 
+import SongFile from '../models/songFileModel.js';
+
 await mongoose.connect(
-  'mongodb+srv://marcos:WXgAl20LBjRb49b8@cluster0.ofr2q.mongodb.net/streaming-service?retryWrites=true&w=majority&appName=Cluster0',
+  'mongodb+srv://user554:BHVTeZOx80QQM7jY@cluster0.bui7i1e.mongodb.net/streaming-service',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -71,7 +73,6 @@ const uploadRandomImage = async () => {
       console.error('Error uploading image:', error);
       throw error;
     });
-
 
     return new Promise((resolve, reject) => {
       uploadStream.on('finish', async () => {
@@ -1078,7 +1079,6 @@ async function seed() {
       });
     }
     for (let currentUser of createdUsers) {
-     
       const otherUsers = createdUsers.filter(
         (user) => user._id.toString() !== currentUser._id.toString()
       );
@@ -1141,11 +1141,13 @@ async function seed() {
       '------------------------  Inserting custom data with song files  -------------------------'
     );
     for (let data of customData) {
-      data.artist.profile_image_url = await uploadRandomImage();
-      let cArtist = await Artist.create(data.artist);
+      let cArtist = await Artist.create({
+        ...data.artist,
+        profile_image_url: new mongoose.Types.ObjectId(sampleArtistImageId),
+      });
 
       data.album.cover_image_url = await uploadRandomImage();
-    
+
       let cAlbum = await Album.create(data.album);
       cAlbum.artists = [{ artistId: cArtist._id }];
       const imageId = await uploadSong(
