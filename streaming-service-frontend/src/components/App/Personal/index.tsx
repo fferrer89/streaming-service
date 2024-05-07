@@ -15,7 +15,7 @@ const Personal: React.FC = () => {
             Your Sounds
           </div>
         </div>
-        <div className="flex flex-col w-fit h-fit gap-2 rounded-full items-center justify-center"
+        <div className="flex flex-col w-fit h-fit gap-2 rounded-full items-center justify-center overflow-y-auto"
         style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
           <div 

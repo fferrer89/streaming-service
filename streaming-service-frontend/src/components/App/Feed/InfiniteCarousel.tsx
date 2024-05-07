@@ -1,6 +1,5 @@
-
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import { motion, useAnimationFrame } from "framer-motion";
 
 interface InfiniteCarouselProps {
@@ -16,22 +15,28 @@ const InfiniteCarousel: React.FC<InfiniteCarouselProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useRef(0);
+  const halfContentWidth = useRef(0);
 
-  useAnimationFrame((t) => {
+  useEffect(() => {
+    // Calculate the width of half the items when the component is first rendered
+    if (containerRef.current) {
+      const contentWidth = containerRef.current.scrollWidth / 2;
+      halfContentWidth.current = contentWidth;
+    }
+  }, [items]);
+
+  useAnimationFrame(() => {
     if (!containerRef.current) return;
-
-    const containerWidth = containerRef.current.offsetWidth;
-    const contentWidth = containerRef.current.scrollWidth;
 
     if (direction === "left") {
       x.current -= speed;
-      if (x.current <= -contentWidth) {
+      if (x.current <= -halfContentWidth.current) {
         x.current = 0;
       }
     } else {
       x.current += speed;
       if (x.current >= 0) {
-        x.current = -contentWidth + containerWidth;
+        x.current = -halfContentWidth.current;
       }
     }
 
@@ -42,6 +47,7 @@ const InfiniteCarousel: React.FC<InfiniteCarouselProps> = ({
     <motion.div
       className="flex gap-14 py-9 no-scrollbar"
       ref={containerRef}
+      style={{ willChange: "transform" }}
     >
       {[...items, ...items]}
     </motion.div>
