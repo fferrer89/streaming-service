@@ -11,6 +11,7 @@ import { BsSoundwave } from 'react-icons/bs';
 import { PiMusicNotesFill } from 'react-icons/pi';
 import { BsMusicPlayerFill } from 'react-icons/bs';
 import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Legend, Tooltip, Bar, PieChart, Pie, Cell } from 'recharts';
+import Image from 'next/image';
 
 interface User {
   gender: string;
@@ -22,6 +23,20 @@ interface Artist {
 
 interface Song {
   language: string;
+}
+
+interface Album {
+  album_type: string;
+}
+
+interface MostLikedSongs {
+  _id: string;
+  title: string;
+  writtenBy: string;
+  release_date: string;
+  likes: string;
+  genre: string;
+  cover_image_url: string;
 }
 
 interface CustomLabel {
@@ -37,6 +52,7 @@ interface CustomLabel {
 let countData = [];
 let userGenderData = [];
 let artistGenderData = [];
+let albumTypeData = [];
 let songLanguageData = [];
 
 const COLORS = ['#0EA5E9', '#22C55E', '#EF4444'];
@@ -57,11 +73,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 const AdminDashboard: React.FC = () => {
   const router = useRouter();
   const { loggedIn, userType } = useSelector((state: RootState) => state.user);
-  const { data: adminData, loading: adminLoading, error: adminError } = useQuery(queries.GET_ADMIN, { fetchPolicy: 'cache-and-network' });
-  const { data, loading, error } = useQuery(queries.GET_COUNT, { fetchPolicy: 'cache-and-network' });
-  const { data: userData, loading: userLoading, error: userError } = useQuery(queries.GET_USERS, { fetchPolicy: 'cache-and-network' })
-  const { data: artistData, loading: artistLoading, error: artistError } = useQuery(queries.GET_ARTISTS, { fetchPolicy: 'cache-and-network' })
-  const { data: songData, loading: songLoading, error: songError } = useQuery(queries.GET_SONGS, { fetchPolicy: 'cache-and-network' });
+  const { data, loading, error } = useQuery(queries.GET_DASHBOARD_DATA, { fetchPolicy: 'cache-and-network' });
 
   useEffect(() => {
     document.title = 'Dashboard | Sounds 54';
@@ -77,7 +89,7 @@ const AdminDashboard: React.FC = () => {
     }
   }, [loggedIn, router]);
 
-  if (!loggedIn || userType !== 'admin') {
+  if (loading || (!loggedIn || userType !== 'admin')) {
     return (
       <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
         <span className='mr-2'>Loading</span>
@@ -88,22 +100,17 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
-  if (adminLoading || loading || userLoading || artistLoading || songLoading) {
-    return (
-      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
-        <span className='mr-2'>Loading</span>
-        <span className='animate-bounce'>.</span>
-        <span className='animate-bounce delay-75'>.</span>
-        <span className='animate-bounce delay-200'>.</span>
-      </div>
-    );
+  if (error) {
+    return <div>Error: {error?.message}</div>
   }
 
-  if (adminError || error || userError || artistError || songError) {
-    return <div>Error: {adminError?.message || error?.message || userError?.message || artistError?.message || songError?.message}</div>
-  }
+  const date = (date: string) => {
+    date = date.split('T')[0];
+    let newDate = date.split('-');
+    return `${newDate[1]}-${newDate[2]}-${newDate[0]}`;
+  };
 
-  if (data && adminData && userData && artistData && songData) {
+  if (data) {
     countData = [
       {
         name: 'Users',
@@ -135,7 +142,7 @@ const AdminDashboard: React.FC = () => {
     let userFemaleCount = 0;
     let userMaleCount = 0;
     let userOtherCount = 0;
-    userData.users.forEach((user: User) => {
+    data.users.forEach((user: User) => {
       if (user.gender) {
         if (user.gender.toLowerCase() === 'female') {
           userFemaleCount++;
@@ -156,7 +163,7 @@ const AdminDashboard: React.FC = () => {
     let artistFemaleCount = 0;
     let artistMaleCount = 0;
     let artistOtherCount = 0;
-    artistData.artists.forEach((artist: Artist) => {
+    data.artists.forEach((artist: Artist) => {
       if (artist.gender) {
         if (artist.gender.toLowerCase() === 'female') {
           artistFemaleCount++;
@@ -174,9 +181,26 @@ const AdminDashboard: React.FC = () => {
       { name: 'Other', value: artistOtherCount }
     ];
 
+    let albumAlbumCount = 0;
+    let albumSingleCount = 0;
+    data.albums.forEach((album: Album) => {
+      if (album.album_type) {
+        if (album.album_type.toLowerCase() === 'album') {
+          albumAlbumCount++;
+        } else {
+          albumSingleCount++;
+        }
+      }
+    });
+
+    albumTypeData = [
+      { name: 'Album', value: albumAlbumCount },
+      { name: 'Single', value: albumSingleCount }
+    ];
+
     let songEnglishCount = 0;
     let songOtherCount = 0;
-    songData.songs.forEach((song: Song) => {
+    data.songs.forEach((song: Song) => {
       if (song.language) {
         if (song.language.toLowerCase() === 'english') {
           songEnglishCount++;
@@ -195,9 +219,9 @@ const AdminDashboard: React.FC = () => {
       <>
         <main className='flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
           <AdminSidebar></AdminSidebar>
-          <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
+          <div className='flex flex-col gap-8 py-10 px-6 w-full h-full sm:ml-60'>
             <h1 className='text-4xl text-[#22333B]'>
-              Welcome {`${adminData.admin[0].first_name} ${adminData.admin[0].last_name}`}&#33;
+              Welcome {`${data.admin[0].first_name} ${data.admin[0].last_name}`}&#33;
             </h1>
             <div className='flex flex-col md:flex-wrap md:flex-row gap-2 w-full'>
               <CountWrapper>
@@ -247,9 +271,9 @@ const AdminDashboard: React.FC = () => {
               </CountWrapper>
             </div>
             <div className='h-80 bg-[#22333B] rounded-sm p-4'>
-              <span className='text-lg text-[#C6AC8E]'>Total Count Analysis</span>
+              <span className='text-lg text-[#C6AC8E] font-bold'>Total Count Analysis</span>
               <ResponsiveContainer width='100%' height='100%'>
-                <BarChart width={500} height={500} data={countData} margin={{ top: 30, right: 20, left: -20, bottom: 20 }}>
+                <BarChart width={500} height={500} data={countData} margin={{ top: 30, right: 20, left: 0, bottom: 20 }}>
                   <CartesianGrid strokeDasharray='0' vertical={false} stroke='#C6AC8E' />
                   <XAxis dataKey='name' stroke='#C6AC8E' />
                   <YAxis stroke='#C6AC8E' />
@@ -261,7 +285,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>User Profile</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>User Profile</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -283,7 +307,7 @@ const AdminDashboard: React.FC = () => {
                 </ResponsiveContainer>
               </div>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>Artist Profile</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>Artist Profile</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -304,8 +328,32 @@ const AdminDashboard: React.FC = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
+            </div>
+            <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>Songs Language</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>Album Type</span>
+                <ResponsiveContainer width='100%' height='100%'>
+                  <PieChart width={400} height={400}>
+                    <Pie
+                      data={albumTypeData}
+                      cx='50%'
+                      cy='50%'
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={100}
+                      fill='#8884d8'
+                      dataKey='value'
+                    >
+                      {albumTypeData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={['#EAb308', '#EF4444'][index % 2]} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>Songs Language</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -325,6 +373,42 @@ const AdminDashboard: React.FC = () => {
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
+              </div>
+            </div>
+            <div className='bg-[#22333B] px-4 pt-4 pb-4 rounded-sm flex-1'>
+              <span className='text-lg text-[#C6AC8E] font-bold'>Most Liked Songs</span>
+              <div className='mt-3'>
+                <table className='w-full text-[#C6AC8E] text-center'>
+                  <thead className='bg-[#38474F]'>
+                    <tr>
+                      <td className='p-2 pr-0'>No</td>
+                      <td className='py-2'>Title</td>
+                      <td className='py-2'>Writer</td>
+                      <td className='py-2'>Released</td>
+                      <td className='py-2'>Likes</td>
+                      <td className='py-2'>Genre</td>
+                      <td>Song</td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.mostLikedSongs.map((song: MostLikedSongs, index: number) => (
+                      <tr key={song._id} className='border-b border-[#38474F]'>
+                        <td className='p-4 pr-0'>{index + 1}</td>
+                        <td className='py-4'>{(song.title) ? song.title : '--'}</td>
+                        <td className='py-4'>{(song.writtenBy) ? song.writtenBy : '--'}</td>
+                        <td className='py-4'>{(song.release_date) ? date(song.release_date) : '--'}</td>
+                        <td className='py-4'>{(song.likes) ? song.likes : '0'}</td>
+                        <td className='py-4'>{(song.genre) ? song.genre : '--'}</td>
+                        <td className='py-2 flex justify-center items-center'>
+                          {(song.cover_image_url) ?
+                            <Image src={`http://localhost:4000/file/download/${song.cover_image_url}`} alt='Song Cover' width={50} height={50} className='rounded-full text-center' /> :
+                            <PiMusicNotesFill className='w-[50px] h-[50px] mb-4' />
+                          }
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

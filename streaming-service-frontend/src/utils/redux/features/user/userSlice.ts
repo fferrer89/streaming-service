@@ -11,6 +11,18 @@ interface UserState {
 }
 
 const getInitialState = (): UserState => {
+  // REMOVE IF IT BREAKS
+  if (typeof window === 'undefined') {
+    return {
+      loggedIn: false,
+      userData: null,
+      token: null,
+      expirationTime: null,
+      userType: null,
+      userId: null,
+    };
+  }
+
   const loggedIn = localStorage.getItem('loggedIn') === 'true';
   const userData = JSON.parse(localStorage.getItem('userData') || 'null');
   const token = localStorage.getItem('token') || null;
