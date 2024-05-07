@@ -7,23 +7,26 @@ import Album from '../models/albumModel.js';
 import Song from '../models/songModel.js';
 import ListeningHistory from '../models/listeningHistoryModel.js';
 import Playlist from '../models/playlistModel.js';
+import Image from '../models/imageModel.js';
 import mongo from 'mongodb';
 import Grid from 'gridfs-stream';
 import fs from 'fs';
 import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
+import axios from 'axios';
 
-import SongFile from '../models/songFileModel.js';
-
-await mongoose.connect('mongodb://127.0.0.1:27017/streaming-service', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+await mongoose.connect(
+  'mongodb+srv://marcos:WXgAl20LBjRb49b8@cluster0.ofr2q.mongodb.net/streaming-service?retryWrites=true&w=majority&appName=Cluster0',
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
 const uploadSong = async (filePath, albumTitle, songTitle) => {
   try {
-    filePath = `${filePath}/${songTitle}`.replaceAll(' ', '_');
+    filePath = `${filePath}/${songTitle}.mp3`.replaceAll(' ', '_');
     const readableStream = fs.createReadStream(filePath);
 
     const uploadStream = bucket.openUploadStream(songTitle);
@@ -51,6 +54,50 @@ const uploadSong = async (filePath, albumTitle, songTitle) => {
     throw error;
   }
 };
+
+const uploadRandomImage = async () => {
+  try {
+    const response = await axios.get('https://picsum.photos/800', {
+      responseType: 'stream',
+    });
+
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+    const uploadStream = bucket.openUploadStream('randomImage.jpg');
+    const fileId = uploadStream.id;
+
+    response.data.pipe(uploadStream);
+
+    uploadStream.on('error', (error) => {
+      console.error('Error uploading image:', error);
+      throw error;
+    });
+
+
+    return new Promise((resolve, reject) => {
+      uploadStream.on('finish', async () => {
+        const image = new Image({
+          filename: 'randomImage.jpg',
+          fileId: fileId,
+          contentType: 'image/jpeg',
+        });
+
+        await image.save();
+
+        console.log('Image uploaded successfully with ID:', image._id);
+        resolve(image._id);
+      });
+
+      uploadStream.on('error', (error) => {
+        console.error('Error uploading image:', error);
+        reject(error);
+      });
+    });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+};
+
 const admin = {
   first_name: 'Han',
   last_name: 'Solo',
@@ -79,6 +126,7 @@ const users = [
     gender: 'FEMALE',
     profile_image_url: new mongoose.Types.ObjectId(),
   },
+
   {
     first_name: 'Alice',
     last_name: 'Smith',
@@ -87,7 +135,7 @@ const users = [
     password: 'Password789$',
     date_of_birth: '01/01/1988',
     gender: 'FEMALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=16',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
   {
     first_name: 'Bob',
@@ -97,7 +145,7 @@ const users = [
     password: 'Password000$',
     date_of_birth: '01/01/1992',
     gender: 'MALE',
-    profile_image_url: 'https://picsum.photos/200/200?random=17',
+    profile_image_url: new mongoose.Types.ObjectId(),
   },
 ];
 
@@ -146,6 +194,7 @@ const BillHobson = {
   date_of_birth: '01/01/1980',
   gender: 'MALE',
   genres: ['ROCK'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const JohnDoe = {
@@ -157,6 +206,7 @@ const JohnDoe = {
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['POP'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const AldousIchnite = {
@@ -168,6 +218,7 @@ const AldousIchnite = {
   date_of_birth: '01/01/1999',
   gender: 'MALE',
   genres: ['ELECTRONIC'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const DanaSchechter = {
@@ -179,6 +230,7 @@ const DanaSchechter = {
   date_of_birth: '01/01/1999',
   gender: 'FEMALE',
   genres: ['INDIE_POP'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const MiamiSlice = {
@@ -190,6 +242,7 @@ const MiamiSlice = {
   date_of_birth: '01/01/2001',
   gender: 'FEMALE',
   genres: ['DISCO', 'HOUSE', 'DANCE'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const TripleHere = {
@@ -201,6 +254,7 @@ const TripleHere = {
   date_of_birth: '01/01/2001',
   gender: 'MALE',
   genres: ['SYNTH_POP', 'TRIP_HOP'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const KetsaMia = {
@@ -212,6 +266,7 @@ const KetsaMia = {
   date_of_birth: '01/01/1980',
   gender: 'FEMALE',
   genres: ['SYNTH_POP', 'HIP_HOP'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const AudioKofee = {
@@ -223,6 +278,7 @@ const AudioKofee = {
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['ELECTRONIC', 'SYNTH_POP'],
+  profile_image_url: new mongoose.Types.ObjectId(),
 };
 
 const johnAlbum = {
@@ -853,6 +909,7 @@ async function seed() {
     await Song.deleteMany({});
     await ListeningHistory.deleteMany({});
     await Playlist.deleteMany({});
+    await Image.deleteMany({});
 
     const filesCollection = mongoose.connection.db.collection('fs.files');
     await filesCollection.deleteMany({});
@@ -929,6 +986,17 @@ async function seed() {
     }));
     const createdArtists = await Artist.create(newArtists);
 
+    for (let artist of createdArtists) {
+      const imageId = await uploadRandomImage();
+      artist.profile_image_url = imageId;
+      await artist.save();
+    }
+    for (let user of createdUsers) {
+      const imageId = await uploadRandomImage();
+      user.profile_image_url = imageId;
+      await user.save();
+    }
+
     const albumsWithArtists = albums.map((album) => ({
       ...album,
       artists: createdArtists.map((artist) => ({ artistId: artist._id })),
@@ -953,6 +1021,8 @@ async function seed() {
     for (let song of createdSongs) {
       const randomAlbumIndex = Math.floor(Math.random() * createdAlbums.length);
       song.album = createdAlbums[randomAlbumIndex]._id;
+      let imageId = await uploadRandomImage();
+      song.cover_image_url = imageId;
       await Song.findByIdAndUpdate(song._id, { album: song.album });
     }
 
@@ -961,6 +1031,8 @@ async function seed() {
         Math.random() * createdArtists.length
       );
       album.artists = [{ artistId: createdArtists[randomArtistIndex]._id }];
+      let imageId = await uploadRandomImage();
+      album.cover_image_url = imageId;
       await Album.findByIdAndUpdate(album._id, { artists: album.artists });
     }
 
@@ -1006,6 +1078,7 @@ async function seed() {
       });
     }
     for (let currentUser of createdUsers) {
+     
       const otherUsers = createdUsers.filter(
         (user) => user._id.toString() !== currentUser._id.toString()
       );
@@ -1022,6 +1095,8 @@ async function seed() {
     }
 
     for (let playlist of playlists) {
+      let imageId = await uploadRandomImage();
+      playlist.cover_image_url = imageId;
       playlist.songs = createdSongs.map((song) => song._id);
     }
 
@@ -1066,8 +1141,11 @@ async function seed() {
       '------------------------  Inserting custom data with song files  -------------------------'
     );
     for (let data of customData) {
+      data.artist.profile_image_url = await uploadRandomImage();
       let cArtist = await Artist.create(data.artist);
 
+      data.album.cover_image_url = await uploadRandomImage();
+    
       let cAlbum = await Album.create(data.album);
       cAlbum.artists = [{ artistId: cArtist._id }];
       const imageId = await uploadSong(
@@ -1083,15 +1161,9 @@ async function seed() {
         const songId = await uploadSong(
           `./utils/songData/${data.album.title}`,
           data.album.title,
-          `${song.title}.mp3`
+          song.title
         );
         console.log(songId);
-        let fSong = await SongFile.create({
-          filename: song.title,
-          mimetype: 'audio/mpeg',
-          uploadDate: new Date(),
-          fileId: songId,
-        });
         song.artists = [cArtist._id];
         song.album = cAlbum._id;
         song.song_url = songId;
@@ -1111,4 +1183,5 @@ async function seed() {
     mongoose.connection.close();
   }
 }
+
 await seed();

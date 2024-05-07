@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
 import Image from 'next/image';
@@ -18,49 +18,72 @@ const GET_USER_PROFILE_IMAGE = gql`
 const SideNav: React.FC = () => {
     
     const userId = useSelector((state: { user: { userId: string | null } }) => state.user.userId);
+    const userType = useSelector((state: { user: { userType: 'user' | 'artist' | 'admin' | null } }) => state.user.userType);
 
+    const { data, loading, error } = useQuery(GET_USER_PROFILE_IMAGE, {
+        variables: { userId },
+        skip: !userId,
+    });
 
-  const { data, loading, error } = useQuery(GET_USER_PROFILE_IMAGE, {
-    variables: { userId },
-    skip: !userId,
-  });
+    const [homeRoute, setHomeRoute] = useState('/sound');
+    const [searchRoute, setSearchRoute] = useState('/sound/search');
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+    useEffect(() => {
+        const determineRoutes = () => {
+            switch (userType) {
+                case 'artist':
+                    setHomeRoute('/artist/dashboard');
+                    setSearchRoute('/artist/search');
+                    break;
+                case 'user':
+                case 'admin':
+                default:
+                    setHomeRoute('/sound');
+                    setSearchRoute('/sound/search');
+                    break;
+            }
+        };
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+        determineRoutes();
+    }, [userType]);
 
-  const profileImageUrl = data?.getUserById?.profile_image_url ;
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
+    if (error) {
+        return <div>Error: {error.message}</div>;
+    }
 
-  return (
-    <section className={styles.sideNav}>
-      <header>
-        <Link href={'/user/profile'}>
-          <Image className=' rounded-full border border-white' src={"/img/ellipse.png"} width={45} height={45} alt='Profile image' />
-        </Link>
-      </header>
-      <nav>
-        <ul>
-          <li>
-            <Link href={'/'}>
-              <Image src='/icons/home-white.png' width={30} height={30} alt='Home icon' />
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link href={'sound/search'}>
-              <Image src='/icons/search-white.png' width={30} height={30} alt='Search icon' />
-              Search
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </section>
-  );
+    const profileImageUrl = data?.getUserById?.profile_image_url
+    ? `http://localhost:4000/file/download/${data?.getUserById?.profile_image_url}`
+    : null;
+
+    return (
+        <section className={styles.sideNav}>
+            <header>
+                <Link href={'/user/profile'}>
+                    <Image className='rounded-full border border-white' src={profileImageUrl ? profileImageUrl : "/img/ellipse.png"} width={45} height={45} alt='Profile image' />
+                </Link>
+            </header>
+            <nav>
+                <ul>
+                    <li>
+                        <Link href={homeRoute}>
+                            <Image src='/icons/home-white.png' width={30} height={30} alt='Home icon' />
+                            Home
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href={searchRoute}>
+                            <Image src='/icons/search-white.png' width={30} height={30} alt='Search icon' />
+                            Search
+                        </Link>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    );
 };
 
 export default SideNav;

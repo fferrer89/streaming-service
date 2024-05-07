@@ -37,7 +37,7 @@ const Card: React.FC<CardProps> = ({ image, songId, rounded = "lg", onClick }) =
       alt="Album"
       height={200}
       width={200}
-      className={`h-48 w-48 object-cover border-2 ${roundedClasses[rounded]} cursor-pointer`}
+      className={`h-32 w-32 object-cover border-2 ${roundedClasses[rounded]} cursor-pointer`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={onClick}

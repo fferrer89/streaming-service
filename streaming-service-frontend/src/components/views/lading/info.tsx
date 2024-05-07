@@ -1,6 +1,10 @@
 import React from 'react';
 import Reveal from '@/utils/effects/Reveal';
+import { useRouter } from "next/navigation";// Import useRouter from next/router
+
 const Info: React.FC = () => {
+  const router = useRouter(); // Initialize useRouter
+
   return (
     <div className="bg-[#C6AC8E]  h-screen w-screen flex-col items-center justify-center relative ">
       <Reveal width="fit-content" delay={0.35}>
@@ -14,7 +18,9 @@ const Info: React.FC = () => {
               <p className="text-[34px] font-bold  font-mono">Join our crew for a symphony of<br/> surprises</p>
             </div>
             <div className="flex-grow"></div>
-            <button className="bg-[#22333B] text-[#C6AC8E] font-mono  font-semibold text-3xl border-none px-5 py-5 cursor-pointer w-full flex justify-between rounded-full mb-auto ">
+            <button className="bg-[#22333B] text-[#C6AC8E] font-mono  font-semibold text-3xl border-none px-5 py-5 cursor-pointer w-full flex justify-between rounded-full mb-auto "
+            onClick={() => router.push('/signup')}
+            >
               <span className="pr-2">Sign Up</span>
               <span>&gt;</span>
             </button>
@@ -30,7 +36,9 @@ const Info: React.FC = () => {
                 <p className="text-[44px] font-bold  font-mono">Discover a world of new sounds</p>
               </div>
               <div className="flex-grow"></div>
-              <button className="bg-transparent text-[#22333B] font-mono  font-semibold text-3xl border-2 border-[#22333B] px-5 py-5 cursor-pointer w-full flex justify-between rounded-full mb-auto">
+              <button className="bg-transparent text-[#22333B] font-mono  font-semibold text-3xl border-2 border-[#22333B] px-5 py-5 cursor-pointer w-full flex justify-between rounded-full mb-auto"
+                onClick={() => router.push('/sound')}
+              > 
                 <span className="pr-2">Explore</span>
                 <span>&gt;</span>
               </button>

@@ -178,6 +178,13 @@ type Mutation {
         visibility: String!
     ): Playlist!
 
+    editPlaylist(
+        playlistId: ID!
+        description: String,
+        title: String,
+        visibility: String
+    ): Playlist
+
     addSongToPlaylist(playlistId: ID!, songId: ID!): Playlist
     removeSongFromPlaylist(playlistId: ID!, songId: ID!): Playlist
     removePlaylist(playlistId: ID!): Playlist
@@ -306,6 +313,8 @@ type Playlist {
     songs: [Song]
     created_date: Date!
     likes: Int!
+    isLiked: Boolean
+    isOwner: Boolean
 }
 
 type LikedUser {
