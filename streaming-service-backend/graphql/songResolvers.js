@@ -1,4 +1,3 @@
-import { GraphQLError } from 'graphql';
 import Songs from '../models/songModel.js';
 import songHelper from '../utils/songsHelpers.js';
 import ListenHistory from '../models/listeningHistoryModel.js';
