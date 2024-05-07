@@ -16,7 +16,7 @@ type Query {
     artists: [Artist]
     getArtistById(_id: ID!): Artist
     #FIXME returns the first artist found by a given first_name
-    getArtistsByName(name: String!): [Artist]
+    getArtistsByName(name: String!, limit: Int): [Artist]
     #FIXME how to calculate this? Artists cannot be "liked" according to the DB schema
     getMostFollowedArtists(top: Int): [Artist]
     getArtistsByAlbumId(albumId: ID!): [Artist]
@@ -25,11 +25,11 @@ type Query {
 
     albums: [Album]
     getAlbumById(_id: ID!): Album
-    getAlbumsByTitle(title: String!): [Album]
+    getAlbumsByTitle(title: String!, limit: Int): [Album]
     getAlbumsByVisibility(visibility: Visibility!): [Album]
     getAlbumsByReleasedYear(year: Int!): [Album]
     getAlbumsByGenre(genre: String!): [Album]
-    getNewlyReleasedAlbums: [Album]
+    getNewlyReleasedAlbums(limit: Int): [Album]
     getMostLikedAlbums(limit: Int): [Album]
     #    FIXME albums cannot be liked by users according to the DB schema
     getUserLikedAlbums(userId: ID!): [Album]
@@ -38,7 +38,7 @@ type Query {
 
     songs: [Song]
     getSongById(_id: ID!): Song
-    getSongsByTitle(searchTerm: String!): [Song]
+    getSongsByTitle(searchTerm: String!, limit: Int): [Song]
     getSongsByAlbumID(albumId: String!): [Song]
     getSongsByArtistID(artistId: String!): [Song]
     getSongsByWriter(searchTerm: String!): [Song]
@@ -53,10 +53,10 @@ type Query {
 
     playlists: [Playlist]
     getPlaylistById(_id: ID!): Playlist
-    getPlaylistsByTitle(searchTerm: String!): [Playlist]
+    getPlaylistsByTitle(searchTerm: String!, limit: Int): [Playlist]
     getPlaylistsByOwner(userId: ID!): [Playlist]
     getPlaylistsByVisibility(visibility: Visibility!): [Playlist]
-    getMostLikedPlaylists: [Playlist]
+    getMostLikedPlaylists(limit: Int): [Playlist]
     getUserLikedPlaylists(userId: String!): [Playlist]
 
     streamSong(trackID: ID!): Stream

@@ -47,14 +47,14 @@ export const playlistResolvers = {
       return playlist;
     },
 
-    getPlaylistsByTitle: async (_, args, context) => {
-      let { searchTerm } = args;
+    getPlaylistsByTitle: async (_, { searchTerm, limit = 10 }, context) => {
+      //let { searchTerm, limit } = args;
 
       searchTerm = songsHelpers.emptyValidation(searchTerm, 'Search Term');
 
       let playlists = await Playlists.find({
         title: { $regex: new RegExp(searchTerm, 'i') },
-      });
+      }).limit(limit);
 
       let filteredPlaylist = playlists.filter((playlist) => {
         //will give different playlist if user is logged in;

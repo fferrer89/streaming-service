@@ -59,7 +59,9 @@ export const artistResolvers = {
       try {
         validateMogoObjID(args._id, '_id');
 
-        const cachedArtist = await context.redisClient.json.get(`artist:${args._id}`);
+        const cachedArtist = await context.redisClient.json.get(
+          `artist:${args._id}`
+        );
         if (cachedArtist) {
           return cachedArtist;
         }
@@ -86,7 +88,7 @@ export const artistResolvers = {
             { first_name: { $regex: new RegExp(args.name, 'i') } },
             { last_name: { $regex: new RegExp(args.name, 'i') } },
           ],
-        });
+        }).limit(args.limit);
         return artists;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch artist: ${error.message}`, {
@@ -284,7 +286,9 @@ export const artistResolvers = {
     removeArtist: async (_, args, context) => {
       try {
         validateMogoObjID(args.artistId.trim(), 'artist id');
-        const deletedArtist = await Artist.findByIdAndDelete(args.artistId.trim());
+        const deletedArtist = await Artist.findByIdAndDelete(
+          args.artistId.trim()
+        );
 
         await context.redisClient.del(`artist:${args.artistId}`);
         await context.redisClient.del('artists');
@@ -295,8 +299,8 @@ export const artistResolvers = {
 
         return deletedArtist;
       } catch (error) {
-        throw new GraphQLError(`Error deleting artist: ${error.message}`)
+        throw new GraphQLError(`Error deleting artist: ${error.message}`);
       }
-    }
+    },
   },
 };

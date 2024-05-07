@@ -39,7 +39,7 @@ export const albumResolvers = {
         throw new GraphQLError(`Failed to fetch album: ${error.message}`);
       }
     },
-    getAlbumsByTitle: async (_, { title }, contextValue) => {
+    getAlbumsByTitle: async (_, { title, limit = 10 }, contextValue) => {
       try {
         if (!title || typeof title !== 'string' || title.trim().length < 3) {
           songsHelpers.badUserInputWrapper(
@@ -48,7 +48,7 @@ export const albumResolvers = {
         }
         const albums = await Album.find({
           title: { $regex: new RegExp(title.trim(), 'i') },
-        });
+        }).limit(limit);
         return albums;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch albums: ${error.message}`);
@@ -105,9 +105,11 @@ export const albumResolvers = {
         throw new GraphQLError(`Failed to fetch albums: ${error.message}`);
       }
     },
-    getNewlyReleasedAlbums: async () => {
+    getNewlyReleasedAlbums: async (_, { limit = 10 }, contextValue) => {
       try {
-        const albums = await Album.find().sort({ release_date: -1 }); // Sort by release date, newest first
+        const albums = await Album.find()
+          .sort({ release_date: -1 })
+          .limit(limit); // Sort by release date, newest first
         return albums;
       } catch (error) {
         throw new GraphQLError(`Failed to fetch albums: ${error.message}`);
