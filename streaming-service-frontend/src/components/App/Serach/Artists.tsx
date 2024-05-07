@@ -1,8 +1,10 @@
 // Artists.tsx
-import React from 'react';
+import React,{useState, useEffect} from 'react';
 import { Separator } from "@/components/ui/separator";
 import ArtistItem from './units/artists';
 import { getImageUrl } from '@/utils/tools/images';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 
 interface ArtistProps {
   _id: string;
@@ -18,6 +20,31 @@ interface ArtistsProps {
 
 
 const Artists: React.FC<ArtistsProps> = ({ artists }) => {
+    const [artistRoute, setArtistRoute] = useState<string>();
+    const userType = useSelector((state: { user: { userType: 'user' | 'artist' | 'admin' | null } }) => state.user.userType);
+    const router = useRouter();
+
+    useEffect(() => {
+        function setArtistsRoute() {
+            switch (userType) {
+                case 'artist':
+                    setArtistRoute('/artist/profile/');
+                    break;
+                case 'user':
+                    setArtistRoute('/sound/profile/');
+                    break;
+                case 'admin':
+                default:
+                    setArtistRoute('/sounds/profile/');
+                    break;
+            }
+        }
+        setArtistsRoute();
+    }, []);
+
+    function handleClick(id: string) {
+        router.push(`${artistRoute}/${id}`);
+    }
 
     
     
@@ -41,6 +68,7 @@ const Artists: React.FC<ArtistsProps> = ({ artists }) => {
               display_name={artist.display_name}
               profile_image_url={artist.profile_image_url ? getImageUrl(artist.profile_image_url) : "/img/artist-icon.jpeg"}
               genres={artist.genres}
+                onClick={handleClick}
             />
           ))
         ) : (

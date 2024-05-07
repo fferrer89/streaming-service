@@ -1,6 +1,10 @@
 import { gql } from "@apollo/client";
 
-
+// getMostFollowedArtists
+// getNewlyReleasedAlbums
+// getMostLikedAlbums
+// getNewlyReleasedSongs
+// getMostLikedPlaylists
 export const FeedQuery = gql`
   query Feed {
     getMostLikedSongs {
@@ -27,7 +31,6 @@ export const FeedQuery = gql`
         profile_image_url
       }
     }
-
     getMostFollowedArtists {
       created_date
       date_of_birth
