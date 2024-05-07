@@ -44,7 +44,7 @@ const AddSongForm = ({ data: playlistData }) => {
   const [
     addSongTOPlaylisr,
     { data: mutationData, loading: mutationLoading, error: mutationError },
-  ] = useMutation(queries.ADD_SONG_To_PLAYLIST, {
+  ] = useMutation(queries.ADD_SONG_TO_PLAYLIST, {
     refetchQueries: [queries.GET_PLAYLIST],
     client,
   });

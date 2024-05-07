@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMutation, useQuery } from "@apollo/client";
 import queries from "@/utils/queries";
 import SuccessModal from "../SuccessModal";
-
+import { useSelector } from "react-redux";
 const AlbumDetailsSongs: React.FC<{
   songs: any;
   refetch: any;
@@ -19,12 +19,16 @@ const AlbumDetailsSongs: React.FC<{
   const [isSuccess, setIsSuccess] = useState(false);
   const [removeSongFromAlbum] = useMutation(queries.REMOVE_SONG_FROM_ALBUM);
   const [addSongToAlbum] = useMutation(queries.ADD_SONG_TO_ALBUM);
-
+  const artistId = useSelector(
+    (state: { user: { userId: string | null } }) => state.user.userId
+  );
   const {
     loading: songsLoading,
     error: songsError,
     data: songData,
-  } = useQuery(queries.GET_SONGS);
+  } = useQuery(queries.GET_SONGS_BY_ARTIST, {
+    variables: { artistId: artistId },
+  });
 
   const handleRemoveSong = (songId: string) => {
     setSongToRemove(songId);
@@ -107,8 +111,8 @@ const AlbumDetailsSongs: React.FC<{
   };
 
   useEffect(() => {
-    if (songData && songData.songs.length > 0) {
-      setSelectedSongId(songData.songs[0]._id);
+    if (songData && songData.getSongsByArtistID.length > 0) {
+      setSelectedSongId(songData.getSongsByArtistID[0]._id);
     }
   }, [songData]);
 
@@ -124,7 +128,6 @@ const AlbumDetailsSongs: React.FC<{
       />
     );
   }
-  console.log(songData);
   return (
     <div className="w-full max-w-md p-4 bg-stone-300 border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
       <div className="flex items-center justify-between mb-4">
@@ -149,7 +152,7 @@ const AlbumDetailsSongs: React.FC<{
                 <div className="flex-shrink-0">
                   <img
                     className="w-8 h-8 rounded-full"
-                    src={`http://localhost:4000/file/download/${song.cover_image_url}`}
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${song.cover_image_url}`}
                     alt={song.title}
                   />
                 </div>
@@ -207,7 +210,7 @@ const AlbumDetailsSongs: React.FC<{
           <div className="bg-gray-200 p-4 rounded-lg shadow-lg text-black">
             <p>Select an Song to add:</p>
             <select value={selectedSongId} onChange={handleSongChange}>
-              {songData.songs
+              {songData.getSongsByArtistID
                 .filter((song: any) => song.album === null)
                 .map((song: any) => (
                   <option key={song._id} value={song._id}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { ApolloLink, HttpLink } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
 import {
   ApolloNextAppProvider,
   NextSSRInMemoryCache,
@@ -8,9 +9,18 @@ import {
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
 
+let userToken = localStorage.getItem("token");
+const authLink = setContext((_, { headers }) => {
+  return {
+    headers: {
+      ...headers,
+      authorization: userToken,
+    },
+  };
+});
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: "http://localhost:4000/graphql",
+    uri: process.env.NEXT_PUBLIC_BACKEND_GRAPHQL_URL,
     fetchOptions: { cache: "no-store" },
   });
 
@@ -22,9 +32,9 @@ function makeClient() {
             new SSRMultipartLink({
               stripDefer: true,
             }),
-            httpLink,
+            authLink.concat(httpLink),
           ])
-        : httpLink,
+        : authLink.concat(httpLink),
   });
 }
 

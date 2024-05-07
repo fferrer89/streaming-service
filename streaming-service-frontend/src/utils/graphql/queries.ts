@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 
-// getMostFollowedArtists
 // getNewlyReleasedAlbums
 // getMostLikedAlbums
 // getNewlyReleasedSongs
@@ -42,6 +41,64 @@ export const FeedQuery = gql`
       genres
       last_name
       profile_image_url
+    }
+    getNewlyReleasedAlbums {
+      _id
+      album_type
+      artists {
+        display_name
+        profile_image_url
+        last_name
+      }
+      cover_image_url
+      total_songs
+      songs {
+        _id
+      }
+      description
+      created_date
+      title
+    }
+    getMostLikedAlbums {
+      _id
+      album_type
+      artists {
+        display_name
+        profile_image_url
+        last_name
+      }
+      cover_image_url
+      total_songs
+      songs {
+        _id
+      }
+      description
+      created_date
+      title
+    }
+    getNewlyReleasedSongs {
+      _id
+      duration
+      genre
+      language
+      likes
+      lyrics
+      producers
+      release_date
+      album {
+        _id 
+        title
+        cover_image_url
+      }
+      song_url
+      title
+      writtenBy
+      cover_image_url
+      artists {
+        _id
+        display_name
+        profile_image_url
+      }
     }
   }
 `;

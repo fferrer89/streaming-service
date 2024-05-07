@@ -43,7 +43,7 @@ const Playlists: React.FC = () => {
       style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
     >
       <div className="inline-flex gap-4 flex-auto items-start relative w-full px-5 pt-3 flex-col">
-        <div className="relative w-auto mt-0 font-mono font-medium text-black text-lg text-center tracking-normal leading-normal">
+        <div className="relative w-auto mt-0 font-mono font-medium   text-lg text-center tracking-normal leading-normal">
           Playlists
         </div>
         <Separator className="w-[95%] " />

@@ -61,7 +61,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   };
 
   const formattedDate = date.toLocaleString("en-US", options);
-  const imageUrl = `http://localhost:4000/file/download/${cover_image_url}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${cover_image_url}`;
   return (
     <div
       className="flex flex-col w-full h-fit gap-3 p-0 bg-white rounded-lg overflow-hidden relative"
