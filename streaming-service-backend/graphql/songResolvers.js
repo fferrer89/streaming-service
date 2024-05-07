@@ -1,3 +1,4 @@
+import { GraphQLError } from 'graphql';
 import Songs from '../models/songModel.js';
 import songHelper from '../utils/songsHelpers.js';
 import ListenHistory from '../models/listeningHistoryModel.js';
@@ -15,12 +16,12 @@ import Playlist from '../models/playlistModel.js';
 export const songResolvers = {
   Query: {
     songs: async (_, args, context) => {
-      let songs = await Songs.find({});
-      if (songs.length == 0) {
-        songHelper.notFoundWrapper('Songs Not found');
+      try {
+        let songs = await Songs.find();
+        return songs;
+      } catch (error) {
+        throw new GraphQLError(`Failed to fetch songs: ${error.message}`);
       }
-      // no need to convert to string
-      return songs;
     },
     getSongById: async (_, args, context) => {
       let { _id: id } = args;
@@ -463,6 +464,7 @@ export const songResolvers = {
         throw new GraphQLError(error.message);
       }
     },
+    toggleLikeSong: async (args) => { },
     uploadSongFile: async (_, args) => {
       try {
         const { filename, mimetype, encoding, createReadStream } =
