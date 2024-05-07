@@ -10,7 +10,6 @@ import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
 import { GridFSBucket } from 'mongodb';
 import SongFile from '../models/songFileModel.js';
 import mongoose from 'mongoose';
-import { GraphQLError } from 'graphql';
 import Playlist from '../models/playlistModel.js';
 
 export const songResolvers = {
@@ -48,7 +47,7 @@ export const songResolvers = {
       });
       return songs.map((song) => ({
         ...song._doc,
-        song_url: song.song_url || '', 
+        song_url: song.song_url || '',
       }));
     },
 
@@ -464,7 +463,7 @@ export const songResolvers = {
         throw new GraphQLError(error.message);
       }
     },
-    toggleLikeSong: async (args) => { },
+    toggleLikeSong: async (args) => {},
     uploadSongFile: async (_, args) => {
       try {
         const { filename, mimetype, encoding, createReadStream } =
