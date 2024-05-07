@@ -130,3 +130,12 @@ export const MusicGenres = [
 export const Visibilities = ['PUBLIC', 'PRIVATE'];
 export const AlbumTypes = ['ALBUM', 'SINGLE', 'COMPILATION', 'APPEARS_ON'];
 export const Genders = ['MALE', 'FEMALE', 'OTHER'];
+
+export const isoToUsDateFormat = (isoDate, varName) => {
+    // 2024-04-17 -> M/D/YYYY
+    const dateParts = isoDate?.split("-"); // Split into [YYYY, MM, DD]
+    if (dateParts.length !== 3) {
+        return isoDate;
+    }
+    return `${dateParts[1]}/${dateParts[2]}/${dateParts[0]}`; // "MM/DD/YYYY"
+};

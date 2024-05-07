@@ -18,7 +18,7 @@ const albumSchema = new mongoose.Schema({
     },
   },
   cover_image_url: {
-    type: String,
+    type: mongoose.Schema.ObjectId,
     required: false,
   },
   title: {

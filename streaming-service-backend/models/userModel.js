@@ -97,6 +97,8 @@ const userSchema = new mongoose.Schema({
   profile_image_url: {
     type: String,
     required: [false, 'Please provide user profile image url'],
+    type: mongoose.Schema.ObjectId,
+    required: false,
   },
   liked_songs: [
     {

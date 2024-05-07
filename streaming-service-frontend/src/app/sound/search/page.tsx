@@ -5,7 +5,7 @@ import { gql } from "@apollo/client";
 import Artists from "@/components/App/Serach/Artists";
 import Playlists from "@/components/App/Serach/Playlists";;
 import Songs from "@/components/App/Serach/Songs";
-import apolloClient from "@/utils";
+import  apolloClient  from "@/utils";
 
 const SEARCH_QUERIES = gql`
 query SearchQueries($searchTerm: String!) {
@@ -17,6 +17,7 @@ query SearchQueries($searchTerm: String!) {
       owner {
         _id
         display_name
+        profile_image_url
       }
     }
     getSongsByTitle(searchTerm: $searchTerm) {
@@ -33,6 +34,7 @@ query SearchQueries($searchTerm: String!) {
       album {
         _id
         title
+        cover_image_url
       }
       artists {
         _id
@@ -46,7 +48,7 @@ query SearchQueries($searchTerm: String!) {
       profile_image_url
       genres
     }
-  }`;
+}`;
 
 type ResultType = {
   artists: {
@@ -63,6 +65,7 @@ type ResultType = {
     owner: {
       _id: string;
       display_name: string;
+      profile_image_url: string;
     };
   }[];
   songs: {
@@ -75,10 +78,11 @@ type ResultType = {
     language: string;
     genre: string;
     lyrics: string;
-    release_date: Date;
+    release_date: string;
     album: {
-      _id: string;
-      title: string;
+        _id: string;
+        title: string;
+        cover_image_url: string;
     };
     artists: {
       _id: string;

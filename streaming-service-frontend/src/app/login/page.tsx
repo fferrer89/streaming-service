@@ -52,7 +52,7 @@ const Login: React.FC = () => {
   });
 
   useEffect(() => {
-    document.title = 'Login | Sounds 54';
+    document.title = "Login | Sounds 54";
   }, []);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Login: React.FC = () => {
   const handleOnSubmit: SubmitHandler<FormData> = (data, event) => {
     event?.preventDefault();
 
-    if (data.role === 'user') {
+    if (data.role === "user") {
       setRole(data.role);
       loginUser({
         variables: {
@@ -82,7 +82,7 @@ const Login: React.FC = () => {
       });
     }
 
-    if (data.role === 'artist') {
+    if (data.role === "artist") {
       setRole(data.role);
       loginArtist({
         variables: {
@@ -157,7 +157,9 @@ const Login: React.FC = () => {
                   <option value='user'>User</option>
                   <option value='artist'>Artist</option>
                 </select>
-                {errors?.role && <ErrorMessage message={errors.role.message as string} />}
+                {errors?.role && (
+                  <ErrorMessage message={errors.role.message as string} />
+                )}
               </div>
               <div>
                 {role === 'user' && userError && (
@@ -167,7 +169,11 @@ const Login: React.FC = () => {
                   <ErrorMessage message='Login Failed: Invalid email or password' />
                 )}
               </div>
-              <div className={userError || artistError || errors?.role ? 'mt-6' : 'mt-16'}>
+              <div
+                className={
+                  userError || artistError || errors?.role ? "mt-6" : "mt-16"
+                }
+              >
                 <button
                   type='submit'
                   className='mx-auto text-center text-xl px-6 py-4 rounded-full w-full font-bold text-[#22333B] bg-[#A2825D] hover:bg-[#C6AC8E] focus:[#C6AC8E]'

@@ -52,16 +52,16 @@ const AlbumList: React.FC = () => {
                     _id
                     type
                   }
-                `
+                `,
               });
               return album && album._id !== removeAlbum._id;
             });
             return newAlbums;
-          }
-        }
+          },
+        },
       });
     },
-    refetchQueries: [{ query: queries.GET_ALBUMS }]
+    refetchQueries: [{ query: queries.GET_ALBUMS }],
   });
 
   useEffect(() => {
@@ -81,8 +81,8 @@ const AlbumList: React.FC = () => {
   const handleAlbumDelete = () => {
     removeAlbum({
       variables: {
-        id: albumId
-      }
+        id: albumId,
+      },
     });
 
     setOpenModal(false);
@@ -107,17 +107,17 @@ const AlbumList: React.FC = () => {
 
   const handleModal = (albumId: string, albumTitle: string) => {
     setAlbumId(albumId);
-    setAlbumTitle(albumTitle)
+    setAlbumTitle(albumTitle);
     setOpenModal(true);
   };
 
   if (loading) {
     return (
-      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
-        <span className='mr-2'>Loading</span>
-        <span className='animate-bounce'>.</span>
-        <span className='animate-bounce delay-75'>.</span>
-        <span className='animate-bounce delay-200'>.</span>
+      <div className="text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]">
+        <span className="mr-2">Loading</span>
+        <span className="animate-bounce">.</span>
+        <span className="animate-bounce delay-75">.</span>
+        <span className="animate-bounce delay-200">.</span>
       </div>
     );
   }
@@ -129,7 +129,7 @@ const AlbumList: React.FC = () => {
   if (data) {
     return (
       <>
-        <main className='flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
+        <main className="flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden">
           <AdminSidebar></AdminSidebar>
           <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
             <h1 className='text-4xl text-[#22333B]'>Albums</h1>
@@ -154,18 +154,32 @@ const AlbumList: React.FC = () => {
               }
             </div>
           </div>
-          {openModal &&
-            <DeleteModal open={openModal} item={`album ${albumTitle}`} onClose={() => setOpenModal(false)}>
-              <div className='flex gap-4'>
-                <button onClick={handleAlbumDelete} className='w-full mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800'>Delete</button>
-                <button className='w-full mt-6 px-4 py-2 text-sm text-white bg-neutral-700 shadow rounded-md hover:bg-neutral-800' onClick={() => setOpenModal(false)}>Cancel</button>
+          {openModal && (
+            <DeleteModal
+              open={openModal}
+              item={`album ${albumTitle}`}
+              onClose={() => setOpenModal(false)}
+            >
+              <div className="flex gap-4">
+                <button
+                  onClick={handleAlbumDelete}
+                  className="w-full mt-6 px-4 py-2 text-sm text-white bg-red-700 rounded-md hover:bg-red-800"
+                >
+                  Delete
+                </button>
+                <button
+                  className="w-full mt-6 px-4 py-2 text-sm text-white bg-neutral-700 shadow rounded-md hover:bg-neutral-800"
+                  onClick={() => setOpenModal(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </DeleteModal>
-          }
+          )}
         </main>
       </>
     );
   }
-}
+};
 
 export default AlbumList;

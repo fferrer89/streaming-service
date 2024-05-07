@@ -79,8 +79,8 @@ const validDate = (date, param) => {
   if (date.length == 0) {
     badUserInputWrapper('Release Date is empty');
   }
-  date = date.split('/');
-  if (date.length != 3) {
+  date = date.split('/'); // MM/DD/YYYY
+  if (date.length !== 3) {
     badUserInputWrapper(`Invalid date format`);
   }
 

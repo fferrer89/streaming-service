@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <ApolloWrapper>
       <div className="flex flex-col h-screen items-start justify-start">
-        <div className="flex flex-row h-screen w-screen">
+        <div className="flex flex-row h-full w-full">
           <div className="w-fit h-full block top-0 left-0 z-50">
             <Sidebar />
           </div>
