@@ -200,7 +200,7 @@ export default function SongFormModal({method, actionData, action, songData, set
 
                     <button type="submit" value='submit'
                             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none mr-2">
-                        Submit
+                        {method === 'post' ? 'Submit' : 'Save'}
                     </button>
                     <button value='close'
                             onClick={(event) => {
