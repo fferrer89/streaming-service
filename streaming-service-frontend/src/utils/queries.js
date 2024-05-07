@@ -177,7 +177,7 @@ const GET_SONGS = gql`
 `;
 
 const GET_PLAYLISTS_BY_OWNER = gql`
-  query query {
+  query query($userId: userId) {
     getPlaylistsByOwner(userId: $userId) {
       _id
       created_date
@@ -228,8 +228,7 @@ const GET_ARTIST_BY_ID = gql`
       gender
       genres
       last_name
-      password_changed_date
-      profile_image_url
+      display_name
     }
   }
 `;
@@ -533,6 +532,78 @@ const EDIT_SONG = gql`
   }
 `;
 
+const TOGGLE_PLAYLIST = gql`
+  mutation ToggleLikePlaylist($playlistId: ID!) {
+    toggleLikePlaylist(playlistId: $playlistId) {
+      likes
+    }
+  }
+`;
+
+const GET_PLAYLIST = gql`
+  query GetPlaylistById($id: ID!) {
+    getPlaylistById(_id: $id) {
+      visibility
+      isOwner
+      songs {
+        _id
+        title
+        album {
+          _id
+          title
+        }
+        cover_image_url
+        duration
+      }
+      likes
+      description
+      owner {
+        first_name
+      }
+      created_date
+      _id
+      title
+      isLiked
+    }
+  }
+`;
+
+const EDIT_PLAYLIST = gql`
+  mutation EditPlaylist(
+    $title: String
+    $description: String
+    $visibility: String
+    $playlistId: ID!
+  ) {
+    editPlaylist(
+      title: $title
+      description: $description
+      visibility: $visibility
+      playlistId: $playlistId
+    ) {
+      _id
+      title
+    }
+  }
+`;
+
+const CREATE_PLAYLIST = gql`
+  mutation CreatePlaylist(
+    $description: String!
+    $title: String!
+    $visibility: String!
+  ) {
+    createPlaylist(
+      description: $description
+      title: $title
+      visibility: $visibility
+    ) {
+      _id
+      title
+    }
+  }
+`;
+
 const EDIT_ARTIST = gql`
   mutation mutation(
     $artistId: ID!
@@ -567,6 +638,27 @@ const EDIT_ARTIST = gql`
   }
 `;
 
+const GET_SONG_BY_TITLE = gql`
+  query GetSongsByTitle($searchTerm: String!) {
+    getSongsByTitle(searchTerm: $searchTerm) {
+      _id
+      title
+      artists {
+        first_name
+        last_name
+      }
+    }
+  }
+`;
+
+const ADD_SONG_TO_PLAYLIST = gql`
+  mutation AddSongToPlaylist($playlistId: ID!, $songId: ID!) {
+    addSongToPlaylist(playlistId: $playlistId, songId: $songId) {
+      _id
+    }
+  }
+`;
+
 const REMOVE_SONG_FROM_ALBUM = gql`
   mutation RemoveSongFromAlbum($id: ID!, $songId: ID!) {
     removeSongFromAlbum(_id: $id, songId: $songId) {
@@ -575,11 +667,20 @@ const REMOVE_SONG_FROM_ALBUM = gql`
     }
   }
 `;
+
 const REMOVE_ARTIST_FROM_ALBUM = gql`
   mutation RemoveArtistFromAlbum($id: ID!, $artistId: ID!) {
     removeArtistFromAlbum(_id: $id, artistId: $artistId) {
       _id
       title
+    }
+  }
+`;
+
+const REMOVE_SONG_FROM_PLAYLIST = gql`
+  mutation RemoveSongFromPlaylist($playlistId: ID!, $songId: ID!) {
+    removeSongFromPlaylist(playlistId: $playlistId, songId: $songId) {
+      _id
     }
   }
 `;
@@ -630,6 +731,13 @@ const queries = {
   ADD_SONG,
   EDIT_SONG,
   EDIT_ARTIST,
+  TOGGLE_PLAYLIST,
+  GET_PLAYLIST,
+  EDIT_PLAYLIST,
+  CREATE_PLAYLIST,
+  GET_SONG_BY_TITLE,
+  // ADD_SONG_To_PLAYLIST,
+  REMOVE_SONG_FROM_PLAYLIST,
   REMOVE_SONG_FROM_ALBUM,
   REMOVE_ARTIST_FROM_ALBUM,
   ADD_SONG_TO_ALBUM,

@@ -53,7 +53,6 @@ const artistSchema = new mongoose.Schema({
     required: [true, 'Please enter your password'],
     trim: true,
     minLength: [8, 'Password must be at least 8 characters long'],
-    maxLength: [25, 'Password must be less than 25 characters long'],
     select: false,
   },
   password_changed_date: {

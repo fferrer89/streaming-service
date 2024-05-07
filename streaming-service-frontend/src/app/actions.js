@@ -1,10 +1,11 @@
-"use server"; // Server Render Environment
+"use server";
 import validation from "../utils/validations";
 import queries from "../utils/queries";
-import {getClient} from "@/utils";
+import apolloClient  from "@/utils";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { useMutation } from "@apollo/client";
+
 import httpClientReqs from "@/utils/http-client-reqs";
 export async function createAlbum(prevState, formData) {
   let title,
@@ -80,8 +81,8 @@ export async function createAlbum(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-      const client = apolloClient;
-      const { data } = await client.mutate({
+    
+      const { data } = await apolloClient.mutate({
         mutation: queries.ADD_ALBUM,
         variables: {
           title,
@@ -182,7 +183,7 @@ export async function updateAlbum(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-      const client = getClient();
+      
       const { data } = await client.mutate({
         mutation: queries.EDIT_ALBUM,
         variables: {
@@ -215,7 +216,7 @@ export async function updateAlbum(prevState, formData) {
       return { errorMessages: errors };
     } else {
       try {
-        const client = getClient();
+
         const { data } = await client.mutate({
           mutation: queries.EDIT_ALBUM,
           variables: {
@@ -250,7 +251,7 @@ export async function deleteAlbum(albumId) {
     return { errorMessages: errors };
   } else {
     try {
-      const client = getClient();
+ 
       const { data } = await client.mutate({
         mutation: queries.REMOVE_ALBUM,
         variables: { id: albumId },
@@ -266,7 +267,7 @@ export async function deleteAlbum(albumId) {
       return { errorMessages: errors };
     } else {
       try {
-        const client = getClient();
+
         const { data } = await client.mutate({
           mutation: queries.REMOVE_ALBUM,
           variables: { id: albumId },
@@ -390,7 +391,7 @@ export async function createSong(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-      const client = getClient();
+
       const { data } = await client.mutate({
         mutation: queries.ADD_SONG,
         variables: {
@@ -541,7 +542,7 @@ export async function updateSong(prevState, formData) {
     return { errorMessages: errors };
   } else {
     try {
-      const client = getClient();
+
       const { data } = await client.mutate({
         mutation: queries.EDIT_SONG,
         variables: {
@@ -574,7 +575,7 @@ export async function deleteSong(songId) {
     return { errorMessages: errors };
   } else {
     try {
-      const client = getClient();
+
       const { data } = await client.mutate({
         mutation: queries.REMOVE_SONG,
         variables: { songId },

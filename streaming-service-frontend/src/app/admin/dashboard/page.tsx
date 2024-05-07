@@ -3,6 +3,9 @@ import React, { ReactNode, useEffect } from 'react';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import queries from '@/utils/queries';
 import { useQuery } from '@apollo/client';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/utils/redux/store';
+import { useRouter } from 'next/navigation';
 import { HiUsers, HiUserGroup } from 'react-icons/hi';
 import { BsSoundwave } from 'react-icons/bs';
 import { PiMusicNotesFill } from 'react-icons/pi';
@@ -52,6 +55,8 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 };
 
 const AdminDashboard: React.FC = () => {
+  const router = useRouter();
+  const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const { data: adminData, loading: adminLoading, error: adminError } = useQuery(queries.GET_ADMIN, { fetchPolicy: 'cache-and-network' });
   const { data, loading, error } = useQuery(queries.GET_COUNT, { fetchPolicy: 'cache-and-network' });
   const { data: userData, loading: userLoading, error: userError } = useQuery(queries.GET_USERS, { fetchPolicy: 'cache-and-network' })
@@ -62,6 +67,27 @@ const AdminDashboard: React.FC = () => {
     document.title = 'Dashboard | Sounds 54';
   }, []);
 
+  useEffect(() => {
+    if (loggedIn && userType === 'user') {
+      router.push('/sound');
+    } else if (loggedIn && userType === 'artist') {
+      router.push('/artist');
+    } else if (!loggedIn || userType !== 'admin') {
+      router.push('/login/admin');
+    }
+  }, [loggedIn, router]);
+
+  if (!loggedIn || userType !== 'admin') {
+    return (
+      <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
+        <span className='mr-2'>Loading</span>
+        <span className='animate-bounce'>.</span>
+        <span className='animate-bounce delay-75'>.</span>
+        <span className='animate-bounce delay-200'>.</span>
+      </div>
+    );
+  }
+
   if (adminLoading || loading || userLoading || artistLoading || songLoading) {
     return (
       <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
@@ -71,6 +97,10 @@ const AdminDashboard: React.FC = () => {
         <span className='animate-bounce delay-200'>.</span>
       </div>
     );
+  }
+
+  if (adminError || error || userError || artistError || songError) {
+    return <div>Error: {adminError?.message || error?.message || userError?.message || artistError?.message || songError?.message}</div>
   }
 
   if (data && adminData && userData && artistData && songData) {
@@ -101,7 +131,7 @@ const AdminDashboard: React.FC = () => {
         fill: '#EF4444'
       }
     ];
-  
+
     let userFemaleCount = 0;
     let userMaleCount = 0;
     let userOtherCount = 0;
@@ -116,13 +146,13 @@ const AdminDashboard: React.FC = () => {
         }
       }
     });
-  
+
     userGenderData = [
       { name: 'Female', value: userFemaleCount },
       { name: 'Male', value: userMaleCount },
       { name: 'Other', value: userOtherCount }
     ];
-  
+
     let artistFemaleCount = 0;
     let artistMaleCount = 0;
     let artistOtherCount = 0;
@@ -137,13 +167,13 @@ const AdminDashboard: React.FC = () => {
         }
       }
     });
-  
+
     artistGenderData = [
       { name: 'Female', value: artistFemaleCount },
       { name: 'Male', value: artistMaleCount },
       { name: 'Other', value: artistOtherCount }
     ];
-  
+
     let songEnglishCount = 0;
     let songOtherCount = 0;
     songData.songs.forEach((song: Song) => {
@@ -155,12 +185,12 @@ const AdminDashboard: React.FC = () => {
         }
       }
     });
-  
+
     songLanguageData = [
       { name: 'English', value: songEnglishCount },
       { name: 'Other', value: songOtherCount }
     ];
-    
+
     return (
       <>
         <main className='flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden'>
@@ -231,7 +261,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 text-[#C6AC8E]'>User Profile</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>User Profile</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -253,7 +283,7 @@ const AdminDashboard: React.FC = () => {
                 </ResponsiveContainer>
               </div>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 text-[#C6AC8E]'>Artist Profile</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>Artist Profile</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -275,7 +305,7 @@ const AdminDashboard: React.FC = () => {
                 </ResponsiveContainer>
               </div>
               <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 text-[#C6AC8E]'>Songs Language</span>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E]'>Songs Language</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie

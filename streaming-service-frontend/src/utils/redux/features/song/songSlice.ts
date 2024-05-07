@@ -10,17 +10,17 @@ interface Song {
   language: string;
   genre: string;
   lyrics: string;
-  release_date: Date;
+  release_date: string;
   album: {
     _id: string;
     title: string;
+    cover_image_url: string;
   };
   artists: {
     _id: string;
     display_name: string;
     profile_image_url: string;
   }[];
-  currentTime: number;
 }
 
 interface SongState {
@@ -39,16 +39,13 @@ const songSlice = createSlice({
   name: 'song',
   initialState,
   reducers: {
-    playSong(state, action: PayloadAction<Song>) {
-      if (state.currentSong && state.currentSong._id === action.payload._id) {
+    playSong(state, action: PayloadAction<{ song: Song; currentTime: number }>) {
+      if (state.currentSong && state.currentSong._id === action.payload.song._id) {
         state.isPlaying = true;
-
       } else {
-      
-        state.currentSong = action.payload;
-        state.currentSong.currentTime = 0;
+        state.currentSong = action.payload.song;
         state.isPlaying = true;
-        state.currentTime = 0;
+        state.currentTime = action.payload.currentTime;
       }
     },
     pauseSong(state) {
@@ -61,7 +58,6 @@ const songSlice = createSlice({
     },
     updateCurrentTime(state, action: PayloadAction<number>) {
       if (state.currentSong) {
-        state.currentSong.currentTime = action.payload;
         state.currentTime = action.payload;
       }
     },
