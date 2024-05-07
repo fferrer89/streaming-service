@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {Separator} from "@/components/ui/separator";
-import {createSong, deleteSong} from "@/app/actions";
+import {updateSong, deleteSong} from "@/app/actions";
 import {isoToUsDateFormat} from "@/utils/helpers";
 import SongFormModal from "@/components/App/Artist/SongFormModal";
 import {useFormState} from "react-dom";
@@ -32,7 +32,7 @@ const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [errorMessages, setErrorMessages] = useState(null);
     const [showSongModal, setShowSongModal] = useState(false);
-    const [createSongFormState, createSongFormAction] = useFormState(createSong, initialState);
+    const [updateSongFormState, updateSongFormAction] = useFormState(updateSong, initialState);
     const cancelRemoveSong = () => {
         setShowConfirmation(false);
     };
@@ -68,8 +68,8 @@ const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
                 {showSongModal && (
                     <SongFormModal
                         method='patch'
-                        actionData={createSongFormState}
-                        action={createSongFormAction}
+                        actionData={updateSongFormState}
+                        action={updateSongFormAction}
                         songData={songData?.getSongById}
                         setShowModal={setShowSongModal}
                         artistId={artistId}
