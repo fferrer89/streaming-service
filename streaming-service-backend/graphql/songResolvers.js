@@ -254,114 +254,55 @@ export const songResolvers = {
   Upload: GraphQLUpload,
   Mutation: {
     addSong: async (_, args, context) => {
-      let {
-        artists,
-        album,
-        title,
-        lyrics,
-        duration,
-        song_url,
-        cover_image_url,
-        writtenBy,
-        producers,
-        genre,
-        release_date,
-      } = args;
-      let queryObject = {
-        artists,
-        title,
-        duration,
-        song_url,
-        cover_image_url,
-        writtenBy,
-        producers,
-        genre,
-        release_date,
-      };
+      try {
+        const {
+          title,
+          duration,
+          song_url,
+          cover_image_url,
+          writtenBy,
+          producers,
+          genre,
+          release_date,
+          artists,
+          lyrics,
+          album,
+        } = args;
 
-      //TODO: Check if the user is artist or not.
-      console.log(args);
-      if (album) {
-        songHelper.emptyValidation(album, "album can't be empty spaces");
-        songHelper.validObjectId(album);
-        let albumExist = await Album.findById(album);
-        if (!albumExist) {
-          songHelper.badUserInputWrapper(`Album not found, ${album}`);
+        const existingArtists = await Artist.find({ _id: { $in: artists } });
+        if (existingArtists.length !== artists.length) {
+          throw new Error('One or more artist IDs are invalid');
         }
-
-        // check if artist provided here match the artits in album.
-        let albumArtistSet = new Set(
-          albumExist.artists.map((art) => art._id.toString())
-        );
-
-        if (albumArtistSet.size != artists.length) {
-          songHelper.badUserInputWrapper('Artist do not match with album');
-        }
-        for (let i = 0; i < artists.length; i++) {
-          if (!albumArtistSet.has(artists[i])) {
-            songHelper.badUserInputWrapper('Artist do not match with album');
+        if (album) {
+          const existingAlbum = await Album.findById(album);
+          if (!existingAlbum) {
+            throw new Error('Album not found with given ID');
           }
         }
-        queryObject.album = album;
-      }
 
-      if (lyrics) {
-        queryObject.lyrics = lyrics;
-      }
-      queryObject.release_date = songHelper.validDate(
-        queryObject.release_date,
-        'Release date'
-      );
+        const song = new Songs({
+          title,
+          duration,
+          song_url,
+          cover_image_url,
+          writtenBy,
+          producers,
+          genre,
+          release_date,
+          artists,
+          lyrics,
+          album,
+        });
 
-      //Check if artists exist:
-      for (let i = 0; i < artists.length; i++) {
-        songHelper.validObjectId(artists[i]);
-        let artistExist = await Artist.findById(artists[i]);
-        if (!artistExist) {
-          songHelper.badUserInputWrapper('Artist does not exist');
-        } else if (
-          !context ||
-          !context.decoded ||
-          artistExist._id.toString != context.decoded.id
-        ) {
-          //songHelper.unAuthorizedWrapper();
-        }
-      }
+        const newSong = await song.save();
 
-      songHelper.validObjectId(queryObject.song_url.trim());
-      const song = await SongFile.findOne({
-        fileId: queryObject.song_url.trim(),
-      });
-      if (!song) {
-        songHelper.notFoundWrapper('Song file not found with given url');
-      }
-
-      songHelper.validObjectId(queryObject.cover_image_url.trim());
-      const cover = await SongFile.findOne({
-        fileId: queryObject.cover_image_url.trim(),
-      });
-      if (!cover) {
-        songHelper.notFoundWrapper('Cover Image file not found with given url');
-      }
-
-      try {
-        let newSong = new Songs(queryObject);
-        const savedSong = await newSong.save();
-
-        //if album id is present then add the song id to ablum collection.
-        if (album) {
-          let albumUpdate = await Album.findByIdAndUpdate(album, {
-            $push: { songs: newSong._id },
-          });
-        }
-        return savedSong;
+        return newSong;
       } catch (error) {
-        songHelper.badUserInputWrapper(error.message);
+        throw new GraphQLError(error.message);
       }
     },
     editSong: async (_, args, context) => {
       try {
-        // Extract the input parameters from the arguments
         const {
           songId,
           title,

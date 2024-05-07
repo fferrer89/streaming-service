@@ -18,7 +18,7 @@ import axios from 'axios';
 import SongFile from '../models/songFileModel.js';
 
 await mongoose.connect(
-    'mongodb://localhost:27017/streaming-service',
+  'mongodb://localhost:27017/streaming-service',
   // 'mongodb+srv://user554:BHVTeZOx80QQM7jY@cluster0.bui7i1e.mongodb.net/streaming-service',
   {
     useNewUrlParser: true,
@@ -1156,6 +1156,12 @@ async function seed() {
         data.album.title,
         'download.jpeg'
       );
+      await SongFile.create({
+        filename: `${data.album.title}`,
+        mimetype: 'image/jpeg',
+        uploadDate: new Date(),
+        fileId: imageId,
+      });
       cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
 
       for (let song of data.songs) {
@@ -1166,6 +1172,12 @@ async function seed() {
           data.album.title,
           `${song.title}.mp3`
         );
+        await SongFile.create({
+          filename: `${song.title}`,
+          mimetype: 'audio/mpeg',
+          uploadDate: new Date(),
+          fileId: songId,
+        });
         console.log(songId);
         song.artists = [cArtist._id];
         song.album = cAlbum._id;
