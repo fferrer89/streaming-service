@@ -404,7 +404,6 @@ export const songResolvers = {
         throw new GraphQLError(error.message);
       }
     },
-    toggleLikeSong: async (args) => {},
     uploadSongFile: async (_, args) => {
       try {
         const { filename, mimetype, encoding, createReadStream } =
