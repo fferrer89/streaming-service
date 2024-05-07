@@ -18,7 +18,7 @@ const AdminSideBar: React.FC = () => {
   };
 
   return (
-    <div className='flex flex-col min-w-60 px-4 py-2 bg-[#22333B]'>
+    <div className='flex flex-col min-w-60 px-4 py-2 bg-[#22333B] sm:fixed sm:h-full sm:z-10 sm:top-0 sm:left-0'>
       <div className='flex items-center justify-center gap-4 px-1 py-3'>
         <FcBullish fontSize={35} />
         <span className='text-2xl mt-2 text-[#C6AC8E]'>Sounds 54</span>
