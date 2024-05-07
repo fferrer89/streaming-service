@@ -703,6 +703,25 @@ const ADD_ARTIST_TO_ALBUM = gql`
   }
 `;
 
+const GET_NEXT_SONGS = gql`
+  query getNextSongs($clickedSongId: ID!) {
+    getNextSongs(clickedSongId: $clickedSongId) {
+      _id
+      duration
+      title
+      likes
+      song_url
+      cover_image_url
+      writtenBy
+      producers
+      language
+      genre
+      lyrics
+      release_date
+    }
+  }
+`;
+
 const queries = {
   REGISTER_USER,
   REGISTER_ARTIST,
@@ -736,12 +755,13 @@ const queries = {
   EDIT_PLAYLIST,
   CREATE_PLAYLIST,
   GET_SONG_BY_TITLE,
-  // ADD_SONG_To_PLAYLIST,
+  ADD_SONG_TO_PLAYLIST,
   REMOVE_SONG_FROM_PLAYLIST,
   REMOVE_SONG_FROM_ALBUM,
   REMOVE_ARTIST_FROM_ALBUM,
   ADD_SONG_TO_ALBUM,
   ADD_ARTIST_TO_ALBUM,
+  GET_NEXT_SONGS,
 };
 
 export default queries;

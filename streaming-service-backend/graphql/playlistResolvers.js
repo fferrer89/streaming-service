@@ -161,8 +161,8 @@ export const playlistResolvers = {
       return false;
     },
     isOwner: async (parent, _, context) => {
-      console.log(parent.owner, context.decoded.id);
-      if (parent.owner.toString() === context.decoded.id) {
+      //console.log(parent.owner, context.decoded.id);
+      if ( context && context.decoded && parent.owner.toString() === context.decoded.id) {
         return true;
       }
       return false;
@@ -308,7 +308,7 @@ export const playlistResolvers = {
 
     toggleLikePlaylist: async (_, args, context) => {
       console.log(args);
-      if (!context.decoded && !context.decoded.id)
+      if (!context.decoded || !context.decoded.id)
         songsHelpers.unAuthorizedWrapper('Please login to like this playlist');
 
       let { playlistId } = args;

@@ -60,6 +60,8 @@ type Query {
     getUserLikedPlaylists(userId: String!): [Playlist]
 
     streamSong(trackID: ID!): Stream
+
+    getNextSongs(clickedSongId: ID!): [Song]
 }
 
 type Mutation {

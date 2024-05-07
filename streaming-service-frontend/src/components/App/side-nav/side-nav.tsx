@@ -8,6 +8,7 @@ import { gql } from '@apollo/client';
 import { useSelector } from 'react-redux';
 import { getImageUrl } from '@/utils/tools/images';
 
+import LogoutButton from '../Artist/LogoutButton';
 const GET_USER_PROFILE_IMAGE = gql`
   query GetUserProfileImage($userId: ID!) {
     getUserById(_id: $userId) {
@@ -77,6 +78,7 @@ const SideNav: React.FC = () => {
                 <Link href={'/user/profile'}>
                     <Image className='rounded-full border border-white' src={ profileImageUrl} width={45} height={45} alt='Profile image' />
                 </Link>
+                <LogoutButton />
             </header>
             <nav>
                 <ul>

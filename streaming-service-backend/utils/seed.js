@@ -19,7 +19,7 @@ import SongFile from '../models/songFileModel.js';
 
 await mongoose.connect(
   'mongodb://localhost:27017/streaming-service',
-  // 'mongodb+srv://user554:BHVTeZOx80QQM7jY@cluster0.bui7i1e.mongodb.net/streaming-service',
+  //'mongodb+srv://user554:BHVTeZOx80QQM7jY@cluster0.bui7i1e.mongodb.net/streaming-service',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -43,7 +43,7 @@ const uploadSong = async (filePath, albumTitle, songTitle) => {
 
     return new Promise((resolve, reject) => {
       uploadStream.on('finish', () => {
-        console.log('File uploaded successfully with ID:', uploadStream.id);
+        //console.log('File uploaded successfully with ID:', uploadStream.id);
         resolve(uploadStream.id);
       });
 
@@ -123,7 +123,7 @@ const users = [
     last_name: 'Doe',
     display_name: 'janedoe',
     email: 'jane@example.com',
-    password: 'Password456$',
+    password: 'Password123$',
     date_of_birth: '01/01/1995',
     gender: 'FEMALE',
     profile_image_url: new mongoose.Types.ObjectId(),
@@ -134,7 +134,7 @@ const users = [
     last_name: 'Smith',
     display_name: 'alicesmith',
     email: 'alice@example.com',
-    password: 'Password789$',
+    password: 'Password123$',
     date_of_birth: '01/01/1988',
     gender: 'FEMALE',
     profile_image_url: new mongoose.Types.ObjectId(),
@@ -144,7 +144,7 @@ const users = [
     last_name: 'Johnson',
     display_name: 'bobjohnson',
     email: 'bob@example.com',
-    password: 'Password000$',
+    password: 'Password123$',
     date_of_birth: '01/01/1992',
     gender: 'MALE',
     profile_image_url: new mongoose.Types.ObjectId(),
@@ -157,7 +157,7 @@ const artists = [
     last_name: 'Marley',
     display_name: 'Marley',
     email: 'bob@example.com',
-    password: 'Password456#',
+    password: 'Password123$',
     date_of_birth: '01/01/1940',
     gender: 'MALE',
     profile_image_url: new mongoose.Types.ObjectId(),
@@ -168,7 +168,7 @@ const artists = [
     last_name: 'Adkins',
     display_name: 'Adele',
     email: 'adele@example.com',
-    password: 'Password456@',
+    password: 'Password123$',
     date_of_birth: '01/01/1980',
     gender: 'FEMALE',
     profile_image_url: new mongoose.Types.ObjectId(),
@@ -181,7 +181,7 @@ const SmithMr = {
   last_name: 'Mr',
   display_name: 'Mr Smith',
   email: 'smith@example.com',
-  password: 'Password4123#',
+  password: 'Password123$',
   date_of_birth: '01/01/1940',
   gender: 'MALE',
   genres: ['COUNTRY'],
@@ -192,7 +192,7 @@ const BillHobson = {
   last_name: 'Hobson',
   display_name: 'Bill Hobson',
   email: 'bill@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/1980',
   gender: 'MALE',
   genres: ['ROCK'],
@@ -204,7 +204,7 @@ const JohnDoe = {
   last_name: 'Doe',
   display_name: 'POPSTAR',
   email: 'john@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['POP'],
@@ -216,7 +216,7 @@ const AldousIchnite = {
   last_name: 'Ichnite',
   display_name: 'Aldous Ichnite',
   email: 'aldous@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/1999',
   gender: 'MALE',
   genres: ['ELECTRONIC'],
@@ -228,7 +228,7 @@ const DanaSchechter = {
   last_name: 'Schechter',
   display_name: 'Dana Schechter',
   email: 'dana@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/1999',
   gender: 'FEMALE',
   genres: ['INDIE_POP'],
@@ -240,7 +240,7 @@ const MiamiSlice = {
   last_name: 'Slice',
   display_name: 'Miami Slice',
   email: 'miami@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/2001',
   gender: 'FEMALE',
   genres: ['DISCO', 'HOUSE', 'DANCE'],
@@ -252,7 +252,7 @@ const TripleHere = {
   last_name: 'Here',
   display_name: 'Triple5 Here',
   email: 'triple@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/2001',
   gender: 'MALE',
   genres: ['SYNTH_POP', 'TRIP_HOP'],
@@ -264,7 +264,7 @@ const KetsaMia = {
   last_name: 'Mia',
   display_name: 'Ketsa Mia',
   email: 'ketsa@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/1980',
   gender: 'FEMALE',
   genres: ['SYNTH_POP', 'HIP_HOP'],
@@ -276,7 +276,7 @@ const AudioKofee = {
   last_name: 'Kofee',
   display_name: 'Audio Kofee',
   email: 'audio@example.com',
-  password: 'Password123#',
+  password: 'Password123$',
   date_of_birth: '01/01/1990',
   gender: 'MALE',
   genres: ['ELECTRONIC', 'SYNTH_POP'],
@@ -902,7 +902,7 @@ let customData = [
 async function seed() {
   try {
     console.log(
-      '------------------------  Strated Clearing Current Database  -------------------------'
+      '------------------------  Started Clearing Current Database  -------------------------'
     );
     await Admin.deleteMany({});
     await User.deleteMany({});
@@ -919,7 +919,9 @@ async function seed() {
       mongoose.connection.db.collection('fs.chunks');
     await filesChunksCollection.deleteMany({});
     await SongFile.deleteMany({});
-
+    console.log(
+      '------------------------  Current Database Cleared Successfully -------------------------'
+    );
     console.log(
       '------------------------  Inserting Sample Images  -------------------------'
     );
@@ -943,10 +945,10 @@ async function seed() {
       null,
       'user.jpeg'
     );
-    console.log(`Sample songs image: ${sampleSongImageId}`);
-    console.log(`Sample album image: ${sampleAlbumImageId}`);
-    console.log(`Sample artist image: ${sampleArtistImageId}`);
-    console.log(`Sample user image: ${sampleUserImageId}`);
+    // console.log(`Sample songs image: ${sampleSongImageId}`);
+    // console.log(`Sample album image: ${sampleAlbumImageId}`);
+    // console.log(`Sample artist image: ${sampleArtistImageId}`);
+    // console.log(`Sample user image: ${sampleUserImageId}`);
 
     await SongFile.create({
       filename: 'sample_user_image',
@@ -972,171 +974,189 @@ async function seed() {
       uploadDate: new Date(),
       fileId: sampleSongImageId,
     });
-
     console.log(
-      '------------------------  Inserting dummy Data without song files  -------------------------'
+      '------------------------  Finished Inserting Sample Images  -------------------------'
     );
-    const createAdmin = await Admin.create(admin);
-    const newUsers = users.map((user) => ({
-      ...user,
-      profile_image_url: new mongoose.Types.ObjectId(sampleUserImageId),
-    }));
-    const createdUsers = await User.create(newUsers);
-    const newArtists = artists.map((artist) => ({
-      ...artist,
-      profile_image_url: new mongoose.Types.ObjectId(sampleArtistImageId),
-    }));
-    const createdArtists = await Artist.create(newArtists);
-
-    for (let artist of createdArtists) {
-      const imageId = await uploadRandomImage();
-      artist.profile_image_url = imageId;
-      await artist.save();
-    }
-    for (let user of createdUsers) {
-      const imageId = await uploadRandomImage();
-      user.profile_image_url = imageId;
-      await user.save();
-    }
-
-    const albumsWithArtists = albums.map((album) => ({
-      ...album,
-      artists: createdArtists.map((artist) => ({ artistId: artist._id })),
-      cover_image_url: new mongoose.Types.ObjectId(sampleAlbumImageId),
-    }));
-
-    for (let song of songs) {
-      song.artists = createdArtists.map((artist) => artist._id);
-    }
-
-    const createdAlbums = await Album.create(albumsWithArtists);
-
-    const songsWithAlbumsAndArtists = songs.map((song) => ({
-      ...song,
-      album:
-        createdAlbums[Math.floor(Math.random() * createdAlbums.length)]._id,
-      cover_image_url: new mongoose.Types.ObjectId(sampleSongImageId),
-    }));
-
-    const createdSongs = await Song.create(songsWithAlbumsAndArtists);
-
-    for (let song of createdSongs) {
-      const randomAlbumIndex = Math.floor(Math.random() * createdAlbums.length);
-      song.album = createdAlbums[randomAlbumIndex]._id;
-      let imageId = await uploadRandomImage();
-      song.cover_image_url = imageId;
-      await Song.findByIdAndUpdate(song._id, { album: song.album });
-    }
-
-    for (let album of createdAlbums) {
-      const randomArtistIndex = Math.floor(
-        Math.random() * createdArtists.length
-      );
-      album.artists = [{ artistId: createdArtists[randomArtistIndex]._id }];
-      let imageId = await uploadRandomImage();
-      album.cover_image_url = imageId;
-      await Album.findByIdAndUpdate(album._id, { artists: album.artists });
-    }
-
-    for (let album of createdAlbums) {
-      const albumSongs = createdSongs.filter((song) =>
-        song.album.equals(album._id)
-      );
-      album.songs = {
-        songId: albumSongs[Math.floor(Math.random() * albumSongs.length)]._id,
-      };
-      await album.save();
-    }
-
-    const albumsWithLikedBy = createdAlbums.map((album) => ({
-      ...album._doc,
-      liked_by: {
-        users: createdUsers.map((user) => user._id),
-        artists: createdArtists.map((artist) => artist._id),
-      },
-    }));
-
-    await Promise.all(
-      albumsWithLikedBy.map((album) =>
-        Album.findByIdAndUpdate(album._id, { liked_by: album.liked_by })
-      )
+    console.log(
+      '------------------------  Inserting sample song data  -------------------------'
     );
-
-    // Populating followers and following for artists and users
-    const aids = createdArtists.map((artist) => artist._id);
-    for (let currentArtist of createdArtists) {
-      const otherArtists = createdArtists.filter(
-        (artist) => artist._id.toString() !== currentArtist._id.toString()
+    for (let i = 1; i <= 80; i++) {
+      const songId = await uploadSong(
+        `./utils/songData/sample_songs`,
+        null,
+        `song_${i}.mp3`
       );
-      const followingArtists = otherArtists.map((artist) => artist._id);
-      const followingUsers = createdUsers.map((user) => user._id);
-      await Artist.findByIdAndUpdate(currentArtist._id, {
-        $set: {
-          'following.artists': followingArtists,
-          'followers.artists': followingArtists,
-          'following.users': followingUsers,
-          'followers.users': followingUsers,
-        },
+      await SongFile.create({
+        filename: `song_${i}.mp3`,
+        mimetype: 'audio/mpeg',
+        uploadDate: new Date(),
+        fileId: songId,
       });
     }
-    for (let currentUser of createdUsers) {
-      const otherUsers = createdUsers.filter(
-        (user) => user._id.toString() !== currentUser._id.toString()
-      );
-      const followingArtists = createdArtists.map((artist) => artist._id);
-      const followingUsers = otherUsers.map((user) => user._id);
-      await User.findByIdAndUpdate(currentUser._id, {
-        $set: {
-          'following.artists': followingArtists,
-          'followers.artists': followingArtists,
-          'following.users': followingUsers,
-          'followers.users': followingUsers,
-        },
-      });
-    }
+    console.log(
+      '------------------------  Finished Inserting sample song data  -------------------------'
+    );
+    // const createAdmin = await Admin.create(admin);
+    // const newUsers = users.map((user) => ({
+    //   ...user,
+    //   profile_image_url: new mongoose.Types.ObjectId(sampleUserImageId),
+    // }));
+    // const createdUsers = await User.create(newUsers);
+    // const newArtists = artists.map((artist) => ({
+    //   ...artist,
+    //   profile_image_url: new mongoose.Types.ObjectId(sampleArtistImageId),
+    // }));
+    // const createdArtists = await Artist.create(newArtists);
 
-    for (let playlist of playlists) {
-      let imageId = await uploadRandomImage();
-      playlist.cover_image_url = imageId;
-      playlist.songs = createdSongs.map((song) => song._id);
-    }
+    // for (let artist of createdArtists) {
+    //   const imageId = await uploadRandomImage();
+    //   artist.profile_image_url = imageId;
+    //   await artist.save();
+    // }
+    // for (let user of createdUsers) {
+    //   const imageId = await uploadRandomImage();
+    //   user.profile_image_url = imageId;
+    //   await user.save();
+    // }
 
-    for (let playlist of playlists) {
-      playlist.liked_users = createdUsers.map((user) => user._id);
-    }
+    // const albumsWithArtists = albums.map((album) => ({
+    //   ...album,
+    //   artists: createdArtists.map((artist) => ({ artistId: artist._id })),
+    //   cover_image_url: new mongoose.Types.ObjectId(sampleAlbumImageId),
+    // }));
 
-    for (let history of listeningHistory) {
-      history.userId =
-        createdUsers[Math.floor(Math.random() * createdUsers.length)]._id;
-      history.songId =
-        createdSongs[Math.floor(Math.random() * createdSongs.length)]._id;
-    }
-    console.log(listeningHistory);
-    for (let album of albums) {
-      album.artists = createdArtists.map((artist) => artist._id);
-    }
+    // for (let song of songs) {
+    //   song.artists = createdArtists.map((artist) => artist._id);
+    // }
 
-    for (let song of songs) {
-      song.artists = createdArtists.map((artist) => artist._id);
-    }
+    // const createdAlbums = await Album.create(albumsWithArtists);
 
-    for (let playlist of playlists) {
-      playlist.songs = createdSongs.map((song) => song._id);
-      playlist.liked_users = createdUsers.map((user) => user._id);
-    }
+    // const songsWithAlbumsAndArtists = songs.map((song) => ({
+    //   ...song,
+    //   album:
+    //     createdAlbums[Math.floor(Math.random() * createdAlbums.length)]._id,
+    //   cover_image_url: new mongoose.Types.ObjectId(sampleSongImageId),
+    // }));
 
-    if (createdUsers.length >= 2) {
-      playlists[0].owner = createdUsers[0];
-      playlists[1].owner = createdUsers[1];
-    } else {
-      console.error('Not enough users created to assign owners to playlists');
-    }
+    // const createdSongs = await Song.create(songsWithAlbumsAndArtists);
 
-    const createdPlaylists = await Playlist.create(playlists);
+    // for (let song of createdSongs) {
+    //   const randomAlbumIndex = Math.floor(Math.random() * createdAlbums.length);
+    //   song.album = createdAlbums[randomAlbumIndex]._id;
+    //   let imageId = await uploadRandomImage();
+    //   song.cover_image_url = imageId;
+    //   await Song.findByIdAndUpdate(song._id, { album: song.album });
+    // }
 
-    await ListeningHistory.create(listeningHistory);
-    await Album.create(albums);
-    await Song.create(songs);
+    // for (let album of createdAlbums) {
+    //   const randomArtistIndex = Math.floor(
+    //     Math.random() * createdArtists.length
+    //   );
+    //   album.artists = [{ artistId: createdArtists[randomArtistIndex]._id }];
+    //   let imageId = await uploadRandomImage();
+    //   album.cover_image_url = imageId;
+    //   await Album.findByIdAndUpdate(album._id, { artists: album.artists });
+    // }
+
+    // for (let album of createdAlbums) {
+    //   const albumSongs = createdSongs.filter((song) =>
+    //     song.album.equals(album._id)
+    //   );
+    //   album.songs = {
+    //     songId: albumSongs[Math.floor(Math.random() * albumSongs.length)]._id,
+    //   };
+    //   await album.save();
+    // }
+
+    // const albumsWithLikedBy = createdAlbums.map((album) => ({
+    //   ...album._doc,
+    //   liked_by: {
+    //     users: createdUsers.map((user) => user._id),
+    //     artists: createdArtists.map((artist) => artist._id),
+    //   },
+    // }));
+
+    // await Promise.all(
+    //   albumsWithLikedBy.map((album) =>
+    //     Album.findByIdAndUpdate(album._id, { liked_by: album.liked_by })
+    //   )
+    // );
+
+    // // Populating followers and following for artists and users
+    // const aids = createdArtists.map((artist) => artist._id);
+    // for (let currentArtist of createdArtists) {
+    //   const otherArtists = createdArtists.filter(
+    //     (artist) => artist._id.toString() !== currentArtist._id.toString()
+    //   );
+    //   const followingArtists = otherArtists.map((artist) => artist._id);
+    //   const followingUsers = createdUsers.map((user) => user._id);
+    //   await Artist.findByIdAndUpdate(currentArtist._id, {
+    //     $set: {
+    //       'following.artists': followingArtists,
+    //       'followers.artists': followingArtists,
+    //       'following.users': followingUsers,
+    //       'followers.users': followingUsers,
+    //     },
+    //   });
+    // }
+    // for (let currentUser of createdUsers) {
+    //   const otherUsers = createdUsers.filter(
+    //     (user) => user._id.toString() !== currentUser._id.toString()
+    //   );
+    //   const followingArtists = createdArtists.map((artist) => artist._id);
+    //   const followingUsers = otherUsers.map((user) => user._id);
+    //   await User.findByIdAndUpdate(currentUser._id, {
+    //     $set: {
+    //       'following.artists': followingArtists,
+    //       'followers.artists': followingArtists,
+    //       'following.users': followingUsers,
+    //       'followers.users': followingUsers,
+    //     },
+    //   });
+    // }
+
+    // for (let playlist of playlists) {
+    //   let imageId = await uploadRandomImage();
+    //   playlist.cover_image_url = imageId;
+    //   playlist.songs = createdSongs.map((song) => song._id);
+    // }
+
+    // for (let playlist of playlists) {
+    //   playlist.liked_users = createdUsers.map((user) => user._id);
+    // }
+
+    // for (let history of listeningHistory) {
+    //   history.userId =
+    //     createdUsers[Math.floor(Math.random() * createdUsers.length)]._id;
+    //   history.songId =
+    //     createdSongs[Math.floor(Math.random() * createdSongs.length)]._id;
+    // }
+    // console.log(listeningHistory);
+    // for (let album of albums) {
+    //   album.artists = createdArtists.map((artist) => artist._id);
+    // }
+
+    // for (let song of songs) {
+    //   song.artists = createdArtists.map((artist) => artist._id);
+    // }
+
+    // for (let playlist of playlists) {
+    //   playlist.songs = createdSongs.map((song) => song._id);
+    //   playlist.liked_users = createdUsers.map((user) => user._id);
+    // }
+
+    // if (createdUsers.length >= 2) {
+    //   playlists[0].owner = createdUsers[0];
+    //   playlists[1].owner = createdUsers[1];
+    // } else {
+    //   console.error('Not enough users created to assign owners to playlists');
+    // }
+
+    // const createdPlaylists = await Playlist.create(playlists);
+
+    // await ListeningHistory.create(listeningHistory);
+    // await Album.create(albums);
+    // await Song.create(songs);
 
     console.log(
       '------------------------  Inserting custom data with song files  -------------------------'
@@ -1166,7 +1186,7 @@ async function seed() {
 
       for (let song of data.songs) {
         let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
-        console.log(`Song path : ${songPath}`);
+        console.log(`Song found at path path : ${songPath}`);
         const songId = await uploadSong(
           `./utils/songData/${cAlbum.title}`,
           data.album.title,
@@ -1178,7 +1198,6 @@ async function seed() {
           uploadDate: new Date(),
           fileId: songId,
         });
-        console.log(songId);
         song.artists = [cArtist._id];
         song.album = cAlbum._id;
         song.song_url = songId;
@@ -1188,10 +1207,13 @@ async function seed() {
         await cAlbum.save();
       }
     }
-
+    console.log(
+      '------------------------  Finished Inserting custom data with song files  -------------------------'
+    );
     console.log(
       '------------------------  Database seeded successfully  -------------------------'
     );
+    mongoose.connection.close();
   } catch (error) {
     console.error('Error seeding database:', error);
   } finally {

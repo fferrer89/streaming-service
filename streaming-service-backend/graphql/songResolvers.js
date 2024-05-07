@@ -202,6 +202,81 @@ export const songResolvers = {
 
       return downloadStream;
     },
+    getNextSongs: async (_, { clickedSongId }, context) => {
+      try {
+        const clickedSong = await Songs.findById(clickedSongId);
+        if (!clickedSong) {
+          throw new Error('Clicked song not found');
+        }
+
+        const newlyReleasedAlbums = await Album.find({
+          release_date: { $gte: new Date() },
+          genres: clickedSong.genre,
+        }).limit(5);
+        const albumIds = newlyReleasedAlbums.map((album) => album._id);
+        const songsFromNewlyReleasedAlbums = await Songs.find({
+          album: { $in: albumIds },
+        }).limit(10);
+
+        const mostLikedPlaylists = await Playlist.find({
+          genres: clickedSong.genre,
+        })
+          .sort({ likes: -1 })
+          .limit(5);
+        const playlistSongIds = mostLikedPlaylists.flatMap(
+          (playlist) => playlist.songs
+        );
+        const songsFromMostLikedPlaylists = await Songs.find({
+          _id: { $in: playlistSongIds },
+        }).limit(10);
+
+        const mostLikedArtists = await Artist.find({
+          genres: clickedSong.genre,
+        })
+          .sort({ likes: -1 })
+          .limit(5);
+        const artistSongIds = mostLikedArtists.flatMap(
+          (artist) => artist.songs
+        );
+        const songsFromMostLikedArtists = await Songs.find({
+          _id: { $in: artistSongIds },
+        }).limit(10);
+
+        let nextSongs = [
+          ...songsFromNewlyReleasedAlbums,
+          ...songsFromMostLikedPlaylists,
+          ...songsFromMostLikedArtists,
+        ];
+        if (!nextSongs || nextSongs.length == 0) {
+          const songsByLikes = await Songs.aggregate([
+            { $match: { genre: clickedSong.genre } },
+            { $sort: { likes: -1 } },
+            { $limit: 50 },
+          ]);
+
+          const songsByReleaseDate = await Songs.aggregate([
+            { $match: { genre: clickedSong.genre } },
+            { $sort: { release_date: -1 } },
+            { $limit: 50 },
+          ]);
+
+          const allSongs = await Songs.aggregate([
+            { $sort: { release_date: -1 } },
+            { $limit: 50 },
+          ]);
+          const allNextSongs = [
+            ...songsByLikes,
+            ...songsByReleaseDate,
+            ...allSongs,
+          ];
+          const shuffledSongs = allNextSongs.sort(() => Math.random() - 0.5);
+          nextSongs = shuffledSongs.slice(0, 50);
+        }
+        return nextSongs;
+      } catch (error) {
+        throw new GraphQLError(error.message);
+      }
+    },
   },
 
   Song: {
