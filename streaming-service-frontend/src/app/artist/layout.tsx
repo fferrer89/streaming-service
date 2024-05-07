@@ -1,10 +1,10 @@
-"use client";
-import React, { ReactNode, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/utils/redux/store";
-import ArtistSidebar from "@/components/App/sidebar/artistSidebar";
-import SPlayer from "@/components/views/dashboard/footer-player";
-import { useRouter } from "next/navigation";
+'use client';
+import React, { ReactNode, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '@/utils/redux/store';
+import ArtistSidebar from '@/components/App/sidebar/artistSidebar';
+import SPlayer from '@/components/views/dashboard/footer-player';
+import { useRouter } from 'next/navigation';
 
 interface LayoutProps {
   children: ReactNode;
@@ -15,28 +15,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const { loggedIn } = useSelector((state: RootState) => state.user);
 
-  // useEffect(() => {
-  //   if (!loggedIn) {
-  //     router.push('/login');
-  //   }
-  // }, [loggedIn, router]);
+  useEffect(() => {
+    if (!loggedIn) {
+      router.push('/login');
+    }
+  }, [loggedIn, router]);
 
-  const handleLogin = () => {
-    dispatch(login(true));
-    dispatch(
-      playSong({
-        id: 1,
-        title: "Sample Song",
-        artist: "Sample Artist",
-        duration: 180,
-        currentTime: 0,
-      })
-    );
-  };
-
-  // if (!loggedIn) {
-  //   return null;
-  // }
+  if (!loggedIn) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col h-screen items-start justify-start">

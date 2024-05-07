@@ -5,7 +5,7 @@ import { gql } from "@apollo/client";
 import Artists from "@/components/App/Serach/Artists";
 import Playlists from "@/components/App/Serach/Playlists";;
 import Songs from "@/components/App/Serach/Songs";
-import apolloClient from "@/utils";
+import {getClient} from "@/utils";
 
 const SEARCH_QUERIES = gql`
 query SearchQueries($searchTerm: String!) {
@@ -98,7 +98,7 @@ const Search: React.FC = () => {
     const [results, setResults] = useState<ResultType>({ artists: [], playlists: [], songs: [] });
   
     const { data, loading, error } = useQuery(SEARCH_QUERIES, {
-      client: apolloClient,
+      client: getClient(),
       variables: { searchTerm: debouncedSearchTerm },
       skip: !debouncedSearchTerm, // Skip the query if the search term is empty
     });
