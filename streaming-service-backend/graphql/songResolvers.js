@@ -328,21 +328,21 @@ export const songResolvers = {
         }
       }
 
-      // songHelper.validObjectId(queryObject.song_url.trim());
-      // const song = await SongFile.findOne({
-      //   fileId: queryObject.song_url.trim(),
-      // });
-      // if (!song) {
-      //   songHelper.notFoundWrapper('Song file not found with given url');
-      // }
-      //
-      // songHelper.validObjectId(queryObject.cover_image_url.trim());
-      // const cover = await SongFile.findOne({
-      //   fileId: queryObject.cover_image_url.trim(),
-      // });
-      // if (!cover) {
-      //   songHelper.notFoundWrapper('Cover Image file not found with given url');
-      // }
+      songHelper.validObjectId(queryObject.song_url.trim());
+      const song = await SongFile.findOne({
+        fileId: queryObject.song_url.trim(),
+      });
+      if (!song) {
+        songHelper.notFoundWrapper('Song file not found with given url');
+      }
+
+      songHelper.validObjectId(queryObject.cover_image_url.trim());
+      const cover = await SongFile.findOne({
+        fileId: queryObject.cover_image_url.trim(),
+      });
+      if (!cover) {
+        songHelper.notFoundWrapper('Cover Image file not found with given url');
+      }
 
       try {
         let newSong = new Songs(queryObject);
