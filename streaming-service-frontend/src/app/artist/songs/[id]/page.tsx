@@ -11,6 +11,7 @@ const ArtistSong: React.FC<{ params: { id: string } }> = ({ params }) => {
     data: song,
     loading,
     error,
+    refetch
   } = useQuery(queries.GET_SONG_BY_ID, {
     variables: { id: params.id },
   });
@@ -24,7 +25,10 @@ const ArtistSong: React.FC<{ params: { id: string } }> = ({ params }) => {
       style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
     >
       <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
-        <SongDetails songData={song} />
+        <SongDetails
+            songData={song}
+            refetch={refetch}
+        />
       </div>
     </div>
   );

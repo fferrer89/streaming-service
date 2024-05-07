@@ -16,9 +16,9 @@ const ArtistAlbum: React.FC<{ params: { id: string } }> = ({ params }) => {
     error,
     refetch,
   } = useQuery(queries.GET_ALBUM_BY_ID, {
-    variables: { id: params.id },
+    variables: { id: params?.id },
   });
-  console.log(params.id);
+  console.log(params?.id);
   if (loading) {
     return <div>Loading</div>;
   }

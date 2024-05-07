@@ -549,7 +549,7 @@ export async function deleteSong(songId) {
   try {
     songId = validation.checkId(songId, "songId");
   } catch (e) {
-    errors.push(e);
+    errors.push(e?.message);
   }
   if (errors.length > 0) {
     return { errorMessages: errors };
