@@ -21,8 +21,8 @@ const PlaylistItem: React.FC<PlaylistProps> = ({ _id, title, description, visibi
   const firstPathSegment = pathname.split('/')[1];
 
   return (
-    <a href={`/${firstPathSegment}/playlist/${_id}`} className="m-2 p-2 rounded-lg shadow-md hover:scale-105 transition-transform flex flex-col items-center">
-        <img src={imageUrl} alt={title} className="w-16 h-16 rounded-lg object-cover" />
+    <a href={`/${firstPathSegment}/playlist/${_id}`} className="m-2 p-2 rounded-lg shadow-md hover:scale-105 transition-transform flex flex-col items-center ">
+        <img src={"/img/playlisticon.png"} alt={title} className="w-16 h-16 rounded-lg object-coverm bg-white" />
         <span className="mt-1 text-sm font-semibold text-gray-800">
         {title}
       </span>

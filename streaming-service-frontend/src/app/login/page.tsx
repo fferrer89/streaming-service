@@ -27,13 +27,15 @@ const Login: React.FC = () => {
 
   const [loginUser] = useMutation(queries.LOGIN_USER, {
     onCompleted: (data: any) => {
-      const { user, token } = data.loginUser;
+      const { user, token} = data.loginUser;
+      console
       setUserError(false);
       (document.getElementById('login') as HTMLFormElement)?.reset();
       dispatch(login({ user, token, expiresIn: 3600, userType: 'user' }));
       router.push('/sound');
     },
     onError(error: any) {
+      console.log("Error: ",error);
       setUserError(true);
     }
   });

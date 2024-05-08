@@ -9,6 +9,9 @@ import { GetUserPlaylists } from "@/utils/graphql/queries";
 import { GetUserPlaylistsVariables, GetUserPlaylist } from "@/utils/graphql/resultTypes";
 import { RootState } from "@/utils/redux/store";
 import { openModal } from "@/utils/redux/features/modal/modalSlice";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+
 
 export type GetPlaylistsByOwnerResult = {
   getPlaylistsByOwner: GetUserPlaylist[]; // Ensure this matches the actual structure returned by the server
@@ -18,7 +21,10 @@ const Playlists: React.FC = () => {
   const [playlists, setPlaylists] = useState<GetUserPlaylist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-
+  const pathname = usePathname();
+  const Segment = pathname.split('/');
+  
+  const { push }= useRouter();
   const userId = useSelector((state: RootState) => state.user.userId);
   const dispatch = useDispatch();
 
@@ -38,6 +44,7 @@ const Playlists: React.FC = () => {
       setError("Error fetching playlists");
       setLoading(false);
     }
+    console.log("data", pathname.split('/') );
   }, [queryLoading, queryError, data, userId]);
 
   const handleOpenModal = () => {
@@ -67,11 +74,12 @@ const Playlists: React.FC = () => {
             <div
               key={index}
               className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors opacity-75"
+              onClick={() => { push(`/${Segment[1]}/playlist/${playlist._id}`)}}
             >
               <img
-                src="/img/music_note.jpeg"
+                src="/img/playlisticon.png"
                 alt="Music note icon"
-                className="w-8 h-8 object-cover border border-black"
+                className="w-8 h-8 object-cover"
               />
               <span className="text-gray-800 text-sm font-semibold">{playlist.title}</span>
             </div>
