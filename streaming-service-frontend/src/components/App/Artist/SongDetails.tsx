@@ -62,7 +62,7 @@ const SongDetails: React.FC<{ songData: any; refetch: any }> = ({
       //window.location.href = "/artist/songs";
     }
   };
-  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${cover_image_url}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${cover_image_url}`;
   return (
     <div
       className="flex flex-col w-full h-fit gap-3 p-0 bg-white rounded-lg overflow-hidden items-center relative"

@@ -12,7 +12,7 @@ const ArtistProfileImage: React.FC<ArtistProfileImageProps> = ({
   size,
 }) => {
   const imageUrl = image_url
-    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${image_url}`
+    ? `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${image_url}`
     : "/img/ellipse.png";
   return (
     <Image

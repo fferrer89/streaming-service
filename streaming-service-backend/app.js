@@ -46,11 +46,7 @@ const server = new ApolloServer({
         `[GRAPHQL] -- Operation = ${req.body.operationName} -- Status = ${res.statusCode}`
       );
     }
-    // will bypass authentication middelware for login, register and playground
     if (
-      // Uncomment this part to disable authentication on all queries and mutations
-      // req.body.operationName.toLowerCase() !== 'mutation' &&
-      // req.body.operationName.toLowerCase() !== 'query' &&
       req.body.operationName !== 'IntrospectionQuery' &&
       req.body.operationName !== 'registerUser' &&
       req.body.operationName !== 'registerArtist' &&

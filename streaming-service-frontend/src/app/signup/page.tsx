@@ -40,7 +40,7 @@ const Signup: React.FC = () => {
       const { user, token } = data.registerUser;
       setUserError(false);
       (document.getElementById('register') as HTMLFormElement)?.reset();
-      dispatch(register_re({ user, token, expiresIn: 3600, userType: 'user' }));
+      //dispatch(register_re({ user, token, expiresIn: 3600, userType: 'user' }));
       router.push('/login');
     },
     onError(error) {
@@ -53,7 +53,7 @@ const Signup: React.FC = () => {
       const { artist, token } = data.registerArtist;
       setArtistError(false);
       (document.getElementById('register') as HTMLFormElement)?.reset();
-      dispatch(register_re({ user: artist, token, expiresIn: 3600, userType: 'artist' }));
+      //dispatch(register_re({ user: artist, token, expiresIn: 3600, userType: 'artist' }));
       router.push('/login');
     },
     onError(error) {

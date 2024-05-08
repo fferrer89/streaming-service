@@ -7,7 +7,7 @@ let apolloClientInstance: ApolloClient<any> | null = null;
 const createApolloClient = (token: string | null) => {
   if (!apolloClientInstance) {
     const httpLink = new HttpLink({
-      uri: process.env.NEXT_PUBLIC_GRAPHQL_SERVER_URL,
+      uri: process.env.NEXT_PUBLIC_BACKEND_GRAPHQL_URL,
     });
     const authLink = setContext((_, { headers }) => ({
       headers: {

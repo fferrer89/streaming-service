@@ -147,7 +147,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   };
 
   const formattedDate = date.toLocaleString("en-US");
-  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${cover_image_url}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${cover_image_url}`;
 
   return (
     <div

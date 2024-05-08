@@ -1,4 +1,4 @@
-const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const baseURL = process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL;
 const filePath = "/file";
 const httpClientReqs = {
   uploadFile: async (file) => {

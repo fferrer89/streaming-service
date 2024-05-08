@@ -124,7 +124,7 @@ const CreateAlbumModal: React.FC<{
       formData.append("file", file);
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/upload`,
+        `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/upload`,
         formData,
         {
           headers: {

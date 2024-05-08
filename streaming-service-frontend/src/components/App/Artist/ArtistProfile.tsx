@@ -50,7 +50,7 @@ const ArtistProfile: React.FC<{ artistData: any }> = ({ artistData }) => {
 
   const { firstName, lastName, displayName, email, genres } = formData;
 
-  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${artistData.getArtistById.profile_image_url}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${artistData.getArtistById.profile_image_url}`;
 
   return (
     <div className="container mx-auto my-5 p-5 rounded-lg">
