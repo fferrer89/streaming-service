@@ -5,6 +5,7 @@ import { isoToUsDateFormat } from "@/utils/helpers";
 import SongFormModal from "@/components/App/Artist/SongFormModal";
 import { useFormState } from "react-dom";
 import { useSelector } from "react-redux";
+import { useRouter } from 'next/navigation';
 const initialState = {
   message: null,
 };
@@ -39,15 +40,17 @@ const SongDetails: React.FC<{ songData: any }> = ({ songData, refetch }) => {
   const cancelRemoveSong = () => {
     setShowConfirmation(false);
   };
+  const router = useRouter();
   const confirmRemoveSong = async () => {
-    // let data = await deleteSong(_id);
     data = await deleteSong(_id);
     if (data?.errorMessages?.length > 0) {
       setErrorMessages(data?.errorMessages);
     } else {
       setShowConfirmation(false);
+      
+      //router.push("/artist/songs");
       refetch();
-      window.location.href = "http://localhost:3000/artist/songs";
+      window.location.href = "/artist/songs";
     }
   };
   const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${cover_image_url}`;
@@ -137,9 +140,12 @@ const SongDetails: React.FC<{ songData: any }> = ({ songData, refetch }) => {
             </p>
             <p className="text-sm text-gray-600 mb-2">Duration: {duration}</p>
             <p className="text-sm text-gray-600 mb-2">Genre: {genre}</p>
-            <p className="text-sm text-gray-600 mb-2">Language: {language}</p>
-            <p className="text-sm text-gray-600 mb-2">Likes: {likes}</p>
-            <p className="text-sm text-gray-600 mb-2">Lyrics: {lyrics}</p>
+            <p className="text-sm text-gray-600 mb-2">
+              Language: {language ? language : "English"}
+            </p>
+            <p className="text-sm text-gray-600 mb-2">
+              Likes: {likes ? likes : 0}
+            </p>
             <p className="text-sm text-gray-600 mb-2">
               Producers: {producers.join(", ")}
             </p>
