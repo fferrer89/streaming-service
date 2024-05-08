@@ -251,20 +251,6 @@ const GET_ALBUMS_BY_ARTIST = gql`
   }
 `;
 
-const GET_DASHBOARD_MOST_LIKED_SONGS = gql`
-  query getMostLikedSongs {
-    getMostLikedSongs {
-      _id
-      title
-      writtenBy
-      release_date
-      likes
-      genre
-      cover_image_url
-    }
-  } 
-`;
-
 const GET_DASHBOARD_DATA = gql`
   query getDashboardData {
     admin: admin {
@@ -297,6 +283,36 @@ const GET_DASHBOARD_DATA = gql`
     getAlbumCount
     getSongCount
     getPlaylistCount
+  }
+`;
+
+const GET_DASHBOARD_USERS = gql`
+  query users {
+    users {
+      _id
+      display_name
+      first_name
+      last_name
+      email
+      gender
+      date_of_birth
+      profile_image_url
+    }
+  }
+`;
+
+const GET_DASHBOARD_ARTISTS = gql`
+  query artists {
+    artists {
+      _id
+      display_name
+      first_name
+      last_name
+      email
+      gender
+      date_of_birth
+      profile_image_url
+    }
   }
 `;
 
@@ -804,6 +820,8 @@ const queries = {
   GET_SONGS,
   GET_PLAYLISTS_BY_OWNER,
   GET_DASHBOARD_DATA,
+  GET_DASHBOARD_USERS,
+  GET_DASHBOARD_ARTISTS,
   GET_DASHBOARD_ALBUMS,
   GET_DASHBOARD_SONGS,
   REMOVE_USER,

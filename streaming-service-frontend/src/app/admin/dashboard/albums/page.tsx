@@ -27,13 +27,13 @@ interface Albums {
   total_songs: string;
   release_date: string;
   created_date: string;
-  cover_image_url: string;
   visibility: string;
+  cover_image_url: string;
 }
 
 const PAGE_SIZE = 10;
 
-const AlbumList: React.FC = () => {
+const AdminDashboardAlbums: React.FC = () => {
   const router = useRouter();
   const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const [openModal, setOpenModal] = useState(false);
@@ -190,4 +190,4 @@ const AlbumList: React.FC = () => {
   }
 };
 
-export default AlbumList;
+export default AdminDashboardAlbums;
