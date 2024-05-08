@@ -6,6 +6,7 @@ import Artists from "@/components/App/Serach/Artists";
 import Playlists from "@/components/App/Serach/Playlists";
 import Songs from "@/components/App/Serach/Songs";
 import createApolloClient from "@/utils";
+import Albums from "@/components/App/Serach/Albums";
 
 const SEARCH_QUERIES = gql`
 query SearchQueries($searchTerm: String!) {
@@ -48,6 +49,17 @@ query SearchQueries($searchTerm: String!) {
       profile_image_url
       genres
     }
+    getAlbumsByTitle(title: $searchTerm) {
+    _id
+    cover_image_url
+    title
+    release_date
+    artists {
+      _id
+      display_name
+      profile_image_url
+    }
+  }
 }`;
 
 type ResultType = {
@@ -87,7 +99,18 @@ type ResultType = {
     artists: {
       _id: string;
       display_name: string;
-    profile_image_url: string;
+      profile_image_url: string;
+    }[];
+  }[];
+  albums: {
+    _id: string;
+    title: string;
+    cover_image_url: string;
+    release_date: string;
+    artists: {
+      _id: string;
+      display_name: string;
+      profile_image_url: string;
     }[];
   }[];
 };
@@ -95,7 +118,7 @@ type ResultType = {
 const Search: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-    const [results, setResults] = useState<ResultType>({ artists: [], playlists: [], songs: [] });
+    const [results, setResults] = useState<ResultType>({ artists: [], playlists: [], songs: [], albums: [] });
     const apolloClient = createApolloClient(localStorage.getItem("token"));
   
     const { data, loading, error } = useQuery(SEARCH_QUERIES, {
@@ -126,6 +149,7 @@ const Search: React.FC = () => {
           artists: data.getArtistsByName,
           playlists: data.getPlaylistsByTitle,
           songs: data.getSongsByTitle,
+          albums: data.getAlbumsByTitle
         });
       } else if (!debouncedSearchTerm) {
         setResults({ artists: [], playlists: [], songs: [] });
@@ -171,6 +195,7 @@ const Search: React.FC = () => {
         <Songs songs={results.songs} />
         <Artists artists={results.artists} />
         <Playlists playlistsData={{ playlists: results.playlists }} />
+        <Albums albums={results.albums} />
     </div>
     
     </div>

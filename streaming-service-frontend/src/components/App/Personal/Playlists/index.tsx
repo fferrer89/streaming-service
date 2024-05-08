@@ -78,7 +78,7 @@ const Playlists: React.FC = () => {
         ) : playlists.length > 0 ? (
           <>
             {playlists.map((playlist, index) => (
-              <a href={`/${userType === 'artist' ? 'artist' : 'sound'}/playlist/${playlist._id}`}>
+              <Link href={`/${userType === 'artist' ? 'artist' : 'sound'}/playlist/${playlist._id}`}>
                 <div
                   key={index}
                   className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors opacity-75 cursor-pointer"
@@ -92,7 +92,7 @@ const Playlists: React.FC = () => {
                     {playlist.title}
                   </span>
                 </div>
-              </a>
+              </Link>
             ))}
             <button
               onClick={handleOpenModal}

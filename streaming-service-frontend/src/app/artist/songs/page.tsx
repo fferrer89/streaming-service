@@ -30,6 +30,9 @@ const ArtistSongs: React.FC = () => {
   const [showSongModal, setShowSongModal] = useState(false);
   // @ts-ignore
   const [createSongFormState, createSongFormAction] = useFormState((state, payload) => createSong(state, payload, token), initialState);
+  useEffect(() => {
+    refetch();
+  }, []);
   if (loading) {
     return <div>Loading</div>;
   }

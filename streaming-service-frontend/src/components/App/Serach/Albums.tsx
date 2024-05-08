@@ -37,7 +37,7 @@ const Albums: React.FC<AlbumsProps> = ({ albums }) => {
         <Separator className="w-[95%]" />
         <div className="flex-1 overflow-x-auto">
             <div className="grid grid-flow-col auto-cols-max gap-4 py-5 px-3">
-            {albums.length > 0 ? (
+            {albums && albums.length > 0 ? (
                 albums.map((album, index) => (
                 <AlbumItem
                     key={album._id}

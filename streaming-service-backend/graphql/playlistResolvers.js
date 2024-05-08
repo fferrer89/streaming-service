@@ -58,21 +58,13 @@ export const playlistResolvers = {
       }).limit(limit);
 
       let filteredPlaylist = playlists.filter((playlist) => {
-        //will give different playlist if user is logged in;
-        if (
-          context.decoded &&
-          context.decoded.id &&
-          context.decoded.id === playlist.owner.toString()
-        ) {
-          // if user is logged in then return playlist where ower id matches;
-          return true;
-        } else {
+       
           if (playlist.visibility == 'PUBLIC') {
             //if not logged in then return only public playlist
             return true;
           }
           return false;
-        }
+        
       });
 
       if (filteredPlaylist.length < 1) {

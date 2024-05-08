@@ -23,12 +23,18 @@ const ArtistAlbums: React.FC = () => {
     refetch,
   } = useQuery(queries.GET_ALBUMS_BY_ARTIST, {
     variables: { artistId: artistId },
+    fetchPolicy: 'cache-and-network'
   });
   const [showModal, setShowModal] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const handleSuccessModalClose = () => {
     setSuccessModalOpen(false);
+    refetch();
   };
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   if (loading) {
     return <div>Loading</div>;

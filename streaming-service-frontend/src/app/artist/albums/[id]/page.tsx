@@ -9,7 +9,7 @@ type ResultType = {
   albums: { name: string; link: string }[];
 };
 
-const ArtistAlbum: React.FC<{ params: { id: string } }> = ({ params }) => {
+const ArtistAlbum: React.FC<{ params: any }> = ({ params }) => {
   const {
     data: album,
     loading,
@@ -29,7 +29,7 @@ const ArtistAlbum: React.FC<{ params: { id: string } }> = ({ params }) => {
       style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
     >
       <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
-        <AlbumDetails albumData={album} refetch={refetch} />
+        <AlbumDetails albumData={album} refetch={params.refetch} />
       </div>
     </div>
   );

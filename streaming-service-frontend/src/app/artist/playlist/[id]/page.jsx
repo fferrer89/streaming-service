@@ -2,7 +2,7 @@
 import { gql, useQuery } from "@apollo/client";
 import { FaTrash } from "react-icons/fa";
 import { PlayListBanner } from "@/components/App/playlist/Banner";
-import apolloClient from "@/utils";
+import createApolloClient from "@/utils";
 import queries from "@/utils/queries";
 import { AddSong } from "@/components/App/playlist/AddSong";
 import { useMutation } from "@apollo/client";
@@ -10,11 +10,13 @@ import { useDispatch } from 'react-redux';
 import { playSong } from '@/utils/redux/features/song/songSlice';
 
 export default function Playlist({ params }) {
+  const apolloClient = createApolloClient(localStorage.getItem('token'));
   const dispatch = useDispatch();
   console.log(params);
   const { loading, data, error } = useQuery(queries.GET_PLAYLIST, {
     variables: { id: params.id },
-    apolloClient,
+    client: apolloClient,
+    fetchPolicy: 'cache-and-network',
     onCompleted: data => {
       if (data && data.getPlaylistById && data.getPlaylistById.songs) {
         console.log("Songs list loaded successfully.");
@@ -26,7 +28,7 @@ export default function Playlist({ params }) {
     { data: mutationData, loading: mutationLoading, error: mutationError },
   ] = useMutation(queries.REMOVE_SONG_FROM_PLAYLIST, {
     refetchQueries: [queries.GET_PLAYLIST],
-    apolloClient,
+    client: apolloClient,
   });
   console.log("playlists",data);
   console.log(error);

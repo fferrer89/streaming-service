@@ -53,9 +53,9 @@ const SongDetails: React.FC<{ songData: any }> = ({ songData, refetch }) => {
     } else {
       setShowConfirmation(false);
 
-      //router.push("/artist/songs");
+      router.push("/artist/songs");
       refetch();
-      window.location.href = "/artist/songs";
+      //window.location.href = "/artist/songs";
     }
   };
   const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${cover_image_url}`;
