@@ -13,7 +13,7 @@ const songSchema = new mongoose.Schema({
     validate: [
       {
         validator: (art) => {
-          console.log(art);
+          //  console.log(art);
           if (!art || art.length == 0) {
             return false;
           }

@@ -17,9 +17,8 @@ const ArtistAlbum: React.FC<{ params: any }> = ({ params }) => {
     refetch,
   } = useQuery(queries.GET_ALBUM_BY_ID, {
     variables: { id: params?.id },
-    fetchPolicy: 'cache-and-network' 
+    fetchPolicy: "cache-and-network",
   });
-  console.log(params?.id);
   if (loading) {
     return <div>Loading</div>;
   }

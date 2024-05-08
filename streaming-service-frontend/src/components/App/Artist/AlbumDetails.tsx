@@ -88,7 +88,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
         variables: { id: _id },
       });
       if (response.data.removeAlbum) {
-        console.log(
+       // console.log(
           "Album removed successfully:",
           response.data.removeAlbum.title
         );
@@ -121,7 +121,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
       });
       
       if (response.data.editAlbum) {
-        console.log("Album updated successfully:", response.data.editAlbum.title);
+       // console.log("Album updated successfully:", response.data.editAlbum.title);
         refetch();
         toggleEditMode();
       }

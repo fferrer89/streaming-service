@@ -106,18 +106,18 @@ export const userResolvers = {
         const user = await User.findOne({ email: args.email }).select(
           '+password'
         );
-        console.log('User:', user);
+        //  console.log('User:', user);
         if (!user) {
           throw new GraphQLError('Invalid email or password.');
         }
 
-        console.log('Entered password:', args.password);
-        console.log('Hashed password:', user.password);
+        // console.log('Entered password:', args.password);
+        // console.log('Hashed password:', user.password);
         const isPasswordCorrect = await user.isPasswordCorrect(
           args.password,
           user.password
         );
-        console.log('Password correct:', isPasswordCorrect);
+        //   console.log('Password correct:', isPasswordCorrect);
         if (!isPasswordCorrect) {
           throw new GraphQLError('Invalid email or password.');
         }

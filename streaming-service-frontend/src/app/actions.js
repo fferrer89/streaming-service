@@ -404,10 +404,16 @@ export async function createSong(prevState, formData, token) {
     }
   }
 }
-export async function updateSong(prevState, formData, token, inputCoverImageUrl, inputSongUrl) {
-  console.log("inputCoverImageUrl", inputCoverImageUrl);
-  console.log("inputSongUrl", inputSongUrl);
-  console.log("formData", formData);
+export async function updateSong(
+  prevState,
+  formData,
+  token,
+  inputCoverImageUrl,
+  inputSongUrl
+) {
+  // console.log("inputCoverImageUrl", inputCoverImageUrl);
+  // console.log("inputSongUrl", inputSongUrl);
+  // console.log("formData", formData);
   const apolloClient = getApolloClient(token);
   let songId,
     title,
@@ -427,7 +433,9 @@ export async function updateSong(prevState, formData, token, inputCoverImageUrl,
   title = formData.get("title");
   duration = formData.get("duration");
   song_url = formData.get("song_url") ? formData.get("song_url") : inputSongUrl; // Use inputSongUrl if song_url is not provided
-  cover_image_url = formData.get("cover_image_url") ? formData.get("cover_image_url") : inputCoverImageUrl; // Use inputCoverImageUrl if cover_image_url is not provided
+  cover_image_url = formData.get("cover_image_url")
+    ? formData.get("cover_image_url")
+    : inputCoverImageUrl; // Use inputCoverImageUrl if cover_image_url is not provided
   writtenBy = formData.get("writtenBy");
   producers = formData.get("producers"); // [String]
   genre = formData.get("genre"); // MusicGenre

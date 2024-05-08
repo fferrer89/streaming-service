@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { gql } from "@apollo/client";
@@ -8,7 +8,7 @@ import Songs from "@/components/App/Serach/Songs";
 import createApolloClient from "@/utils";
 
 const SEARCH_QUERIES = gql`
-query SearchQueries($searchTerm: String!) {
+  query SearchQueries($searchTerm: String!) {
     getPlaylistsByTitle(searchTerm: $searchTerm) {
       _id
       title
@@ -49,7 +49,8 @@ query SearchQueries($searchTerm: String!) {
       profile_image_url
       genres
     }
-}`;
+  }
+`;
 
 type ResultType = {
   artists: {
@@ -81,63 +82,66 @@ type ResultType = {
     lyrics: string;
     release_date: string;
     album: {
-        _id: string;
-        title: string;
-        cover_image_url: string;
+      _id: string;
+      title: string;
+      cover_image_url: string;
     };
     artists: {
       _id: string;
       display_name: string;
-    profile_image_url: string;
+      profile_image_url: string;
     }[];
   }[];
 };
 
 const Search: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
-    const [results, setResults] = useState<ResultType>({ artists: [], playlists: [], songs: [] });
-    const apolloClient = createApolloClient(localStorage.getItem("token"));
-  
-    const { data, loading, error } = useQuery(SEARCH_QUERIES, {
-      client: apolloClient,
-      variables: { searchTerm: debouncedSearchTerm },
-      skip: !debouncedSearchTerm, // Skip the query if the search term is empty
-    });
-  
-    console.log(data);
-  
-    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchTerm(event.target.value);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [results, setResults] = useState<ResultType>({
+    artists: [],
+    playlists: [],
+    songs: [],
+  });
+  const apolloClient = createApolloClient(localStorage.getItem("token"));
+
+  const { data, loading, error } = useQuery(SEARCH_QUERIES, {
+    client: apolloClient,
+    variables: { searchTerm: debouncedSearchTerm },
+    skip: !debouncedSearchTerm, // Skip the query if the search term is empty
+  });
+
+  // console.log(data);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
     };
-  
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setDebouncedSearchTerm(searchTerm);
-      }, 500);
-  
-      return () => {
-        clearTimeout(timer);
-      };
-    }, [searchTerm]);
-  
-    useEffect(() => {
-      if (data) {
-        setResults({
-          artists: data.getArtistsByName,
-          playlists: data.getPlaylistsByTitle,
-          songs: data.getSongsByTitle,
-        });
-      } else if (!debouncedSearchTerm) {
-        setResults({ artists: [], playlists: [], songs: [] });
-      }
-    }, [data, debouncedSearchTerm]);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (data) {
+      setResults({
+        artists: data.getArtistsByName,
+        playlists: data.getPlaylistsByTitle,
+        songs: data.getSongsByTitle,
+      });
+    } else if (!debouncedSearchTerm) {
+      setResults({ artists: [], playlists: [], songs: [] });
+    }
+  }, [data, debouncedSearchTerm]);
 
   return (
-
     <div
       className="  flex-col h-full p-5 gap-5 w-full rounded-lg flex items-center relative self-stretch "
-      style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }}
+      style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
     >
       <div className="min-w-[500px] mx-auto">
         <div className="relative flex items-center w-full h-12 rounded-lg focus-within:shadow-lg bg-white opacity-75 overflow-hidden">
@@ -167,16 +171,13 @@ const Search: React.FC = () => {
           />
         </div>
       </div>
-      
-    <div className= "grid grid-cols-1 gap-4 w-full place-items-center">
+
+      <div className="grid grid-cols-1 gap-4 w-full place-items-center">
         <Songs songs={results.songs} />
         <Artists artists={results.artists} />
         <Playlists playlistsData={{ playlists: results.playlists }} />
-        
+      </div>
     </div>
-    
-    </div>
-
   );
 };
 

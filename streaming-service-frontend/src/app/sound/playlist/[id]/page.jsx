@@ -6,12 +6,12 @@ import apolloClient from "@/utils";
 import queries from "@/utils/queries";
 import { AddSong } from "@/components/App/playlist/AddSong";
 import { useMutation } from "@apollo/client";
-import { useDispatch } from 'react-redux';
-import { playSong } from '@/utils/redux/features/song/songSlice';
+import { useDispatch } from "react-redux";
+import { playSong } from "@/utils/redux/features/song/songSlice";
 
 export default function Playlist({ params }) {
   const dispatch = useDispatch();
-  console.log(params);
+  //console.log(params);
   const { loading, data, error } = useQuery(queries.GET_PLAYLIST, {
     variables: { id: params.id },
     apolloClient,
@@ -23,17 +23,22 @@ export default function Playlist({ params }) {
     refetchQueries: [queries.GET_PLAYLIST],
     apolloClient,
   });
-  console.log("playlists",data);
-  console.log(error);
+  // console.log("playlists",data);
+  //console.log(error);
   if (loading) return <div className="text-center text-lg">Loading...</div>;
-  if (error) return <div className="text-center text-lg text-red-500">Error loading playlist</div>;
+  if (error)
+    return (
+      <div className="text-center text-lg text-red-500">
+        Error loading playlist
+      </div>
+    );
 
   if (data) {
     return (
-      <div className="flex flex-col w-full  p-5 rounded-lg shadow-lg"
-        style={{backgroundColor: "rgba(255, 255, 255, 0.8)"}}
+      <div
+        className="flex flex-col w-full  p-5 rounded-lg shadow-lg"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
       >
-       
         <PlayListBanner playlist={data.getPlaylistById} />
         <div className="flex flex-col mt-8">
           <div className="flex flex-col justify-between px-4">

@@ -134,7 +134,7 @@ const CreateAlbumModal: React.FC<{
       );
 
       const id = response.data.fileId;
-      console.log(`File Successfully Uploaded ${id}`);
+      // console.log(`File Successfully Uploaded ${id}`);
       setAlbumData({ ...albumData, coverImageUrl: id });
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -163,7 +163,7 @@ const CreateAlbumModal: React.FC<{
   if (songsError) {
     return <div>Error Loading Artist List</div>;
   }
-  console.log(artistsData);
+  // console.log(artistsData);
   return (
     <div className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center">
       <div className="absolute inset-0 bg-black opacity-50"></div>
