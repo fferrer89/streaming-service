@@ -141,107 +141,107 @@ const AdminDashboard: React.FC = () => {
   if (data) {
     const countData = data
       ? [
-          { name: "Users", count: data.getUserCount, fill: "#0EA5E9" },
-          { name: "Artists", count: data.getArtistCount, fill: "#F97316" },
-          { name: "Albums", count: data.getAlbumCount, fill: "#22C55E" },
-          { name: "Songs", count: data.getSongCount, fill: "#EAB308" },
-          { name: "Playlists", count: data.getPlaylistCount, fill: "#EF4444" },
-        ]
+        { name: "Users", count: data.getUserCount, fill: "#0EA5E9" },
+        { name: "Artists", count: data.getArtistCount, fill: "#F97316" },
+        { name: "Albums", count: data.getAlbumCount, fill: "#22C55E" },
+        { name: "Songs", count: data.getSongCount, fill: "#EAB308" },
+        { name: "Playlists", count: data.getPlaylistCount, fill: "#EF4444" },
+      ]
       : [];
     const userGenderData = data
       ? [
-          {
-            name: "Female",
-            value: data.users.filter(
-              (user) => user.gender.toLowerCase() === "female"
-            ).length,
-          },
-          {
-            name: "Male",
-            value: data.users.filter(
-              (user) => user.gender.toLowerCase() === "male"
-            ).length,
-          },
-          {
-            name: "Other",
-            value: data.users.filter(
-              (user) =>
-                user.gender.toLowerCase() !== "female" &&
-                user.gender.toLowerCase() !== "male"
-            ).length,
-          },
-        ]
+        {
+          name: "Female",
+          value: data.users.filter(
+            (user: User) => user.gender.toLowerCase() === "female"
+          ).length,
+        },
+        {
+          name: "Male",
+          value: data.users.filter(
+            (user: User) => user.gender.toLowerCase() === "male"
+          ).length,
+        },
+        {
+          name: "Other",
+          value: data.users.filter(
+            (user: User) =>
+              user.gender.toLowerCase() !== "female" &&
+              user.gender.toLowerCase() !== "male"
+          ).length,
+        },
+      ]
       : [];
     const artistGenderData = data
       ? [
-          {
-            name: "Female",
-            value: data.artists.filter(
-              (artist) => artist.gender.toLowerCase() === "female"
-            ).length,
-          },
-          {
-            name: "Male",
-            value: data.artists.filter(
-              (artist) => artist.gender.toLowerCase() === "male"
-            ).length,
-          },
-          {
-            name: "Other",
-            value: data.artists.filter(
-              (artist) =>
-                artist.gender.toLowerCase() !== "female" &&
-                artist.gender.toLowerCase() !== "male"
-            ).length,
-          },
-        ]
+        {
+          name: "Female",
+          value: data.artists.filter(
+            (artist: Artist) => artist.gender.toLowerCase() === "female"
+          ).length,
+        },
+        {
+          name: "Male",
+          value: data.artists.filter(
+            (artist: Artist) => artist.gender.toLowerCase() === "male"
+          ).length,
+        },
+        {
+          name: "Other",
+          value: data.artists.filter(
+            (artist: Artist) =>
+              artist.gender.toLowerCase() !== "female" &&
+              artist.gender.toLowerCase() !== "male"
+          ).length,
+        },
+      ]
       : [];
     const albumTypeData = data
       ? [
-          {
-            name: "Album",
-            value: data.albums.filter(
-              (album) => album.album_type.toLowerCase() === "album"
-            ).length,
-          },
-          {
-            name: "Single",
-            value: data.albums.filter(
-              (album) => album.album_type.toLowerCase() !== "album"
-            ).length,
-          },
-        ]
+        {
+          name: "Album",
+          value: data.albums.filter(
+            (album: Album) => album.album_type.toLowerCase() === "album"
+          ).length,
+        },
+        {
+          name: "Single",
+          value: data.albums.filter(
+            (album: Album) => album.album_type.toLowerCase() !== "album"
+          ).length,
+        },
+      ]
       : [];
     const songLanguageData = data
       ? [
-          {
-            name: "English",
-            value: data.songs.filter(
-              (song) => song.language.toLowerCase() === "english"
-            ).length,
-          },
-          {
-            name: "Hindi",
-            value: data.songs.filter(
-              (song) => song.language.toLowerCase() === "hindi"
-            ).length,
-          },
-          {
-            name: "Arabic",
-            value: data.songs.filter(
-              (song) => song.language.toLowerCase() === "arabic"
-            ).length,
-          },
-          {
-            name: "Other",
-            value: data.songs.filter(
-              (song) =>
-                !["english", "hindi", "arabic"].includes(
-                  song.language.toLowerCase()
-                )
-            ).length,
-          },
-        ]
+        {
+          name: "English",
+          value: data.songs.filter(
+            (song: Song) => song.language.toLowerCase() === "english"
+          ).length,
+        },
+        {
+          name: "Hindi",
+          value: data.songs.filter(
+            (song: Song) => song.language.toLowerCase() === "hindi"
+          ).length,
+        },
+        {
+          name: "Arabic",
+          value: data.songs.filter(
+            (song: Song) => song.language.toLowerCase() === "arabic"
+          ).length,
+        },
+        {
+          name: "Other",
+          value: data.songs.filter(
+            (song: Song) =>
+              !["english", "hindi", "arabic"].includes(
+                song.language.toLowerCase()
+              )
+          ).length,
+        },
+      ]
       : [];
     return (
       <>
