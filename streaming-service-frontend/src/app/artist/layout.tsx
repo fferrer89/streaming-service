@@ -21,17 +21,31 @@ const InnerLayout: React.FC<LayoutProps> = ({ children }) => {
   const router = useRouter();
   const { loggedIn } = useSelector((state: RootState) => state.user);
   const { isOpen, modalType } = useSelector((state: RootState) => state.modal);
-
+  const userType = useSelector((state: RootState) => state.user.userType);
+  if (userType !== "artist") {
+    if (userType === "user") {
+      router.push("/sound");
+    } else {
+      router.push("/login");
+    }
+  }
   useEffect(() => {
     if (!loggedIn) {
       console.log("not logged in:", loggedIn);
       router.push("/login");
     }
+    if (userType !== "artist") {
+      if (userType === "user") {
+        router.push("/sound");
+      } else {
+        router.push("/login");
+      }
+    }
   }, [loggedIn, router]);
 
   const handleCloseModal = () => dispatch(closeModal());
 
-  if (!loggedIn) {
+  if (!loggedIn || !userType || userType !== "artist") {
     return null;
   }
 

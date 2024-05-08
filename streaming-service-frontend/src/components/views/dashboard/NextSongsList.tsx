@@ -1,22 +1,106 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateCurrentSong } from '@/utils/redux/features/song/songSlice';
+import { stopSong } from '@/utils/redux/features/song/songSlice';
+import { GetUserPlaylists } from '@/utils/graphql/queries';
+
+const TOGGLE_LIKE_SONG = gql`
+  mutation ToggleLikeSong($id: ID!, $songId: ID!) {
+    toggleLikeSong(_id: $id, songId: $songId) {
+      _id
+      likes
+    }
+  }
+`;
+
+const ADD_SONG_TO_PLAYLIST = gql`
+  mutation AddSongToPlaylist($playlistId: ID!, $songId: ID!) {
+    addSongToPlaylist(playlistId: $playlistId, songId: $songId) {
+      _id
+    }
+  }
+`;
 
 const NextSongsList = ({ nextSongs, currentSong }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [toggleLikeSong] = useMutation(TOGGLE_LIKE_SONG, {
+    onCompleted: (data) => {
+      if (currentSong._id === data.toggleLikeSong._id) {
+        dispatch(updateCurrentSong({ ...currentSong, likes: data.toggleLikeSong.likes }));
+      }
+    }
+  });
+  const [addSongToPlaylist] = useMutation(ADD_SONG_TO_PLAYLIST);
+  const userId = useSelector((state) => state.user.userId);
+  const userType = useSelector((state) => state.user.userType);
+  const dispatch = useDispatch();
+  const [showAddToPlaylistModal, setShowAddToPlaylistModal] = useState(false);
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState("");
+
+  const { data: playlistsData } = useQuery(GetUserPlaylists, {
+    variables: { userId },
+    skip: !userId
+  });
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
   };
+
+  const handleLikeSong = (songId) => {
+    toggleLikeSong({ variables: { id: userId, songId } });
+  };
+
+  const handleAddToPlaylist = () => {
+    setShowAddToPlaylistModal(true);
+  };
+
+  const handleSelectPlaylist = (event) => {
+    setSelectedPlaylistId(event.target.value);
+  };
+
+  const handleSubmitAddToPlaylist = () => {
+    if (selectedPlaylistId && currentSong._id) {
+      addSongToPlaylist({
+        variables: {
+          playlistId: selectedPlaylistId,
+          songId: currentSong._id
+        }
+      });
+      setShowAddToPlaylistModal(false);
+    }
+  };
+
+  const handleClosePlayer = () => {
+    dispatch(stopSong());
+  };
+
   return (
     <div className="flex justify-between">
       <div className="w-2/3 bg-stone-700 text-white">
         <h3 className="flex justify-between items-center">
           Current Song:
-          <button
-            onClick={toggleCollapse}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            {isCollapsed ? "Expand" : "Collapse"}
-          </button>
+          <div>
+            <button
+              onClick={toggleCollapse}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+            >
+              {isCollapsed ? "Expand" : "Collapse"}
+            </button>
+            <button
+              onClick={handleClosePlayer}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Close
+            </button>
+            <button
+              onClick={handleAddToPlaylist}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Add to Playlist
+            </button>
+          </div>
         </h3>
         {!isCollapsed && (
           <div className="text-white p-4 bg-stone-800">
@@ -24,23 +108,26 @@ const NextSongsList = ({ nextSongs, currentSong }) => {
             <p className="text-lg">
               {currentSong.artists &&
                 currentSong.artists
-                  .map(
-                    (artist: { display_name: string }) => artist.display_name
-                  )
+                  .map((artist) => artist.display_name)
                   .join(", ")}
             </p>
+            <p className="text-sm">
+              Likes: {currentSong.likes ? currentSong.likes : 0}
+            </p>
+            {userType === "user" && (
+              <button onClick={() => handleLikeSong(currentSong._id)} className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded">
+                Like
+              </button>
+            )}
             <p className="text-sm">
               Album: {currentSong.album && currentSong.album.title}
             </p>
             <p className="text-sm">
-              Released:{" "}
-              {currentSong.release_date &&
-                new Date(currentSong.release_date).toLocaleDateString()}
+              Released: {currentSong.release_date && new Date(currentSong.release_date).toLocaleDateString()}
             </p>
             <p className="text-sm">Genre: {currentSong.genre}</p>
             <p className="text-sm">
-              Lyrics:{" "}
-              {currentSong.lyrics ? currentSong.lyrics : "Lyrics not available"}
+              Lyrics: {currentSong.lyrics ? currentSong.lyrics : "Lyrics not available"}
             </p>
           </div>
         )}
@@ -64,6 +151,22 @@ const NextSongsList = ({ nextSongs, currentSong }) => {
           </div>
         )}
       </div>
+      {showAddToPlaylistModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-10 flex justify-center items-center bg-stone-400" onClick={() => setShowAddToPlaylistModal(false)}>
+          <div className="bg-stone-700 p-4 rounded" onClick={(e) => e.stopPropagation()}>
+            <h3>Add to Playlist</h3>
+            <select onChange={handleSelectPlaylist} value={selectedPlaylistId} className="bg-stone-700 mb-4">
+              {playlistsData?.getPlaylistsByOwner.map((playlist) => (
+                <option key={playlist._id} value={playlist._id}>{playlist.title}</option>
+              ))}
+            </select>
+            <div className="flex justify-between space-x-4">
+              <button onClick={handleSubmitAddToPlaylist} className="flex-1">Add</button>
+              <button onClick={() => setShowAddToPlaylistModal(false)} className="flex-1">Close</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

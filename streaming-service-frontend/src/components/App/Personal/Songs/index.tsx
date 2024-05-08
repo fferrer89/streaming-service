@@ -10,10 +10,15 @@ import { RootState } from "@/utils/redux/store";
 import { useSelector } from "react-redux";
 import { getImageUrl } from "@/utils/tools/images";
 import createApolloClient from "@/utils/";
+import { playSong } from '@/utils/redux/features/song/songSlice';
+import Link from "next/link";
+import { useDispatch } from "react-redux";
 
 const Songs: React.FC = () => {
+  const dispatch = useDispatch();
   const [songs, setSongs] = useState<UserLikedSong[]>([]);
   const userId = useSelector((state: RootState) => state.user.userId);
+  const userType = useSelector((state: RootState) => state.user.userType);
   const apolloClient = createApolloClient(localStorage.getItem("token"));
   const { loading, error, data } = useQuery(GetUserLikedSongs, {
     variables: { userId },
@@ -43,7 +48,7 @@ const Songs: React.FC = () => {
     >
       <div className="inline-flex gap-4 flex-auto items-start relative w-full px-5 pt-3 flex-col">
         <div className="relative w-auto mt-0 font-mono font-medium text-lg text-center tracking-normal leading-normal">
-          Songs
+          Liked Songs
         </div>
         <Separator className="w-[95%] " />
       </div>
@@ -54,6 +59,7 @@ const Songs: React.FC = () => {
             <div
               key={index}
               className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors"
+              onClick={() => dispatch(playSong({ song, currentTime: 0 }))}
             >
               <img
                 src={
@@ -71,10 +77,11 @@ const Songs: React.FC = () => {
           ))
         ) : (
           <div className="text-center  py-4">
+            <p>You don't have any liked songs yet</p>
             <div className="inline-block rounded-full bg-gray-300 px-6 py-3 shadow border border-black">
-              <a href="/sound/search" className="text-black font-semibold">
+              <Link href={userType === "artist" ? "/artist/search" : "/sound/search"} className="text-black font-semibold">
                 Explore Songs
-              </a>
+              </Link>
             </div>
           </div>
         )}

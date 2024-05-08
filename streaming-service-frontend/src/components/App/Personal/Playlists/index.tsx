@@ -12,12 +12,11 @@ import {
 } from "@/utils/graphql/resultTypes";
 import { RootState } from "@/utils/redux/store";
 import { openModal } from "@/utils/redux/features/modal/modalSlice";
+import Link from "next/link";
 
 export type GetPlaylistsByOwnerResult = {
   getPlaylistsByOwner: GetUserPlaylist[]; // Ensure this matches the actual structure returned by the server
 };
-
-const apolloClient = createApolloClient(localStorage.getItem("token"));
 
 const Playlists: React.FC = () => {
   const [playlists, setPlaylists] = useState<GetUserPlaylist[]>([]);
@@ -25,7 +24,11 @@ const Playlists: React.FC = () => {
   const [error, setError] = useState<string>("");
 
   const userId = useSelector((state: RootState) => state.user.userId);
+  const userType = useSelector((state: RootState) => state.user.userType);
   const dispatch = useDispatch();
+
+  const token = localStorage.getItem("token");
+  const apolloClient = token ? createApolloClient(token) : null;
 
   const {
     loading: queryLoading,
@@ -36,6 +39,7 @@ const Playlists: React.FC = () => {
     {
       variables: { userId: userId as string },
       client: apolloClient,
+      skip: !apolloClient || !userId,
     }
   );
 
@@ -72,28 +76,40 @@ const Playlists: React.FC = () => {
         ) : error ? (
           <div className="text-center py-10 text-red-500">{error}</div>
         ) : playlists.length > 0 ? (
-          playlists.map((playlist, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors opacity-75"
+          <>
+            {playlists.map((playlist, index) => (
+              <a href={`/${userType === 'artist' ? 'artist' : 'sound'}/playlist/${playlist._id}`}>
+                <div
+                  key={index}
+                  className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors opacity-75 cursor-pointer"
+                >
+                  <img
+                    src="/img/music_note.jpeg"
+                    alt="Music note icon"
+                    className="w-8 h-8 object-cover border border-black"
+                  />
+                  <span className="text-gray-800 text-sm font-semibold">
+                    {playlist.title}
+                  </span>
+                </div>
+              </a>
+            ))}
+            <button
+              onClick={handleOpenModal}
+              className="inline-block rounded-full bg-gray-300 px-6 py-3 shadow border border-black mt-4 self-center"
             >
-              <img
-                src="/img/music_note.jpeg"
-                alt="Music note icon"
-                className="w-8 h-8 object-cover border border-black"
-              />
-              <span className="text-gray-800 text-sm font-semibold">
-                {playlist.title}
-              </span>
-            </div>
-          ))
+              <span className="text-black font-semibold">Add Playlist</span>
+            </button>
+          </>
         ) : (
           <div className="text-center">
+            <p>You don't have any playlists yet</p>
             <button
               onClick={handleOpenModal}
               className="inline-block rounded-full bg-gray-300 px-6 py-3 shadow border border-black"
             >
-              <span className="text-black font-bold text-xs">Add Playlist</span>
+
+              <span className="text-black font-semibold">Add Playlist</span>
             </button>
           </div>
         )}

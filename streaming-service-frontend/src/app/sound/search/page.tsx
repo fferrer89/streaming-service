@@ -30,6 +30,7 @@ query SearchQueries($searchTerm: String!) {
       language
       genre
       lyrics
+      likes
       release_date
       album {
         _id

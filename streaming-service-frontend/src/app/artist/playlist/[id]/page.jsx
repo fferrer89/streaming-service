@@ -15,6 +15,11 @@ export default function Playlist({ params }) {
   const { loading, data, error } = useQuery(queries.GET_PLAYLIST, {
     variables: { id: params.id },
     apolloClient,
+    onCompleted: data => {
+      if (data && data.getPlaylistById && data.getPlaylistById.songs) {
+        console.log("Songs list loaded successfully.");
+      }
+    }
   });
   const [
     removeSong,

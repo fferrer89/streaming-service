@@ -24,7 +24,7 @@ export const songResolvers = {
         const allSongs = await Songs.find();
         if (allSongs && allSongs.length !== 0) {
           await context.redisClient.json.set('song_songs', '$', allSongs);
-          await context.redisClient.EXPIRE('song_songs', 1800);
+          await context.redisClient.EXPIRE('song_songs', 300);
 
           return allSongs;
         } else {
@@ -52,7 +52,7 @@ export const songResolvers = {
         }
 
         await context.redisClient.json.set(cacheKey, '$', song);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        await context.redisClient.EXPIRE(cacheKey, 300);
 
         return song;
       } catch (error) {
@@ -75,7 +75,7 @@ export const songResolvers = {
 
       if (songs.length > 0) {
         await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        await context.redisClient.EXPIRE(cacheKey, 300);
       }
 
       return songs.map((song) => ({
@@ -100,7 +100,7 @@ export const songResolvers = {
         songHelper.notFoundWrapper('Songs not found by this album id');
       } else {
         await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        await context.redisClient.EXPIRE(cacheKey, 300);
       }
 
       return songs;
@@ -112,18 +112,18 @@ export const songResolvers = {
       artistId = songHelper.emptyValidation(artistId, 'artistId');
       artistId = songHelper.validObjectId(artistId, 'artistId');
 
-      const cacheKey = `song_songsByArtist:${artistId}`;
-      let cachedSongs = await context.redisClient.json.get(cacheKey);
-      if (cachedSongs) {
-        return cachedSongs;
-      }
+      // const cacheKey = `song_songsByArtist:${artistId}`;
+      // let cachedSongs = await context.redisClient.json.get(cacheKey);
+      // if (cachedSongs) {
+      //   return cachedSongs;
+      // }
 
       let songs = await Songs.find({ artists: { $eq: artistId } });
       if (songs.length == 0) {
         songHelper.notFoundWrapper('Songs not found by this Artist id');
       } else {
-        await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        // await context.redisClient.json.set(cacheKey, '$', songs);
+        // await context.redisClient.EXPIRE(cacheKey, 300);
       }
 
       return songs;
@@ -138,11 +138,11 @@ export const songResolvers = {
         );
       }
 
-      const cacheKey = `song_songsByWriter:${term}`;
-      let cachedSongs = await context.redisClient.json.get(cacheKey);
-      if (cachedSongs) {
-        return cachedSongs;
-      }
+      // const cacheKey = `song_songsByWriter:${term}`;
+      // let cachedSongs = await context.redisClient.json.get(cacheKey);
+      // if (cachedSongs) {
+      //   return cachedSongs;
+      // }
 
       let songs = await Songs.find({
         writtenBy: { $regex: new RegExp(term, 'i') },
@@ -150,8 +150,8 @@ export const songResolvers = {
       if (songs.length < 1) {
         songHelper.notFoundWrapper('Song not found');
       } else {
-        await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        // await context.redisClient.json.set(cacheKey, '$', songs);
+        // await context.redisClient.EXPIRE(cacheKey, 300);
       }
 
       return songs;
@@ -173,7 +173,7 @@ export const songResolvers = {
         songHelper.notFoundWrapper('Song not found');
       } else {
         await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        await context.redisClient.EXPIRE(cacheKey, 300);
       }
       return songs;
     },
@@ -196,7 +196,7 @@ export const songResolvers = {
         return [];
       } else {
         await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        await context.redisClient.EXPIRE(cacheKey, 300);
       }
       return songs;
     },
@@ -219,7 +219,7 @@ export const songResolvers = {
         return [];
       } else {
         await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        await context.redisClient.EXPIRE(cacheKey, 300);
       }
       return songs;
     },
@@ -253,7 +253,7 @@ export const songResolvers = {
         let songIdsArray = songsIds.map((song) => song._id);
         let songs = await Songs.find({ _id: { $in: songIdsArray } });
         await context.redisClient.json.set(cacheKey, '$', songs);
-        await context.redisClient.EXPIRE(cacheKey, 1800);
+        await context.redisClient.EXPIRE(cacheKey, 300);
         return songs;
       }
     },
@@ -261,6 +261,13 @@ export const songResolvers = {
       let { userId } = args;
       userId = songHelper.emptyValidation(userId, 'user id');
       songHelper.validObjectId(userId, 'userId');
+
+      const cacheKey = `song_userLikedSongs:${userId}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
       let likedSongsId = await User.findById({
         _id: new Types.ObjectId(userId),
       }).select('liked_songs');
@@ -274,7 +281,13 @@ export const songResolvers = {
       });
 
       let songs = await Songs.find({ _id: { $in: likedSongsId } });
-      return songs;
+      if (songs.length < 1) {
+        return [];
+      } else {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 300);
+        return songs;
+      }
     },
 
     getMostLikedSongsOfArtist: async (_, args, context) => {
@@ -352,10 +365,11 @@ export const songResolvers = {
           ...songsFromMostLikedArtists,
         ];
 
-        let uniqueSongs = Array.from(new Set(nextSongs.map(song => song._id)))
-          .map(id => {
-            return nextSongs.find(song => song._id === id)
-          });
+        let uniqueSongs = Array.from(
+          new Set(nextSongs.map((song) => song._id))
+        ).map((id) => {
+          return nextSongs.find((song) => song._id === id);
+        });
 
         if (uniqueSongs.length < 30) {
           const additionalSongs = await Songs.aggregate([
@@ -365,10 +379,10 @@ export const songResolvers = {
           ]);
           uniqueSongs = [...uniqueSongs, ...additionalSongs];
         }
-        
+
         if (uniqueSongs.length < 30) {
           const additionalSongs = await Songs.aggregate([
-            { $sample: { size: 30 - uniqueSongs.length } }
+            { $sample: { size: 30 - uniqueSongs.length } },
           ]);
           uniqueSongs = [...uniqueSongs, ...additionalSongs];
         }
@@ -454,12 +468,14 @@ export const songResolvers = {
             throw new Error('Album not found with given ID');
           }
         }
-
+        const sampleImage = await SongFile.findOne({
+          filename: 'sample_song_image',
+        }).fileId;
         const song = new Songs({
           title,
           duration,
           song_url,
-          cover_image_url,
+          cover_image_url: cover_image_url || sampleImage,
           writtenBy,
           producers,
           genre,
@@ -544,14 +560,23 @@ export const songResolvers = {
           existingSong.album ? `song_album:${existingSong.album}` : null,
         ].filter((key) => key !== null);
 
-        const keysToDelete = await context.redisClient.keys('song_songsByTitle:*');
-        const keysToDelete2 = await context.redisClient.keys('song_songsByArtist:*');
+        const keysToDelete = await context.redisClient.keys(
+          'song_songsByTitle:*'
+        );
+        const keysToDelete2 = await context.redisClient.keys(
+          'song_songsByArtist:*'
+        );
 
         // Combine all keys to delete into a single array
-        const allKeysToDelete = relatedCacheKeys.concat(keysToDelete, keysToDelete2);
+        const allKeysToDelete = relatedCacheKeys.concat(
+          keysToDelete,
+          keysToDelete2
+        );
 
         // Use Promise.all to ensure all deletions complete before proceeding
-        await Promise.all(allKeysToDelete.map(key => context.redisClient.DEL(key)));
+        await Promise.all(
+          allKeysToDelete.map((key) => context.redisClient.DEL(key))
+        );
 
         return updatedSong;
       } catch (error) {
@@ -624,36 +649,34 @@ export const songResolvers = {
           throw new Error('User not found');
         }
 
-        const likedIndex = user.liked_songs.findIndex(
-          (song) => song._id.toString() === songId
-        );
-        let userUpdated = false;
-        if (likedIndex !== -1) {
-          user.liked_songs.splice(likedIndex, 1);
-          userUpdated = true;
-        } else {
-          user.liked_songs.push(songId);
-          userUpdated = true;
-        }
-
-        if (userUpdated) {
-          await user.save();
-        }
-
-        const songCacheKey = `song_song:${songId}`;
-        const song =
-          (await context.redisClient.json.get(songCacheKey)) ||
-          (await Songs.findById(songId));
+        const song = await Songs.findById(songId);
         if (!song) {
           throw new Error('Song not found');
         }
 
-        song.likes = user.liked_songs.length;
+        const likedIndex = user.liked_songs.findIndex(
+          (likedSong) => likedSong.songId.toString() === songId
+        );
 
+        let userLikedSongsCacheUpdated = false;
+
+        if (likedIndex === -1) {
+          // Like the song
+          user.liked_songs.push({ songId, liked_date: new Date().toISOString() });
+          song.likes = (song.likes || 0) + 1;
+          userLikedSongsCacheUpdated = true;
+        } else {
+          // Unlike the song
+          user.liked_songs.splice(likedIndex, 1);
+          song.likes = (song.likes || 0) - 1;
+        }
+
+        await user.save();
         const updatedSong = await song.save();
 
+        const songCacheKey = `song_song:${songId}`;
         await context.redisClient.json.set(songCacheKey, '$', updatedSong);
-        await context.redisClient.EXPIRE(songCacheKey, 1800);
+        await context.redisClient.EXPIRE(songCacheKey, 300);
 
         const relatedCacheKeys = [
           `song_songs`,
@@ -679,6 +702,12 @@ export const songResolvers = {
         keysToDelete.forEach(async (key) => {
           await context.redisClient.DEL(key);
         });
+
+        
+        if (userLikedSongsCacheUpdated) {
+          const userLikedSongsCacheKey = `song_userLikedSongs:${_id}`;
+          await context.redisClient.DEL(userLikedSongsCacheKey);
+        }
 
         return updatedSong;
       } catch (error) {

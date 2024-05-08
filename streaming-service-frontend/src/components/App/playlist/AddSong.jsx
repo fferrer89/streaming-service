@@ -6,7 +6,7 @@ import { useMutation } from "@apollo/client";
 import queries from "@/utils/queries";
 import { PlayListModal } from "./PlaylistModal";
 import { useQuery } from "../../../../node_modules/@apollo/client/index";
-import { client } from "@/utils/playlistHelper";
+import createApolloClient from "@/utils";
 import { FaCheckCircle } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
@@ -32,6 +32,7 @@ export const FloatingAddButton = () => {
 };
 
 const AddSongForm = ({ data: playlistData }) => {
+  const client = createApolloClient(localStorage.getItem("token"));
   console.log(playlistData);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");

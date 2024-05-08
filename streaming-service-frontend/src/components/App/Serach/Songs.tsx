@@ -16,6 +16,7 @@ interface SongProps {
     language: string;
     genre: string;
     lyrics: string;
+    likes: number;
     release_date: string;
     album: {
       _id: string;

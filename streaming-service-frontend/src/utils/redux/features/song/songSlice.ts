@@ -11,6 +11,7 @@ interface Song {
   genre: string;
   lyrics: string;
   release_date: string;
+  likes?: number;
   album: {
     _id: string;
     title: string;
@@ -73,6 +74,9 @@ const songSlice = createSlice({
     setNextSongs(state, action: PayloadAction<Song[]>) {
       state.nextSongs = action.payload;
     },
+    updateCurrentSong(state, action: PayloadAction<Song>) {
+      state.currentSong = { ...state.currentSong, ...action.payload };
+    },
   },
 });
 
@@ -82,5 +86,6 @@ export const {
   stopSong,
   updateCurrentTime,
   setNextSongs,
+  updateCurrentSong,
 } = songSlice.actions;
 export default songSlice.reducer;

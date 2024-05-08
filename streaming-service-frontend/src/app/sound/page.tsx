@@ -146,6 +146,7 @@ const Home: React.FC = () => {
                 key={album._id}
                 image={getImageUrl(album.cover_image_url)}
                 songId={album._id}
+                onClick={() => push(`/sound/album/${album._id}`)}
               />
             ))}
             speed={0.4}
@@ -168,6 +169,7 @@ const Home: React.FC = () => {
                 key={album._id}
                 image={getImageUrl(album.cover_image_url)}
                 songId={album._id}
+                onClick={() => push(`/sound/album/${album._id}`)}
               />
             ))}
             speed={0.4}

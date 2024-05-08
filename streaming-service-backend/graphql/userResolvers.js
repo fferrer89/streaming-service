@@ -3,7 +3,6 @@ import { GraphQLError } from 'graphql';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
 
-
 export const userResolvers = {
   Query: {
     users: async (_, args, context) => {
@@ -30,7 +29,9 @@ export const userResolvers = {
       try {
         validateMogoObjID(args._id, '_id');
 
-        const cachedUser = await context.redisClient.json.get(`user:${args._id}`);
+        const cachedUser = await context.redisClient.json.get(
+          `user:${args._id}`
+        );
         if (cachedUser) {
           return cachedUser;
         }
@@ -48,10 +49,12 @@ export const userResolvers = {
         throw new GraphQLError(`Failed to fetch user: ${error.message}`);
       }
     },
-    getUsersByName: async  (_, { name, limit }) => {
-      const users = await User.find({ name: { $regex: name, $options: 'i' } }).limit(limit || 10);
+    getUsersByName: async (_, { name, limit }) => {
+      const users = await User.find({
+        name: { $regex: name, $options: 'i' },
+      }).limit(limit || 10);
 
-    return users;
+      return users;
     },
   },
   Mutation: {
@@ -62,13 +65,17 @@ export const userResolvers = {
           throw new GraphQLError('User already exists with this email.');
         }
 
+        const sampleImage = await SongFile.findOne({
+          filename: 'sample_artist_image',
+        }).fileId;
+
         const newUser = new User({
           first_name: args.first_name,
           last_name: args.last_name,
           display_name: args.display_name,
           email: args.email,
           password: args.password,
-          profile_image_url: args.profile_image_url,
+          profile_image_url: args.profile_image_url || sampleImage,
         });
 
         const validationErrors = newUser.validateSync();
@@ -81,7 +88,7 @@ export const userResolvers = {
 
         const token = generateToken(
           savedUser._id,
-          'user',
+          'USER',
           savedUser.first_name
         );
 
@@ -96,20 +103,25 @@ export const userResolvers = {
     },
     loginUser: async (_, args) => {
       try {
-        const user = await User.findOne({ email: args.email }).select('+password');
+        const user = await User.findOne({ email: args.email }).select(
+          '+password'
+        );
         console.log('User:', user);
         if (!user) {
           throw new GraphQLError('Invalid email or password.');
         }
-    
+
         console.log('Entered password:', args.password);
         console.log('Hashed password:', user.password);
-        const isPasswordCorrect = await user.isPasswordCorrect(args.password, user.password);
+        const isPasswordCorrect = await user.isPasswordCorrect(
+          args.password,
+          user.password
+        );
         console.log('Password correct:', isPasswordCorrect);
         if (!isPasswordCorrect) {
           throw new GraphQLError('Invalid email or password.');
         }
-    
+
         const token = generateToken(user._id, 'USER', user.first_name);
         return { user, token };
       } catch (error) {
@@ -130,8 +142,8 @@ export const userResolvers = {
 
         return deletedUser;
       } catch (error) {
-        throw new GraphQLError(`Error deleting user: ${error.message}`)
+        throw new GraphQLError(`Error deleting user: ${error.message}`);
       }
-    }
+    },
   },
 };
