@@ -16,17 +16,20 @@ const ArtistSongs: React.FC = () => {
   const artistId = useSelector(
     (state: { user: { userId: string | null } }) => state.user.userId
   );
+  const token = useSelector(
+    (state: { user: { token: string | null } }) => state.user.token
+  );
   const {
     data: artistSongs,
     loading,
     error,
     refetch
   } = useQuery(queries.GET_SONGS_BY_ARTIST, {
-    variables: { artistId: artistId },
+    variables: { artistId: artistId , fetchPolicy: 'cache-and-network' },
   });
   const [showSongModal, setShowSongModal] = useState(false);
   // @ts-ignore
-  const [createSongFormState, createSongFormAction] = useFormState(createSong, initialState);
+  const [createSongFormState, createSongFormAction] = useFormState((state, payload) => createSong(state, payload, token), initialState);
   if (loading) {
     return <div>Loading</div>;
   }

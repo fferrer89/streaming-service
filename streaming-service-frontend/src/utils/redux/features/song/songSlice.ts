@@ -47,6 +47,7 @@ const songSlice = createSlice({
     ) {
       if (
         state.currentSong &&
+        action.payload.song &&
         state.currentSong._id === action.payload.song._id
       ) {
         state.isPlaying = true;

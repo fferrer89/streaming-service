@@ -14,14 +14,14 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      authorization: userToken,
+      authorization: userToken ? userToken : "",
     },
   };
 });
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: process.env.NEXT_PUBLIC_BACKEND_GRAPHQL_URL,
-    fetchOptions: { cache: "no-store" },
+    uri: process.env.NEXT_PUBLIC_GRAPHQL_SERVER_URL,
+    //fetchOptions: { cache: "no-store" },
   });
 
   return new NextSSRApolloClient({

@@ -27,7 +27,7 @@ const SPlayer: React.FC = () => {
   useEffect(() => {
     if (currentSong) {
       if (audioRef.current) {
-        const songUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/song/stream/${currentSong.song_url}`;
+        const songUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/song/stream/${currentSong.song_url}`;
         audioRef.current.src = songUrl;
         if (isPlaying) {
           audioRef.current.play();
@@ -87,7 +87,7 @@ const SPlayer: React.FC = () => {
       <div className="h-auto max-h-56 overflow-y-scroll">
         <NextSongsList
           nextSongs={nextSongs}
-          currentSongId={currentSong ? currentSong._id : null}
+          currentSong={currentSong ? currentSong : null}
         />
       </div>
       <AudioPlayer
@@ -95,7 +95,7 @@ const SPlayer: React.FC = () => {
         loop
         showSkipControls={true}
         layout={"stacked-reverse"}
-        src={`${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/song/stream/${currentSong.song_url}`}
+        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/song/stream/${currentSong.song_url}`}
         onPlay={(e) => console.log("onPlay")}
         onClickNext={(e) => handleNextSong()}
         onClickPrevious={(e) => handlePreviousSong()}

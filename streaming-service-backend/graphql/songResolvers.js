@@ -351,32 +351,29 @@ export const songResolvers = {
           ...songsFromMostLikedPlaylists,
           ...songsFromMostLikedArtists,
         ];
-        if (!nextSongs || nextSongs.length == 0) {
-          const songsByLikes = await Songs.aggregate([
-            { $match: { genre: clickedSong.genre } },
-            { $sort: { likes: -1 } },
-            { $limit: 50 },
-          ]);
 
-          const songsByReleaseDate = await Songs.aggregate([
+        let uniqueSongs = Array.from(new Set(nextSongs.map(song => song._id)))
+          .map(id => {
+            return nextSongs.find(song => song._id === id)
+          });
+
+        if (uniqueSongs.length < 30) {
+          const additionalSongs = await Songs.aggregate([
             { $match: { genre: clickedSong.genre } },
             { $sort: { release_date: -1 } },
-            { $limit: 50 },
+            { $limit: 30 - uniqueSongs.length },
           ]);
-
-          const allSongs = await Songs.aggregate([
-            { $sort: { release_date: -1 } },
-            { $limit: 50 },
-          ]);
-          const allNextSongs = [
-            ...songsByLikes,
-            ...songsByReleaseDate,
-            ...allSongs,
-          ];
-          const shuffledSongs = allNextSongs.sort(() => Math.random() - 0.5);
-          nextSongs = shuffledSongs.slice(0, 50);
+          uniqueSongs = [...uniqueSongs, ...additionalSongs];
         }
-        return nextSongs;
+        
+        if (uniqueSongs.length < 30) {
+          const additionalSongs = await Songs.aggregate([
+            { $sample: { size: 30 - uniqueSongs.length } }
+          ]);
+          uniqueSongs = [...uniqueSongs, ...additionalSongs];
+        }
+
+        return uniqueSongs.slice(0, 30);
       } catch (error) {
         throw new GraphQLError(error.message);
       }
@@ -535,7 +532,6 @@ export const songResolvers = {
         if (artists) existingSong.artists = artists;
 
         const updatedSong = await existingSong.save();
-
         const relatedCacheKeys = [
           `song_songs`,
           `song_song:${songId}`,
@@ -548,17 +544,14 @@ export const songResolvers = {
           existingSong.album ? `song_album:${existingSong.album}` : null,
         ].filter((key) => key !== null);
 
-        relatedCacheKeys.forEach(async (key) => {
-          await context.redisClient.DEL(key);
-        });
+        const keysToDelete = await context.redisClient.keys('song_songsByTitle:*');
+        const keysToDelete2 = await context.redisClient.keys('song_songsByArtist:*');
 
-        const keysToDelete = await context.redisClient.keys(
-          'song_songsByTitle:*',
-          'song_songsByArtist:*'
-        );
-        keysToDelete.forEach(async (key) => {
-          await context.redisClient.DEL(key);
-        });
+        // Combine all keys to delete into a single array
+        const allKeysToDelete = relatedCacheKeys.concat(keysToDelete, keysToDelete2);
+
+        // Use Promise.all to ensure all deletions complete before proceeding
+        await Promise.all(allKeysToDelete.map(key => context.redisClient.DEL(key)));
 
         return updatedSong;
       } catch (error) {

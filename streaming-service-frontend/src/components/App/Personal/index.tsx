@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 const Personal: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const dispatch = useDispatch();
-  
+
   const handleOpenModal = () => {
     dispatch(openModal("AddPlaylistModal"));
   };
@@ -28,7 +28,7 @@ const Personal: React.FC = () => {
             src="/icons/library_icon.png"
           />
           <div className="relative w-auto font-mono font-medium text-white text-xl text-center tracking-normal leading-normal">
-            Your Sounds
+            Your Library
           </div>
         </div>
         <div
@@ -36,9 +36,7 @@ const Personal: React.FC = () => {
           style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
           onClick={handleOpenModal}
         >
-          <div
-            className="flex items-center justify-center w-8 h-8 font-mono font-thin text-xl whitespace-nowrap text-white text-center tracking-normal leading-normal rounded-full"
-          >
+          <div className="flex items-center justify-center w-8 h-8 font-mono font-thin text-xl whitespace-nowrap text-white text-center tracking-normal leading-normal rounded-full">
             +
           </div>
         </div>

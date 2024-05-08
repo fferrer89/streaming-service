@@ -9,7 +9,8 @@ import { useQuery } from "@apollo/client";
 import { useSelector } from "react-redux";
 
 const initialState = {
-  errorMessages: null,
+  album: null,
+  errorMessages: [],
 };
 
 const CreateAlbumModal: React.FC<{
@@ -19,6 +20,9 @@ const CreateAlbumModal: React.FC<{
 }> = ({ setShowModal, setSuccessModalOpen, refetch }) => {
   const artistId = useSelector(
     (state: { user: { userId: string | null } }) => state.user.userId
+  );
+  const token = useSelector(
+    (state: { user: { token: string | null } }) => state.user.token
   );
   const [albumData, setAlbumData] = useState({
     album_type: "ALBUM",
@@ -40,13 +44,15 @@ const CreateAlbumModal: React.FC<{
   } = useQuery(queries.GET_SONGS_BY_ARTIST, {
     variables: { artistId: artistId },
   });
+
   const {
     loading: artistsLoading,
     error: artistsError,
     data: artistsData,
   } = useQuery(queries.GET_ARTISTS);
+  // @ts-ignore
   const [createAlbumFormState, createAlbumFormAction] = useFormState(
-    createAlbum,
+    (state, payload) => createAlbum(state, payload, token),
     initialState
   );
 
@@ -118,7 +124,7 @@ const CreateAlbumModal: React.FC<{
       formData.append("file", file);
 
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/upload`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/upload`,
         formData,
         {
           headers: {
@@ -235,7 +241,13 @@ const CreateAlbumModal: React.FC<{
               value={albumData.release_date}
               onChange={handleInputChange}
               className="border border-gray-300 rounded-md p-2 w-full"
-              max={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]}
+              max={
+                new Date(
+                  new Date().getTime() - new Date().getTimezoneOffset() * 60000
+                )
+                  .toISOString()
+                  .split("T")[0]
+              }
             />
           </div>
           <div className="mb-4">
@@ -291,7 +303,7 @@ const CreateAlbumModal: React.FC<{
               name="coverImageUrl"
               onChange={handleFileChange}
               className="border border-gray-300 rounded-md p-2 w-full"
-              accept='image/*'
+              accept="image/*"
             />
           </div>
           <div className="mb-4">

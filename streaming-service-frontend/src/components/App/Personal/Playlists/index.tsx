@@ -4,15 +4,20 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@apollo/client";
-import apolloClient from "@/utils";
+import createApolloClient from "@/utils";
 import { GetUserPlaylists } from "@/utils/graphql/queries";
-import { GetUserPlaylistsVariables, GetUserPlaylist } from "@/utils/graphql/resultTypes";
+import {
+  GetUserPlaylistsVariables,
+  GetUserPlaylist,
+} from "@/utils/graphql/resultTypes";
 import { RootState } from "@/utils/redux/store";
 import { openModal } from "@/utils/redux/features/modal/modalSlice";
 
 export type GetPlaylistsByOwnerResult = {
   getPlaylistsByOwner: GetUserPlaylist[]; // Ensure this matches the actual structure returned by the server
 };
+
+const apolloClient = createApolloClient(localStorage.getItem("token"));
 
 const Playlists: React.FC = () => {
   const [playlists, setPlaylists] = useState<GetUserPlaylist[]>([]);
@@ -22,13 +27,17 @@ const Playlists: React.FC = () => {
   const userId = useSelector((state: RootState) => state.user.userId);
   const dispatch = useDispatch();
 
-  const { loading: queryLoading, error: queryError, data } = useQuery<
-    GetPlaylistsByOwnerResult,
-    GetUserPlaylistsVariables
-  >(GetUserPlaylists, {
-    variables: { userId: userId as string },
-    client: apolloClient,
-  });
+  const {
+    loading: queryLoading,
+    error: queryError,
+    data,
+  } = useQuery<GetPlaylistsByOwnerResult, GetUserPlaylistsVariables>(
+    GetUserPlaylists,
+    {
+      variables: { userId: userId as string },
+      client: apolloClient,
+    }
+  );
 
   useEffect(() => {
     if (!queryLoading && !queryError && data) {
@@ -73,7 +82,9 @@ const Playlists: React.FC = () => {
                 alt="Music note icon"
                 className="w-8 h-8 object-cover border border-black"
               />
-              <span className="text-gray-800 text-sm font-semibold">{playlist.title}</span>
+              <span className="text-gray-800 text-sm font-semibold">
+                {playlist.title}
+              </span>
             </div>
           ))
         ) : (

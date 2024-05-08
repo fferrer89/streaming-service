@@ -49,8 +49,8 @@ const server = new ApolloServer({
     // will bypass authentication middelware for login, register and playground
     if (
       // Uncomment this part to disable authentication on all queries and mutations
-      req.body.operationName.toLowerCase() !== 'mutation' &&
-      req.body.operationName.toLowerCase() !== 'query' &&
+      // req.body.operationName.toLowerCase() !== 'mutation' &&
+      // req.body.operationName.toLowerCase() !== 'query' &&
       req.body.operationName !== 'IntrospectionQuery' &&
       req.body.operationName !== 'registerUser' &&
       req.body.operationName !== 'registerArtist' &&
@@ -59,7 +59,7 @@ const server = new ApolloServer({
       req.body.operationName !== 'loginAdmin'
     ) {
       const token = req.headers.authorization || '';
-      return { redisClient };
+      //return { redisClient };
       try {
         var decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.exp <= Math.floor(Date.now() / 1000)) {

@@ -1,20 +1,20 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Separator } from '@/components/ui/separator';
-import { useQuery } from '@apollo/client';
-import apolloClient from '@/utils';
-import { GetUserLikedSongs } from '@/utils/graphql/queries';
-import { UserLikedSong } from '@/utils/graphql/resultTypes';
-import { RootState } from '@/utils/redux/store'; 
-import { useSelector } from 'react-redux';
-import { getImageUrl } from '@/utils/tools/images';
-
+import React, { useEffect, useState } from "react";
+import { Separator } from "@/components/ui/separator";
+import { useQuery } from "@apollo/client";
+//import apolloClient from "@/utils";
+import { GetUserLikedSongs } from "@/utils/graphql/queries";
+import { UserLikedSong } from "@/utils/graphql/resultTypes";
+import { RootState } from "@/utils/redux/store";
+import { useSelector } from "react-redux";
+import { getImageUrl } from "@/utils/tools/images";
+import createApolloClient from "@/utils/";
 
 const Songs: React.FC = () => {
   const [songs, setSongs] = useState<UserLikedSong[]>([]);
   const userId = useSelector((state: RootState) => state.user.userId);
-
+  const apolloClient = createApolloClient(localStorage.getItem("token"));
   const { loading, error, data } = useQuery(GetUserLikedSongs, {
     variables: { userId },
     client: apolloClient,
@@ -29,7 +29,9 @@ const Songs: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="text-lg font-semibold">Loading your favorite songs...</div>
+        <div className="text-lg font-semibold">
+          Loading your favorite songs...
+        </div>
       </div>
     );
   }
@@ -37,27 +39,42 @@ const Songs: React.FC = () => {
   return (
     <div
       className="flex flex-col w-full h-auto gap-5 p-0 bg-white rounded-lg overflow-hidden items-center relative justify-start"
-      style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
+      style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
     >
-        <div className="inline-flex gap-4 flex-auto items-start relative w-full px-5 pt-3 flex-col">
-          <div className="relative w-auto mt-0 font-mono font-medium text-lg text-center tracking-normal leading-normal">
-            Songs
-          </div>
-          <Separator className="w-[95%] " />
+      <div className="inline-flex gap-4 flex-auto items-start relative w-full px-5 pt-3 flex-col">
+        <div className="relative w-auto mt-0 font-mono font-medium text-lg text-center tracking-normal leading-normal">
+          Songs
         </div>
-        
-      <div className='w-full px-3 py- overflow-y-auto'>
+        <Separator className="w-[95%] " />
+      </div>
+
+      <div className="w-full px-3 py- overflow-y-auto">
         {songs.length > 0 ? (
           songs.map((song, index) => (
-            <div key={index} className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors">
-              <img src={song.album.cover_image_url ? getImageUrl(song.album.cover_image_url) : "/img/music_note.jpeg"} alt="Album cover" className="w-8 h-8 object-cover border border-black" />
-              <span className="text-gray-800 text-sm font-semibold">{song.title}</span>
+            <div
+              key={index}
+              className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors"
+            >
+              <img
+                src={
+                  song.album.cover_image_url
+                    ? getImageUrl(song.album.cover_image_url)
+                    : "/img/music_note.jpeg"
+                }
+                alt="Album cover"
+                className="w-8 h-8 object-cover border border-black"
+              />
+              <span className="text-gray-800 text-sm font-semibold">
+                {song.title}
+              </span>
             </div>
           ))
         ) : (
           <div className="text-center  py-4">
             <div className="inline-block rounded-full bg-gray-300 px-6 py-3 shadow border border-black">
-              <a href="/sound/search" className="text-black font-bold text-xs">Explore Songs</a>
+              <a href="/sound/search" className="text-black font-semibold">
+                Explore Songs
+              </a>
             </div>
           </div>
         )}

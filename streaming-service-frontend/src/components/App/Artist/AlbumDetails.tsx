@@ -3,7 +3,7 @@ import { useMutation, gql } from "@apollo/client";
 import { Separator } from "@/components/ui/separator";
 import AlbumDetailsSongs from "./units/AlbumDetailsSongs";
 import AlbumDetailsArtists from "./units/AlbumDetailsArtists";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const REMOVE_ALBUM_MUTATION = gql`
   mutation RemoveAlbum($id: ID!) {
@@ -58,9 +58,12 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
         variables: { id: _id },
       });
       if (response.data.removeAlbum) {
-        console.log("Album removed successfully:", response.data.removeAlbum.title);
+        console.log(
+          "Album removed successfully:",
+          response.data.removeAlbum.title
+        );
         refetch();
-        router.push('/artist/albums');
+        router.push("/artist/albums");
       }
     } catch (err) {
       console.error("Error removing album:", err);
@@ -69,7 +72,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   };
 
   const formattedDate = date.toLocaleString("en-US", options);
-  const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${cover_image_url}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${cover_image_url}`;
 
   return (
     <div

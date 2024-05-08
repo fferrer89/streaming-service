@@ -6,14 +6,15 @@ import Card from "@/components/App/Feed/Card";
 import InfiniteCarousel from "@/components/App/Feed/InfiniteCarousel";
 import { useDispatch } from "react-redux";
 import { playSong } from "@/utils/redux/features/song/songSlice";
-import apolloClient from "@/utils";
 import { FeedQuery } from "@/utils/graphql/queries";
 import { FeedQueryResult } from "@/utils/graphql/resultTypes";
 import { getImageUrl } from "@/utils/tools/images";
 import { useRouter } from "next/navigation";
 import SkeletonLoader from "@/components/App/SkeletonLoader";
-
+import createApolloClient from "@/utils";
 // TODO: FIX INFINITE CAROUSEL
+
+const apolloClient = createApolloClient(localStorage.getItem("token"));
 
 const Home: React.FC = () => {
   const dispatch = useDispatch();
@@ -88,7 +89,9 @@ const Home: React.FC = () => {
     >
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">SOUNDS FOR YOU</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            SOUNDS FOR YOU
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -110,7 +113,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">ARTISTS OF THE WEEK</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            ARTISTS OF THE WEEK
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -133,7 +138,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">ALBUMS OF THE WEEK</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            ALBUMS OF THE WEEK
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -155,7 +162,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">NEW ALBUMS</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            NEW ALBUMS
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -177,7 +186,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">NEW SONGS</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            NEW SONGS
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -202,4 +213,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-
