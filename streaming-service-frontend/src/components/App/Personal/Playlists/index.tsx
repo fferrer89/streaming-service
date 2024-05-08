@@ -15,15 +15,14 @@ import { openModal } from "@/utils/redux/features/modal/modalSlice";
 import Link from "next/link";
 
 export type GetPlaylistsByOwnerResult = {
-  getPlaylistsByOwner: GetUserPlaylist[]; // Ensure this matches the actual structure returned by the server
-};
+  getPlaylistsByOwner: GetUserPlaylist[];
 
 const Playlists: React.FC = () => {
   const [playlists, setPlaylists] = useState<GetUserPlaylist[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
 
-  const Segment = pathname.split('/');
+
   
 
   const userId = useSelector((state: RootState) => state.user.userId);
@@ -41,7 +40,7 @@ const Playlists: React.FC = () => {
     GetUserPlaylists,
     {
       variables: { userId: userId as string },
-      client: apolloClient,
+      client: apolloClient as any,
       skip: !apolloClient || !userId,
     }
   );
@@ -54,7 +53,7 @@ const Playlists: React.FC = () => {
       setError("Error fetching playlists");
       setLoading(false);
     }
-    console.log("data", pathname.split('/') );
+    
   }, [queryLoading, queryError, data, userId]);
 
   const handleOpenModal = () => {
@@ -88,7 +87,7 @@ const Playlists: React.FC = () => {
                   className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors opacity-75 cursor-pointer"
                 >
                   <img
-                    src="/img/music_note.jpeg"
+                    src="/img/playlisticon.png"
                     alt="Music note icon"
                     className="w-8 h-8 object-cover border border-black"
                   />
