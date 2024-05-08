@@ -15,15 +15,22 @@ import { artistResolvers } from './graphql/artistResolvers.js';
 import { albumResolvers } from './graphql/albumResolvers.js';
 import { songResolvers } from './graphql/songResolvers.js';
 import { playlistResolvers } from './graphql/playlistResolvers.js';
-import redis from 'redis';
+import { Redis } from '@upstash/redis';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
 import express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { authenticateToken } from './utils/helpers.js';
 import morgan from 'morgan';
+
 import cors from 'cors';
-const redisClient = redis.createClient(process.env.REDIS_URL);
+// const redisClient = new Redis(process.env.REDIS_URL);
+// redisClient.set('animal', 'cat');
+
+const redisClient = new Redis({
+  url: process.env.REDIS_URL,
+  token: process.env.REDIS_TOKEN,
+});
 
 const attachRedisClient = (req, res, next) => {
   req.redisClient = redisClient;
@@ -94,12 +101,12 @@ try {
     useNewUrlParser: true,
   });
 
-  await redisClient
-    .connect()
-    .then(() => {})
-    .catch((error) => {
-      throw new Error(`Redis Client failed to connect`);
-    });
+  // await redisClient
+  //   .connect()
+  //   .then(() => {})
+  //   .catch((error) => {
+  //     throw new Error(`Redis Client failed to connect`);
+  //   });
   if (connection) {
     await server.start();
 
