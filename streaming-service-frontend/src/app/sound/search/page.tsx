@@ -90,6 +90,7 @@ type ResultType = {
     producers: string[];
     language: string;
     genre: string;
+    likes: number;
     lyrics: string;
     release_date: string;
     album: {
@@ -102,16 +103,16 @@ type ResultType = {
       display_name: string;
       profile_image_url: string;
     }[];
-    albums: {
+  }[];
+  albums: {
+    _id: string;
+    title: string;
+    cover_image_url: string;
+    release_date: string;
+    artists: {
       _id: string;
-      title: string;
-      cover_image_url: string;
-      release_date: string;
-      artists: {
-        _id: string;
-        display_name: string;
-        profile_image_url: string;
-      }[];
+      display_name: string;
+      profile_image_url: string;
     }[];
   }[];
 };

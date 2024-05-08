@@ -7,10 +7,10 @@ import { useQuery } from "@apollo/client";
 import queries from "@/utils/queries";
 import { useSelector } from "react-redux";
 import SongFormModal from "@/components/App/Artist/SongFormModal";
-import {useFormState} from "react-dom";
-import {createSong} from "@/app/actions";
+import { useFormState } from "react-dom";
+import { createSong } from "@/app/actions";
 const initialState = {
-  message: null
+  message: null,
 };
 const ArtistSongs: React.FC = () => {
   const artistId = useSelector(
@@ -23,13 +23,16 @@ const ArtistSongs: React.FC = () => {
     data: artistSongs,
     loading,
     error,
-    refetch
+    refetch,
   } = useQuery(queries.GET_SONGS_BY_ARTIST, {
-    variables: { artistId: artistId , fetchPolicy: 'cache-and-network' },
+    variables: { artistId: artistId, fetchPolicy: "cache-and-network" },
   });
   const [showSongModal, setShowSongModal] = useState(false);
   // @ts-ignore
-  const [createSongFormState, createSongFormAction] = useFormState((state, payload) => createSong(state, payload, token), initialState);
+  const [createSongFormState, createSongFormAction] = useFormState(
+    (state: any, payload: any) => createSong(state, payload, token),
+    initialState
+  );
   useEffect(() => {
     refetch();
   }, []);
@@ -42,20 +45,20 @@ const ArtistSongs: React.FC = () => {
       className="flex-col h-full p-5 gap-5  w-full rounded-lg  flex items-center relative self-stretch"
       style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
     >
-
       {showSongModal && (
-          <SongFormModal
-              method='post'
-              actionData={createSongFormState}
-              action={createSongFormAction}
-              setShowModal={setShowSongModal}
-              artistId={artistId}
-              refetch={refetch}
-          />
+        <SongFormModal
+          method="post"
+          actionData={createSongFormState}
+          action={createSongFormAction}
+          setShowModal={setShowSongModal}
+          artistId={artistId}
+          refetch={refetch}
+          songData={null}
+        />
       )}
       <button
-          onClick={() => setShowSongModal(true)}
-          className="bg-stone-300 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
+        onClick={() => setShowSongModal(true)}
+        className="bg-stone-300 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow"
       >
         Create New Song
       </button>

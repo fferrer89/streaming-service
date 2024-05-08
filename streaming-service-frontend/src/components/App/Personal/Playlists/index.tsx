@@ -78,7 +78,12 @@ const Playlists: React.FC = () => {
         ) : playlists.length > 0 ? (
           <>
             {playlists.map((playlist, index) => (
-              <Link href={`/${userType === 'artist' ? 'artist' : 'sound'}/playlist/${playlist._id}`}>
+              <Link
+                key={index}
+                href={`/${
+                  userType === "artist" ? "artist" : "sound"
+                }/playlist/${playlist._id}`}
+              >
                 <div
                   key={index}
                   className="flex items-center justify-between bg-gray-100 rounded-lg p-3 mb-2 shadow hover:bg-gray-200 transition-colors opacity-75 cursor-pointer"
@@ -103,12 +108,11 @@ const Playlists: React.FC = () => {
           </>
         ) : (
           <div className="text-center">
-            <p>You don't have any playlists yet</p>
+            <p>You don&apos;t have any playlists yet</p>
             <button
               onClick={handleOpenModal}
               className="inline-block rounded-full bg-gray-300 px-6 py-3 shadow border border-black"
             >
-
               <span className="text-black font-semibold">Add Playlist</span>
             </button>
           </div>

@@ -1,3 +1,4 @@
+//@ts-nocheck
 import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { updateSong, deleteSong } from "@/app/actions";
@@ -9,7 +10,10 @@ import { useRouter } from "next/navigation";
 const initialState = {
   message: null,
 };
-const SongDetails: React.FC<{ songData: any }> = ({ songData, refetch }) => {
+const SongDetails: React.FC<{ songData: any; refetch: any }> = ({
+  songData,
+  refetch,
+}) => {
   const artistId = useSelector(
     (state: { user: { userId: string | null } }) => state.user.userId
   );

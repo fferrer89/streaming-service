@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useMutation } from "@apollo/client";
-import { EDIT_ARTIST_MUTATION } from "@/graphql/mutations";
 import queries from "@/utils/queries";
 import ArtistProfileImage from "./ArtistProfileImage";
 
@@ -13,7 +12,7 @@ const ArtistProfile: React.FC<{ artistData: any }> = ({ artistData }) => {
     day: "numeric",
   };
 
-  const formattedDate = date.toLocaleString("en-US", options);
+  const formattedDate = date.toLocaleString("en-US");
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -115,7 +114,7 @@ const ArtistProfile: React.FC<{ artistData: any }> = ({ artistData }) => {
               <span>Followers</span>
             </div>
             <div className="grid grid-cols-3">
-              {artistData.getArtistById.followers.artists.map((artist) => (
+              {artistData.getArtistById.followers.artists.map((artist: any) => (
                 <div
                   key={artist._id}
                   className="flex items-center justify-center my-2 ml-8"

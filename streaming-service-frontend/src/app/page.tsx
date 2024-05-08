@@ -21,9 +21,7 @@ function useParallax(value: MotionValue<number>, distance: number) {
 function Section({ children }: { children: React.ReactNode }) {
   return (
     <section className=" flex items-center justify-center">
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </section>
   );
 }
@@ -39,23 +37,22 @@ export default function Home() {
   });
 
   let stages = [
-    
-    <Hero/>,
-    <Info/>, 
-    <Support/>,
-    <Footer/>
+    <Hero key={1} />,
+    <Info key={2} />,
+    <Support key={3} />,
+    <Footer key={4} />,
   ];
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between ">
-      
-      <div ref={scrollRef} className=" overflow-x-clip overflow-y-scroll hide-scroll-bar">
-          {stages.map((stage, index) => (
-            <Section key={index}>
-              {stage}
-            </Section>
-          ))}
-        </div>
+      <div
+        ref={scrollRef}
+        className=" overflow-x-clip overflow-y-scroll hide-scroll-bar"
+      >
+        {stages.map((stage, index) => (
+          <Section key={index}>{stage}</Section>
+        ))}
+      </div>
     </main>
   );
 }

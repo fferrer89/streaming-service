@@ -31,6 +31,7 @@ const SEARCH_QUERIES = gql`
       language
       genre
       lyrics
+      likes
       release_date
       album {
         _id
@@ -91,6 +92,7 @@ type ResultType = {
     language: string;
     genre: string;
     lyrics: string;
+    likes: number;
     release_date: string;
     album: {
       _id: string;
@@ -158,7 +160,7 @@ const Search: React.FC = () => {
         albums: data.getAlbumsByTitle,
       });
     } else if (!debouncedSearchTerm) {
-      setResults({ artists: [], playlists: [], songs: [] });
+      setResults({ artists: [], playlists: [], songs: [], albums: [] });
     }
   }, [data, debouncedSearchTerm]);
 

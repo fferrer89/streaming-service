@@ -71,11 +71,11 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   } = albumData.getAlbumById;
   const router = useRouter();
   const date = new Date(release_date);
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
+  // const options = {
+  //   year: "numeric",
+  //   month: "long",
+  //   day: "numeric",
+  // };
 
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -120,7 +120,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
     setEditMode(!editMode);
   };
 
-  const handleEditChange = (e) => {
+  const handleEditChange = (e: any) => {
     const { name, value } = e.target;
     setEditData((prev) => ({ ...prev, [name]: value }));
   };
@@ -131,8 +131,8 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
         variables: {
           id: _id,
           ...editData,
-          genres: editData.genres.split(",").map((genre) => genre.trim()),
-          release_date: new Date(editData.release_date).toISOString(),
+          genres: editData.genres.split(",").map((genre: any) => genre.trim()),
+          release_date: new Date(editData.release_date).toLocaleDateString(),
         },
       });
 
@@ -146,7 +146,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
     }
   };
 
-  const formattedDate = date.toLocaleString("en-US", options);
+  const formattedDate = date.toLocaleString("en-US");
   const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${cover_image_url}`;
 
   return (
@@ -230,7 +230,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
                 name="description"
                 value={editData.description}
                 onChange={handleEditChange}
-                rows="4"
+                rows={4}
                 className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
               />
 

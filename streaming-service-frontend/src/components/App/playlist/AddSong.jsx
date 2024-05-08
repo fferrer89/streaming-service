@@ -107,9 +107,10 @@ const AddSongForm = ({ data: playlistData }) => {
         style={{ overflow: "scroll", width: "100%" }}
       >
         {data &&
-          data.getSongsByTitle.map((song) => {
+          data.getSongsByTitle.map((song, index) => {
             return (
               <div
+                key={index}
                 className="flex flex-row justify-between border"
                 style={{
                   alignSelf: "flex-start",
@@ -122,9 +123,10 @@ const AddSongForm = ({ data: playlistData }) => {
                   <p className="text-md">{song.title}</p>
                   <div className="flex flex-row ">
                     {song.artists &&
-                      song.artists.map((artist) => {
+                      song.artists.map((artist, index) => {
                         return (
                           <span
+                            key={index}
                             className="text-xs"
                             style={{ marginLeft: "0.3rem" }}
                           >

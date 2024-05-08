@@ -10,7 +10,7 @@ import { RootState } from "@/utils/redux/store";
 import { useSelector } from "react-redux";
 import { getImageUrl } from "@/utils/tools/images";
 import createApolloClient from "@/utils/";
-import { playSong } from '@/utils/redux/features/song/songSlice';
+import { playSong } from "@/utils/redux/features/song/songSlice";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 
@@ -77,9 +77,14 @@ const Songs: React.FC = () => {
           ))
         ) : (
           <div className="text-center  py-4">
-            <p>You don't have any liked songs yet</p>
+            <p>You don&apost have any liked songs yet</p>
             <div className="inline-block rounded-full bg-gray-300 px-6 py-3 shadow border border-black">
-              <Link href={userType === "artist" ? "/artist/search" : "/sound/search"} className="text-black font-semibold">
+              <Link
+                href={
+                  userType === "artist" ? "/artist/search" : "/sound/search"
+                }
+                className="text-black font-semibold"
+              >
                 Explore Songs
               </Link>
             </div>
