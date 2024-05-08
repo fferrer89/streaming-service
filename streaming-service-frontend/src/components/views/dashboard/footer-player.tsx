@@ -27,7 +27,7 @@ const SPlayer: React.FC = () => {
   useEffect(() => {
     if (currentSong) {
       if (audioRef.current) {
-        const songUrl = `http://localhost:4000/file/song/stream/${currentSong.song_url}`;
+        const songUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/song/stream/${currentSong.song_url}`;
         audioRef.current.src = songUrl;
         if (isPlaying) {
           audioRef.current.play();
@@ -95,7 +95,7 @@ const SPlayer: React.FC = () => {
         loop
         showSkipControls={true}
         layout={"stacked-reverse"}
-        src={`http://localhost:4000/file/song/stream/${currentSong.song_url}`}
+        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/song/stream/${currentSong.song_url}`}
         onPlay={(e) => console.log("onPlay")}
         onClickNext={(e) => handleNextSong()}
         onClickPrevious={(e) => handlePreviousSong()}

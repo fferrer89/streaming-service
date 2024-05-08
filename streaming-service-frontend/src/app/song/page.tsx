@@ -9,7 +9,7 @@ const Song: React.FC = () => {
       <Player
         trackList={[
           {
-            url: "http://localhost:4000/file/song/stream/662d3a293686f7f5eaf896d1",
+            url: `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/song/stream/662d3a293686f7f5eaf896d1`,
             title: "Madza - Chords of Life",
             tags: [""],
           },

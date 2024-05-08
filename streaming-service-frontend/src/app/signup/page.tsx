@@ -128,7 +128,7 @@ const Signup: React.FC = () => {
   return (
     <>
       <main className='flex flex-col justify-center items-center py-10 text-[#C6AC8E]'>
-        <div className='py-10 px-10 sm:rounded-lg w-full sm:max-w-md bg-[#22333B] sm:shadow-2xl'>
+        <div className='py-10 px-10 sm:rounded-lg w-full sm:max-w-md bg-[#22333B] sm:shadow-2xl border-2 border-[#C6AC8E] rounded-lg'>
           <h1 className='text-3xl font-bold'>Sign up</h1>
           <div className='text-xl font-bold mt-4'>
             <span>Join today and dive into the world of music</span>

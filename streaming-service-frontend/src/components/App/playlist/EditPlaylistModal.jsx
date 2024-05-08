@@ -2,7 +2,7 @@
 
 import { useMutation } from "@apollo/client";
 import React, { useState } from "react";
-import { client } from "../../../utils/playlistHelper";
+import apolloClient from "@/utils";
 import queries from "../../../utils/queries";
 import { PlayListForm } from "./PlaylistForm";
 import { PlayListModal } from "./PlaylistModal";
@@ -13,7 +13,7 @@ const EditPlayListForm = ({ data, onSubmitMessage, setOnSubmitMessage }) => {
     queries.EDIT_PLAYLIST,
     {
       refetchQueries: [queries.GET_PLAYLIST],
-      client,
+      apolloClient ,
       onCompleted: () => {
         setOnSubmitMessage("Successfully Updated");
       },

@@ -1,13 +1,13 @@
-// ArtistProfileImage.tsx
+// UserProfileImage.tsx
 import Image from "next/image";
 import React from "react";
 
-interface ArtistProfileImageProps {
+interface UserProfileImageProps {
   image_url: string | null;
   size: number;
 }
 
-const ArtistProfileImage: React.FC<ArtistProfileImageProps> = ({ image_url, size }) => {
+const UserProfileImage: React.FC<UserProfileImageProps> = ({ image_url, size }) => {
   const imageUrl = image_url ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${image_url}` : "/img/ellipse.png";
   return (
     <Image
@@ -20,4 +20,4 @@ const ArtistProfileImage: React.FC<ArtistProfileImageProps> = ({ image_url, size
   );
 };
 
-export default ArtistProfileImage;
+export default UserProfileImage;

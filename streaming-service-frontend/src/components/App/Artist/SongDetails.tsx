@@ -5,6 +5,7 @@ import {isoToUsDateFormat} from "@/utils/helpers";
 import SongFormModal from "@/components/App/Artist/SongFormModal";
 import {useFormState} from "react-dom";
 import {useSelector} from "react-redux";
+import { useRouter } from "next/navigation";
 const initialState = {
     message: null
 };
@@ -12,6 +13,7 @@ const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
     const artistId = useSelector(
         (state: { user: { userId: string | null } }) => state.user.userId
     );
+    const { push } = useRouter()
     const {
         _id,
         album,
@@ -44,11 +46,11 @@ const SongDetails: React.FC<{ songData: any }> = ({songData, refetch}) => {
         } else {
             setShowConfirmation(false);
             refetch()
-            window.location.href = 'http://localhost:3000/artist/songs';
+            push('/artist/songs');
         }
 
     }
-    const imageUrl = `http://localhost:4000/file/download/${cover_image_url}`;
+    const imageUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${cover_image_url}`;
     return (
         <div
             className="flex flex-col w-full h-fit gap-3 p-0 bg-white rounded-lg overflow-hidden items-center relative"

@@ -152,7 +152,7 @@ const AlbumDetailsSongs: React.FC<{
                 <div className="flex-shrink-0">
                   <img
                     className="w-8 h-8 rounded-full"
-                    src={`http://localhost:4000/file/download/${song.cover_image_url}`}
+                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${song.cover_image_url}`}
                     alt={song.title}
                   />
                 </div>

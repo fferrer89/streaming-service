@@ -51,12 +51,12 @@ const ArtistProfile: React.FC<{ artistData: any }> = ({ artistData }) => {
 
   const { firstName, lastName, displayName, email, genres } = formData;
 
-  const imageUrl = `http://localhost:4000/file/download/${artistData.getArtistById.profile_image_url}`;
+   
 
   return (
     <div
       className="container mx-auto my-5 p-5 rounded-lg"
-      style={{ backgroundColor: "rgba(255, 255, 255, 0.5)" }}
+       
     >
       <div className="md:flex no-wrap md:-mx-2">
         <div className="w-full md:w-3/12 md:mx-2 ">

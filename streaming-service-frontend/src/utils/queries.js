@@ -546,16 +546,27 @@ const GET_PLAYLIST = gql`
       visibility
       isOwner
       songs {
-        _id
-        title
+        _id 
+        title 
+        duration 
+        song_url 
+        writtenBy 
+        producers 
+        language 
+        genre 
+        lyrics 
+        release_date 
         album {
-          _id
-          title
-        }
-        cover_image_url
-        duration
+            _id 
+            title 
+            cover_image_url 
+        } 
+        artists {
+            _id 
+            display_name 
+            profile_image_url 
+        } 
       }
-      likes
       description
       owner {
         first_name
@@ -563,7 +574,7 @@ const GET_PLAYLIST = gql`
       created_date
       _id
       title
-      isLiked
+     
     }
   }
 `;
