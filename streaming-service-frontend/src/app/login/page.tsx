@@ -110,8 +110,8 @@ const Login: React.FC = () => {
 
   return (
     <>
-      <main className='flex flex-col justify-center items-center py-10 text-[#C6AC8E]'>
-        <div className='py-10 px-10 sm:rounded-lg w-full sm:max-w-md bg-[#22333B] sm:shadow-2xl'>
+      <main className='flex flex-col justify-center items-center py-10 text-[#C6AC8E] '>
+        <div className='py-10 px-10 sm:rounded-lg w-full sm:max-w-md bg-[#22333B] sm:shadow-2xl border-2 border-[#C6AC8E] rounded-lg'>
           <h1 className='text-3xl font-bold'>Log in to Sounds 54</h1>
           <div className='flex flex-col items-center mt-10 lg:w-full'>
             <form className='w-full' id='login' onSubmit={handleSubmit(handleOnSubmit)}>

@@ -1,14 +1,23 @@
-import React from "react";
-import Link from "next/link";
+// ArtistProfileImage.tsx
 import Image from "next/image";
-const ArtistProfileImage: React.FC<{ image_url: any }> = ({
-  image_url,
-  size,
-}) => {
-  const iurl = image_url
-    ? `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${image_url}`
-    : "/img/ellipse.png";
-  return <img src={iurl} width={size} height={size} alt="Profile image" />;
+import React from "react";
+
+interface ArtistProfileImageProps {
+  image_url: string | null;
+  size: number;
+}
+
+const ArtistProfileImage: React.FC<ArtistProfileImageProps> = ({ image_url, size }) => {
+  const imageUrl = image_url ? `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${image_url}` : "/img/ellipse.png";
+  return (
+    <Image
+      src={imageUrl}
+      width={size}
+      height={size}
+      alt="Profile Image"
+      className="rounded-full"
+    />
+  );
 };
 
 export default ArtistProfileImage;

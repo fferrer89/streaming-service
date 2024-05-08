@@ -42,7 +42,7 @@ const Songs: React.FC<SongsProps> = ({ songs }) => {
   
     return (
         <div
-        className="flex flex-col w-[1050px] h-[500px] gap-3 p-0 bg-white rounded-lg overflow-hidden relative"
+        className="flex flex-col  w-[95%] gap-3 p-0 bg-white rounded-lg overflow-hidden relative"
         style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
         >
         <div className="flex items-center px-5 pt-1">

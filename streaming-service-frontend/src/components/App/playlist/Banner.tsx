@@ -7,10 +7,10 @@ import React from "react";
 import { client } from "../../../utils/playlistHelper";
 import queries from "../../../utils/queries";
 import { EditPlaylistModal } from "./EditPlaylistModal";
-import { AddPlaylistModal } from "./AddPlaylistModal";
+ 
 import { FloatingAddButton } from "./AddSong";
 
-interface BannaerProp {
+interface BannerProp {
   playlist: {
     songs: {
       _id: string;
@@ -35,7 +35,7 @@ interface BannaerProp {
   };
 }
 
-export const PlayListBanner: React.FC<BannaerProp> = ({ playlist }) => {
+export const PlayListBanner: React.FC<BannerProp> = ({ playlist }) => {
   const [likeToggle, setLikeToggle] = useState<boolean>(playlist.isLiked);
 
   const [likePlayList, { data: toggleData, loading, error }] = useMutation(
@@ -48,52 +48,34 @@ export const PlayListBanner: React.FC<BannaerProp> = ({ playlist }) => {
   }
 
   return (
-    <div
-      className="flex flex-col"
-      style={{
-        height: "200px",
-        justifyContent: "center",
-        backgroundColor: "#a7a8a7",
-      }}
-    >
-      <div className="flex flex-row justify-between">
-        <p className="px-3" style={{ fontSize: "50px" }}>
-          {playlist.title}
-        </p>
-        <div className="px-5 py-3">
-          {playlist.isOwner && <EditPlaylistModal data={playlist} />}
-        </div>
+    <div className="flex flex-col bg-gray-800 text-white p-5 rounded-lg shadow-lg">
+      <div className="flex flex-row justify-between items-center">
+        <h1 className="text-4xl font-bold">{playlist.title}</h1>
+        {playlist.isOwner && <EditPlaylistModal data={playlist} />}
       </div>
 
-      <p className="px-3 text-gray-500" style={{ marginBottom: "1rem" }}>
+      <p className="text-gray-400 mt-2">
         By {playlist.owner.first_name}
       </p>
-      <div className="flex flex-col">
-        <p className="text-sm px-3">{playlist.description}</p>
-        <div className="flex items-center justify-between px-3">
-          <div
-            className="flex text-white justify-center items-center px-2  rounded-md w-fit"
-            style={{ backgroundColor: "#36630b" }}
-          >
-            <p className="text-md" style={{ marginRight: "0.4rem" }}>
-              {playlist.likes}
-            </p>
-            <p>likes</p>
-          </div>
-          <div
-            onClick={() => {
-              setLikeToggle(!likeToggle);
-              likePlayList({
-                variables: { playlistId: playlist._id },
-              });
-            }}
-          >
-            {!likeToggle && <CiHeart size={"40px"} />}
-            {likeToggle && <FcLike size={"40px"} />}
-          </div>
+      <p className="mt-4">{playlist.description}</p>
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center space-x-2 bg-[#A2825D] hover:bg-[#C6AC8E] focus:[#C6AC8E]  px-4 py-2 rounded-full">
+          <span className="text-xl">{playlist.likes}</span>
+          <span>likes</span>
         </div>
-        <AddPlaylistModal />
+        <button
+          onClick={() => {
+            setLikeToggle(!likeToggle);
+            likePlayList({
+              variables: { playlistId: playlist._id },
+            });
+          }}
+          className="flex items-center justify-center p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition-colors"
+        >
+          {!likeToggle ? <CiHeart size={"40px"} /> : <FcLike size={"40px"} />}
+        </button>
       </div>
+      
     </div>
   );
 };

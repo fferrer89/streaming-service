@@ -166,7 +166,7 @@ const Search: React.FC = () => {
         </div>
       </div>
       
-    <div className="flex flex-col w-full h-full items-center overflow-y-scroll p-4 space-y-4 justify-start ">
+    <div className= "grid grid-cols-1 gap-4 w-full place-items-center">
         <Songs songs={results.songs} />
         <Artists artists={results.artists} />
         <Playlists playlistsData={{ playlists: results.playlists }} />

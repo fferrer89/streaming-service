@@ -10,6 +10,7 @@ import { RootState } from '@/utils/redux/store';
 import { useSelector } from 'react-redux';
 import { getImageUrl } from '@/utils/tools/images';
 
+
 const Songs: React.FC = () => {
   const [songs, setSongs] = useState<UserLikedSong[]>([]);
   const userId = useSelector((state: RootState) => state.user.userId);
@@ -54,9 +55,9 @@ const Songs: React.FC = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-10">
+          <div className="text-center  py-4">
             <div className="inline-block rounded-full bg-gray-300 px-6 py-3 shadow border border-black">
-              <a href="/sound/search" className="text-black font-semibold">Explore Songs</a>
+              <a href="/sound/search" className="text-black font-bold text-xs">Explore Songs</a>
             </div>
           </div>
         )}

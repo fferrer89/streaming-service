@@ -1,11 +1,11 @@
-'use client';
-import React from 'react';
-import LogoutButton from '../Artist/LogoutButton';
-import Link from 'next/link';
-import styles from './page.module.css';
-import Image from 'next/image';
-import { IoMusicalNotesOutline } from 'react-icons/io5';
-import { RiFolderMusicLine } from 'react-icons/ri';
+"use client";
+import React from "react";
+import LogoutButton from "../Artist/LogoutButton";
+import Link from "next/link";
+import styles from "./page.module.css";
+import Image from "next/image";
+import { IoMusicalNotesOutline } from "react-icons/io5";
+import { RiFolderMusicLine } from "react-icons/ri";
 
 const ArtistSideNav: React.FC = () => {
   /**
@@ -15,7 +15,7 @@ const ArtistSideNav: React.FC = () => {
   return (
     <section className={styles.sideNav}>
       <header>
-        <Link href={'/artist/profile'}>
+        <Link href={"/artist/profile"}>
           <Image
             src="/img/ellipse.png"
             width={45}
@@ -27,47 +27,47 @@ const ArtistSideNav: React.FC = () => {
       </header>
       <nav>
         <ul>
-          <li className="flex items-center hover:bg-stone-500 px-2 py-1 rounded-md">
-            <Link href={'/artist'}>
-              <Image
-                src="/icons/home-white.png"
-                width={30}
-                height={30}
-                alt="Home icon"
-              />
+          <li className="hover:bg-stone-500 px-2 py-1 rounded-md">
+            <Link href={"/artist"}>
+              <div className="flex items-center">
+                <Image
+                  src="/icons/home-white.png"
+                  width={30}
+                  height={30}
+                  alt="Home icon"
+                />
+                <span className="ml-2">Home</span>
+              </div>
             </Link>
-            <Link href={'/artist'}>Home</Link>
           </li>
-          <li className="flex items-center hover:bg-stone-500 px-2 py-1 rounded-md">
-            <Link href={'/artist/search'}>
-              <Image
-                src="/icons/search-white.png"
-                width={30}
-                height={30}
-                alt="Search icon"
-              />
+          <li className="hover:bg-stone-500 px-2 py-1 rounded-md">
+            <Link href={"/artist/search"}>
+              <div className="flex items-center">
+                <Image
+                  src="/icons/search-white.png"
+                  width={30}
+                  height={30}
+                  alt="Search icon"
+                />
+                <span className="ml-2">Search</span>
+              </div>
             </Link>
-            <Link href={'/artist/search'}>Search</Link>
           </li>
-          <li className="flex items-center hover:bg-stone-500 px-2 py-1 rounded-md">
-            <div className="flex items-center">
-              <Link href="/artist/albums">
+          <li className="hover:bg-stone-500 px-2 py-1 rounded-md">
+            <Link href="/artist/albums">
+              <div className="flex items-center">
                 <RiFolderMusicLine size={30} />
-              </Link>
-              <Link href="/artist/albums">
-                <span className="ml-7">Your Albums</span>
-              </Link>
-            </div>
+                <span className="ml-2">Your Albums</span>
+              </div>
+            </Link>
           </li>
-          <li className="flex items-center hover:bg-stone-500 px-2 py-1 rounded-md">
-            <div className="flex items-center">
-              <Link href="/artist/songs">
+          <li className="hover:bg-stone-500 px-2 py-1 rounded-md">
+            <Link href="/artist/songs">
+              <div className="flex items-center">
                 <IoMusicalNotesOutline size={30} />
-              </Link>
-              <Link href="/artist/songs">
-                <span className="ml-7">Your Songs</span>
-              </Link>
-            </div>
+                <span className="ml-2">Your Songs</span>
+              </div>
+            </Link>
           </li>
         </ul>
       </nav>

@@ -1,4 +1,5 @@
-'use client';
+// Home.tsx
+"use client";
 import React, { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import Card from "@/components/App/Feed/Card";
@@ -9,12 +10,14 @@ import apolloClient from "@/utils";
 import { FeedQuery } from "@/utils/graphql/queries";
 import { FeedQueryResult } from "@/utils/graphql/resultTypes";
 import { getImageUrl } from "@/utils/tools/images";
+import { useRouter } from "next/navigation";
+import SkeletonLoader from "@/components/App/SkeletonLoader";
 
-
-// TODO: FIX INIFINITE CAROUSEL
+// TODO: FIX INFINITE CAROUSEL
 
 const Home: React.FC = () => {
   const dispatch = useDispatch();
+  const { push } = useRouter();
   const [mostLikedSongs, setMostLikedSongs] = useState<
     FeedQueryResult["getMostLikedSongs"]
   >([]);
@@ -27,11 +30,11 @@ const Home: React.FC = () => {
   const [mostLikedAlbums, setMostLikedAlbums] = useState<
     FeedQueryResult["getMostLikedAlbums"]
   >([]);
-  const [ newlyReleasedSongs, setNewlyReleasedSongs ] = useState<
+  const [newlyReleasedSongs, setNewlyReleasedSongs] = useState<
     FeedQueryResult["getNewlyReleasedSongs"]
   >([]);
 
-
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMostLikedSongsAndArtists = async () => {
@@ -46,6 +49,8 @@ const Home: React.FC = () => {
         setNewlyReleasedSongs(data.getNewlyReleasedSongs.slice(0, 10));
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -53,17 +58,23 @@ const Home: React.FC = () => {
   }, []);
 
   const handleSongClick = (songId: string) => {
-
     const clickedSong = mostLikedSongs.find((song) => song._id === songId);
     if (clickedSong) {
-
       dispatch(playSong({ song: clickedSong, currentTime: 0 }));
     }
   };
 
+  const renderLoadingSkeleton = (count: number) => (
+    <div className="flex gap-4 overflow-x-scroll py-3 no-scrollbar w-full">
+      {Array.from({ length: count }).map((_, index) => (
+        <SkeletonLoader key={index} />
+      ))}
+    </div>
+  );
+
   return (
     <div
-      className="w-full h-full bg-cover bg-center overflow-x-hidden"
+      className="grid grid-cols-1 gap-4 bg-cover bg-center overflow-x-hidden h-full no-scrollbar"
       style={{
         backgroundImage: 'url("/img/app-background.png")',
         borderRadius: "1rem",
@@ -75,14 +86,14 @@ const Home: React.FC = () => {
         backgroundRepeat: "no-repeat",
       }}
     >
-      <div className="flex flex-col items-start justify-start h-full w-full overflow-y-scroll overflow-x-clip no-scrollbar">
-        <div className="flex flex-col items-center justify-center w-full h-auto">
-          <div className="w-full flex">
-            <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
-              SOUNDS FOR YOU
-            </h1>
-          </div>
-          <Separator className="w-[97%]" />
+      <div className="flex flex-col items-center justify-center w-full h-auto">
+        <div className="w-full flex">
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">SOUNDS FOR YOU</h1>
+        </div>
+        <Separator className="w-[97%]" />
+        {loading ? (
+          renderLoadingSkeleton(10)
+        ) : (
           <InfiniteCarousel
             items={mostLikedSongs.map((song) => (
               <Card
@@ -95,14 +106,16 @@ const Home: React.FC = () => {
             speed={0.4}
             direction="left"
           />
+        )}
+      </div>
+      <div className="flex flex-col items-center justify-center w-full h-auto">
+        <div className="w-full flex">
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">ARTISTS OF THE WEEK</h1>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-auto">
-          <div className="w-full flex">
-            <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
-              ARTISTS OF THE WEEK
-            </h1>
-          </div>
-          <Separator className="w-[97%]" />
+        <Separator className="w-[97%]" />
+        {loading ? (
+          renderLoadingSkeleton(5)
+        ) : (
           <InfiniteCarousel
             items={mostFollowedArtists.map((artist) => (
               <Card
@@ -110,19 +123,22 @@ const Home: React.FC = () => {
                 key={artist._id}
                 image={getImageUrl(artist.profile_image_url)}
                 songId={artist._id}
+                onClick={() => push(`/artist/profile/${artist._id}`)}
               />
             ))}
             speed={0.4}
             direction="right"
           />
+        )}
+      </div>
+      <div className="flex flex-col items-center justify-center w-full h-auto">
+        <div className="w-full flex">
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">ALBUMS OF THE WEEK</h1>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-auto">
-          <div className="w-full flex">
-            <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
-              ALBUMS OF THE WEEK
-            </h1>
-          </div>
-          <Separator className="w-[97%]" />
+        <Separator className="w-[97%]" />
+        {loading ? (
+          renderLoadingSkeleton(5)
+        ) : (
           <InfiniteCarousel
             items={mostLikedAlbums.map((album) => (
               <Card
@@ -135,14 +151,16 @@ const Home: React.FC = () => {
             speed={0.4}
             direction="left"
           />
+        )}
+      </div>
+      <div className="flex flex-col items-center justify-center w-full h-auto">
+        <div className="w-full flex">
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">NEW ALBUMS</h1>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-auto">
-          <div className="w-full flex">
-            <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
-              NEW ALBUMS
-            </h1>
-          </div>
-          <Separator className="w-[97%]" />
+        <Separator className="w-[97%]" />
+        {loading ? (
+          renderLoadingSkeleton(5)
+        ) : (
           <InfiniteCarousel
             items={newlyReleasedAlbums.map((album) => (
               <Card
@@ -155,14 +173,16 @@ const Home: React.FC = () => {
             speed={0.4}
             direction="right"
           />
+        )}
+      </div>
+      <div className="flex flex-col items-center justify-center w-full h-auto">
+        <div className="w-full flex">
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">NEW SONGS</h1>
         </div>
-        <div className="flex flex-col items-center justify-center w-full h-auto">
-          <div className="w-full flex">
-            <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
-              NEW SONGS
-            </h1>
-          </div>
-          <Separator className="w-[97%]" />
+        <Separator className="w-[97%]" />
+        {loading ? (
+          renderLoadingSkeleton(5)
+        ) : (
           <InfiniteCarousel
             items={newlyReleasedSongs.map((song) => (
               <Card
@@ -175,10 +195,11 @@ const Home: React.FC = () => {
             speed={0.4}
             direction="left"
           />
-        </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default Home;
+

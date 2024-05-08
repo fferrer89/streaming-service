@@ -119,6 +119,29 @@ export type UserLikedSong =  {
         profile_image_url: string;
     }[];
 }
+export type  SongsByArtistID = {
+    _id: string;
+    title: string;
+    duration: number;
+    song_url: string;
+    writtenBy: string;
+    producers: string[];
+    language: string;
+    genre: string;
+    lyrics: string;
+    release_date: string;
+    album: {
+        _id: string;
+        title: string;
+        cover_image_url: string;
+    };
+    artists: {
+        _id: string;
+        display_name: string;
+        profile_image_url: string;
+    }[];
+}
+
 
 export type GetUserPlaylist = {
     _id: string;

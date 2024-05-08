@@ -1,7 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useMutation, gql } from "@apollo/client";
 import { Separator } from "@/components/ui/separator";
 import AlbumDetailsSongs from "./units/AlbumDetailsSongs";
 import AlbumDetailsArtists from "./units/AlbumDetailsArtists";
+import { useRouter } from 'next/navigation';
+
+const REMOVE_ALBUM_MUTATION = gql`
+  mutation RemoveAlbum($id: ID!) {
+    removeAlbum(_id: $id) {
+      _id
+      title
+    }
+  }
+`;
+
 const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   albumData,
   refetch,
@@ -21,6 +33,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
     total_songs,
     visibility,
   } = albumData.getAlbumById;
+  const router = useRouter();
   const date = new Date(release_date);
   const options = {
     year: "numeric",
@@ -29,39 +42,35 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   };
 
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [removeAlbum, { loading, error }] = useMutation(REMOVE_ALBUM_MUTATION);
+
   const handleRemoveAlbum = () => {
     setShowConfirmation(true);
   };
+
   const cancelRemoveAlbum = () => {
     setShowConfirmation(false);
   };
 
   const confirmRemoveAlbum = async () => {
-    // try {
-    //   const response = await removeSongFromAlbum({
-    //     variables: { id: albumId, songId: songToRemove },
-    //   });
-    //   if (response.errors && response.errors.length > 0) {
-    //     setError(`Error removing song`);
-    //     console.error("Error removing song:", error);
-    //   } else {
-    //     console.log("Song removed successfully");
-    //     setSongToRemove("");
-    //     setShowConfirmation(false);
-    //   }
-    //   refetch();
-    // } catch (error) {
-    //   console.error("Error removing song:", error);
-    //   setSongToRemove("");
-    //   setShowConfirmation(false);
-    //   setM("Song Removed successfully");
-    //   setIsSuccess(false);
-    //   setShowSuccess(true);
-    // }
+    try {
+      const response = await removeAlbum({
+        variables: { id: _id },
+      });
+      if (response.data.removeAlbum) {
+        console.log("Album removed successfully:", response.data.removeAlbum.title);
+        refetch();
+        router.push('/artist/albums');
+      }
+    } catch (err) {
+      console.error("Error removing album:", err);
+    }
+    setShowConfirmation(false);
   };
 
   const formattedDate = date.toLocaleString("en-US", options);
   const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${cover_image_url}`;
+
   return (
     <div
       className="flex flex-col w-full h-fit gap-3 p-0 bg-white rounded-lg overflow-hidden relative"
@@ -72,7 +81,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
           Album Details
         </div>
         <button
-          onClick={() => setShowConfirmation(true)}
+          onClick={handleRemoveAlbum}
           className="bg-stone-300 hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow ml-8"
         >
           Delete This Album
@@ -86,10 +95,11 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
           <div className="bg-gray-200 p-4 rounded-lg shadow-lg text-black">
             <p>Are you sure you want to remove this Album?</p>
             <div className="mt-4 flex justify-end">
-              {/* {error && <div>{error}</div>} */}
+              {error && <div className="text-red-500">{error.message}</div>}
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded-md mr-2 hover:bg-red-600"
                 onClick={confirmRemoveAlbum}
+                disabled={loading}
               >
                 Confirm
               </button>

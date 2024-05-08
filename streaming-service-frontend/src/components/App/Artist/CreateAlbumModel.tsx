@@ -235,6 +235,7 @@ const CreateAlbumModal: React.FC<{
               value={albumData.release_date}
               onChange={handleInputChange}
               className="border border-gray-300 rounded-md p-2 w-full"
+              max={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]}
             />
           </div>
           <div className="mb-4">
@@ -290,6 +291,7 @@ const CreateAlbumModal: React.FC<{
               name="coverImageUrl"
               onChange={handleFileChange}
               className="border border-gray-300 rounded-md p-2 w-full"
+              accept='image/*'
             />
           </div>
           <div className="mb-4">
