@@ -16,8 +16,20 @@ export const songResolvers = {
   Query: {
     songs: async (_, args, context) => {
       try {
-        let songs = await Songs.find();
-        return songs;
+        const cachedSongs = await context.redisClient.json.get('song_songs');
+        if (cachedSongs) {
+          return cachedSongs;
+        }
+
+        const allSongs = await Songs.find();
+        if (allSongs && allSongs.length !== 0) {
+          await context.redisClient.json.set('song_songs', '$', allSongs);
+          await context.redisClient.EXPIRE('song_songs', 1800);
+
+          return allSongs;
+        } else {
+          return [];
+        }
       } catch (error) {
         throw new GraphQLError(`Failed to fetch songs: ${error.message}`);
       }
@@ -27,10 +39,20 @@ export const songResolvers = {
       try {
         id = id.trim();
         songHelper.validObjectId(id);
-        let song = await Songs.findById(id);
-        if (!song) {
-          throw 'Song Not found';
+
+        const cacheKey = `song_song:${id}`;
+        let song = await context.redisClient.json.get(cacheKey);
+        if (song) {
+          return song;
         }
+
+        song = await Songs.findById(id);
+        if (!song) {
+          throw new GraphQLError('Song Not found');
+        }
+
+        await context.redisClient.json.set(cacheKey, '$', song);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
 
         return song;
       } catch (error) {
@@ -41,9 +63,21 @@ export const songResolvers = {
     getSongsByTitle: async (_, { searchTerm: term, limit = 10 }, context) => {
       term = songHelper.emptyValidation(term, 'Title');
 
+      const cacheKey = `song_songsByTitle:${term}:${limit}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
       let songs = await Songs.find({
         title: { $regex: new RegExp(`^${term}`, 'i') },
       }).limit(limit);
+
+      if (songs.length > 0) {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
+      }
+
       return songs.map((song) => ({
         ...song._doc,
         song_url: song.song_url || '',
@@ -54,10 +88,19 @@ export const songResolvers = {
       let { albumId } = args;
       albumId = songHelper.emptyValidation(albumId, 'albumId');
       albumId = songHelper.validObjectId(albumId, 'albumId');
-      let songs = await Songs.find({ album: albumId });
 
+      const cacheKey = `song_songsByAlbum:${albumId}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
+      let songs = await Songs.find({ album: albumId });
       if (songs.length == 0) {
         songHelper.notFoundWrapper('Songs not found by this album id');
+      } else {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
       }
 
       return songs;
@@ -69,11 +112,20 @@ export const songResolvers = {
       artistId = songHelper.emptyValidation(artistId, 'artistId');
       artistId = songHelper.validObjectId(artistId, 'artistId');
 
-      let songs = await Songs.find({ artists: { $eq: artistId } });
+      const cacheKey = `song_songsByArtist:${artistId}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
 
+      let songs = await Songs.find({ artists: { $eq: artistId } });
       if (songs.length == 0) {
         songHelper.notFoundWrapper('Songs not found by this Artist id');
+      } else {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
       }
+
       return songs;
     },
 
@@ -85,11 +137,21 @@ export const songResolvers = {
           'search term should be at least 3 characters long'
         );
       }
+
+      const cacheKey = `song_songsByWriter:${term}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
       let songs = await Songs.find({
         writtenBy: { $regex: new RegExp(term, 'i') },
       });
       if (songs.length < 1) {
         songHelper.notFoundWrapper('Song not found');
+      } else {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
       }
 
       return songs;
@@ -99,60 +161,102 @@ export const songResolvers = {
       let { genre } = args;
       genre = songHelper.emptyValidation(genre, 'Genre');
       genre = genre.toLowerCase();
+
+      const cacheKey = `song_songsByGenre:${genre}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
       let songs = await Songs.find({ genre: genre });
       if (songs.length < 1) {
         songHelper.notFoundWrapper('Song not found');
+      } else {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
       }
       return songs;
     },
     getMostLikedSongs: async (_, { limit = 10 }, context) => {
       if (limit < 1) {
-        songHelper.badUserInputWrapper('limit should be grater than 0');
+        songHelper.badUserInputWrapper('limit should be greater than 0');
       }
+
+      const cacheKey = `song_mostLikedSongs:${limit}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
       let songs = await Songs.aggregate([
         { $sort: { likes: -1 } },
         { $limit: limit },
       ]);
       if (songs.length < 1) {
         return [];
+      } else {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
       }
       return songs;
     },
     getNewlyReleasedSongs: async (_, { limit = 10 }, context) => {
       if (limit < 1) {
-        songHelper.badUserInputWrapper('limit should be grater than 0');
+        songHelper.badUserInputWrapper('limit should be greater than 0');
       }
+
+      const cacheKey = `song_newlyReleasedSongs:${limit}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
       let songs = await Songs.aggregate([
         { $sort: { release_date: -1 } },
         { $limit: limit },
       ]);
       if (songs.length < 1) {
         return [];
+      } else {
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
       }
       return songs;
     },
     getTrendingSongs: async (_, { limit = 10 }, context) => {
-      //Not complete;
       if (limit < 1) {
-        songHelper.badUserInputWrapper('limit should be grater than 0');
+        songHelper.badUserInputWrapper('limit should be greater than 0');
       }
+
+      const cacheKey = `song_trendingSongs:${limit}`;
+      let cachedSongs = await context.redisClient.json.get(cacheKey);
+      if (cachedSongs) {
+        return cachedSongs;
+      }
+
       const yesterdayDate = new Date();
       yesterdayDate.setDate(yesterdayDate.getDate() - 1); //last 24 hours
 
-      const group = { $group: { _id: '$songId', countSong: { $sum: 1 } } };
       const match = { $match: { timestamp: { $gte: yesterdayDate } } };
-      const sort = { $sort: { $countSong: 1 } };
-      const limitkey = { $limit: limit };
       const sortByCount = { $sortByCount: '$songId' };
+      const limitKey = { $limit: limit };
 
       let songsIds = await ListenHistory.aggregate([
         match,
         sortByCount,
-        limitkey,
+        limitKey,
       ]);
-      //YET TO BE TESTED;
-    },
 
+      if (songsIds.length < 1) {
+        return [];
+      } else {
+        let songIdsArray = songsIds.map((song) => song._id);
+        let songs = await Songs.find({ _id: { $in: songIdsArray } });
+        await context.redisClient.json.set(cacheKey, '$', songs);
+        await context.redisClient.EXPIRE(cacheKey, 1800);
+        return songs;
+      }
+    },
     getUserLikedSongs: async (_, args, context) => {
       let { userId } = args;
       userId = songHelper.emptyValidation(userId, 'user id');
@@ -176,7 +280,7 @@ export const songResolvers = {
     getMostLikedSongsOfArtist: async (_, args, context) => {
       let { artistId, limit } = args;
       if (limit < 1) {
-        songHelper.badUserInputWrapper('limit should be grater than 0');
+        songHelper.badUserInputWrapper('limit should be greater than 0');
       }
       artistId = songHelper.emptyValidation(artistId, 'artistId');
       songHelper.validObjectId(artistId, 'artistId');
@@ -370,6 +474,31 @@ export const songResolvers = {
 
         const newSong = await song.save();
 
+        const relatedCacheKeys = [
+          `song_songs`,
+          `song_song:${newSong._id}`,
+          `song_songsByAlbum:${album}`,
+          `song_songsByArtist:${artists.join(':')}`,
+          `song_songsByWriter:${writtenBy}`,
+          `song_songsByGenre:${genre}`,
+          `song_mostLikedSongs`,
+          `song_newlyReleasedSongs`,
+          `song_trendingSongs`,
+          ...artists.map((artistId) => `song_artist:${artistId}`),
+          album ? `song_album:${album}` : null,
+        ].filter((key) => key !== null);
+
+        relatedCacheKeys.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
+
+        const keysToDelete = await context.redisClient.keys(
+          'song_songsByTitle:*'
+        );
+        keysToDelete.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
+
         return newSong;
       } catch (error) {
         throw new GraphQLError(error.message);
@@ -407,6 +536,30 @@ export const songResolvers = {
 
         const updatedSong = await existingSong.save();
 
+        const relatedCacheKeys = [
+          `song_songs`,
+          `song_song:${songId}`,
+          `song_songsByAlbum:${existingSong.album}`,
+          `song_songsByWriter:${writtenBy}`,
+          `song_songsByGenre:${genre}`,
+          `song_mostLikedSongs`,
+          `song_newlyReleasedSongs`,
+          `song_trendingSongs`,
+          existingSong.album ? `song_album:${existingSong.album}` : null,
+        ].filter((key) => key !== null);
+
+        relatedCacheKeys.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
+
+        const keysToDelete = await context.redisClient.keys(
+          'song_songsByTitle:*',
+          'song_songsByArtist:*'
+        );
+        keysToDelete.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
+
         return updatedSong;
       } catch (error) {
         throw new GraphQLError(error.message);
@@ -439,9 +592,34 @@ export const songResolvers = {
           { $pull: { liked_songs: songId } }
         );
 
-        const removedS = await Songs.findByIdAndDelete(songId);
+        const removedSong = await Songs.findByIdAndDelete(songId);
 
-        return removedS;
+        const relatedCacheKeys = [
+          `song_songs`,
+          `song_song:${songId}`,
+          `song_songsByAlbum:${existingSong.album}`,
+          `song_songsByArtist:${existingSong.artists.join(':')}`,
+          `song_songsByWriter:${existingSong.writtenBy}`,
+          `song_songsByGenre:${existingSong.genre}`,
+          `song_mostLikedSongs`,
+          `song_newlyReleasedSongs`,
+          `song_trendingSongs`,
+          ...existingSong.artists.map((artistId) => `song_artist:${artistId}`),
+          existingSong.album ? `song_album:${existingSong.album}` : null,
+        ].filter((key) => key !== null);
+
+        relatedCacheKeys.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
+
+        const keysToDelete = await context.redisClient.keys(
+          'song_songsByTitle:*'
+        );
+        keysToDelete.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
+
+        return removedSong;
       } catch (error) {
         throw new GraphQLError(error.message);
       }
@@ -456,15 +634,23 @@ export const songResolvers = {
         const likedIndex = user.liked_songs.findIndex(
           (song) => song._id.toString() === songId
         );
+        let userUpdated = false;
         if (likedIndex !== -1) {
           user.liked_songs.splice(likedIndex, 1);
+          userUpdated = true;
         } else {
           user.liked_songs.push(songId);
+          userUpdated = true;
         }
 
-        await user.save();
+        if (userUpdated) {
+          await user.save();
+        }
 
-        const song = await Songs.findById(songId);
+        const songCacheKey = `song_song:${songId}`;
+        const song =
+          (await context.redisClient.json.get(songCacheKey)) ||
+          (await Songs.findById(songId));
         if (!song) {
           throw new Error('Song not found');
         }
@@ -472,6 +658,34 @@ export const songResolvers = {
         song.likes = user.liked_songs.length;
 
         const updatedSong = await song.save();
+
+        await context.redisClient.json.set(songCacheKey, '$', updatedSong);
+        await context.redisClient.EXPIRE(songCacheKey, 1800);
+
+        const relatedCacheKeys = [
+          `song_songs`,
+          `song_song:${songId}`,
+          `song_songsByAlbum:${song.album}`,
+          `song_songsByArtist:${song.artists.join(':')}`,
+          `song_songsByWriter:${song.writtenBy}`,
+          `song_songsByGenre:${song.genre}`,
+          `song_mostLikedSongs`,
+          `song_newlyReleasedSongs`,
+          `song_trendingSongs`,
+          ...song.artists.map((artistId) => `song_artist:${artistId}`),
+          song.album ? `song_album:${song.album}` : null,
+        ].filter((key) => key !== null);
+
+        relatedCacheKeys.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
+
+        const keysToDelete = await context.redisClient.keys(
+          'song_songsByTitle:*'
+        );
+        keysToDelete.forEach(async (key) => {
+          await context.redisClient.DEL(key);
+        });
 
         return updatedSong;
       } catch (error) {
