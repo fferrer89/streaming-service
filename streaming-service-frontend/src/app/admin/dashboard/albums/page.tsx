@@ -27,17 +27,20 @@ interface Albums {
   total_songs: string;
   release_date: string;
   created_date: string;
-  cover_image_url: string;
   visibility: string;
+  cover_image_url: string;
 }
 
-const AlbumList: React.FC = () => {
+const PAGE_SIZE = 10;
+
+const AdminDashboardAlbums: React.FC = () => {
   const router = useRouter();
   const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const [openModal, setOpenModal] = useState(false);
   const [albumId, setAlbumId] = useState('');
   const [albumTitle, setAlbumTitle] = useState('');
-  const { data, loading, error } = useQuery(queries.GET_ALBUMS, { fetchPolicy: 'cache-and-network' });
+  const { data, loading, error } = useQuery(queries.GET_DASHBOARD_ALBUMS, { fetchPolicy: 'cache-and-network' });
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [removeAlbum] = useMutation(queries.REMOVE_ALBUM, {
     update(cache, { data: { removeAlbum } }) {
@@ -61,7 +64,7 @@ const AlbumList: React.FC = () => {
         },
       });
     },
-    refetchQueries: [{ query: queries.GET_ALBUMS }],
+    refetchQueries: [{ query: queries.GET_DASHBOARD_ALBUMS }],
   });
 
   useEffect(() => {
@@ -88,7 +91,7 @@ const AlbumList: React.FC = () => {
     setOpenModal(false);
   };
 
-  if (!loggedIn || userType !== 'admin') {
+  if (loading || !loggedIn || userType !== 'admin') {
     return (
       <div className='text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]'>
         <span className='mr-2'>Loading</span>
@@ -97,6 +100,10 @@ const AlbumList: React.FC = () => {
         <span className='animate-bounce delay-200'>.</span>
       </div>
     );
+  }
+
+  if (error) {
+    return <div>Error: {error?.message}</div>
   }
 
   const date = (date: string) => {
@@ -111,37 +118,38 @@ const AlbumList: React.FC = () => {
     setOpenModal(true);
   };
 
-  if (loading) {
-    return (
-      <div className="text-4xl flex justify-center items-center h-full text-[#22333B] bg-[#C6AC8E]">
-        <span className="mr-2">Loading</span>
-        <span className="animate-bounce">.</span>
-        <span className="animate-bounce delay-75">.</span>
-        <span className="animate-bounce delay-200">.</span>
-      </div>
-    );
-  }
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
-  if (error) {
-    return <div>Error: {error?.message}</div>
-  }
+  const paginatedAlbums = data.albums.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   if (data) {
     return (
       <>
         <main className="flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden">
           <AdminSidebar></AdminSidebar>
-          <div className='flex flex-col gap-8 py-10 px-6 w-full h-full'>
-            <h1 className='text-4xl text-[#22333B]'>Albums</h1>
+          <div className='flex flex-col gap-8 py-10 px-6 w-full h-full sm:ml-60'>
+            <div className='flex justify-between items-center'>
+              <h1 className='text-4xl text-[#22333B]'>Albums</h1>
+              <div className="inline-flex gap-4">
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}
+                  className="bg-transparent hover:bg-[#22333B] text-[#22333B] font-semibold hover:text-[#C6AC8E] py-2 px-4 border border-[#22333B] hover:border-transparent rounded"
+                >Prev</button>
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={data.albums.length / PAGE_SIZE <= currentPage}
+                  className="bg-transparent hover:bg-[#22333B] text-[#22333B] font-semibold hover:text-[#C6AC8E] py-2 px-4 border border-[#22333B] hover:border-transparent rounded"
+                >Next</button>
+              </div>
+            </div>
             <div className='flex flex-col md:flex-wrap md:flex-row gap-6 w-full'>
-              {(data.albums.length > 0) ?
-                (data.albums.map((album: Albums) => (
-                  <div key={album._id} className='flex flex-col sm:w-56 items-center px-3 py-6 rounded-md bg-[#22333B]'>
+              {(paginatedAlbums.length > 0) ?
+                (paginatedAlbums.map((album: Albums) => (
+                  <div key={album._id} className='flex flex-col sm:w-56 items-center justify-center text-center px-3 py-6 rounded-md bg-[#22333B]'>
                     {(album.cover_image_url) ?
-                      <Image src={`/file/download/${album.cover_image_url}`} alt='Album Cover' width={100} height={100} className='mb-4 rounded-full' /> :
+                      <Image src={`http://localhost:4000/file/download/${album.cover_image_url}`} alt='Album Cover' width={100} height={100} className='mb-4 rounded-full' /> :
                       <BsSoundwave className='w-[100px] h-[100px] mb-4 rounded-full' />
                     }
-                    <h5 className='mb-2 text-xl font-medium text-[#C6AC8E]'>{album.title}</h5>
+                    <h5 className='mb-2 text-xl font-medium text-[#C6AC8E] text-pretty'>{album.title}</h5>
                     <span className='text-sm mb-2 text-[#C6AC8E]'>{(album.album_type) ? album.album_type : '--'}</span>
                     <span className='text-sm mb-2 text-[#C6AC8E]'>Songs: {album.total_songs}</span>
                     <span className='text-sm mb-2 text-[#C6AC8E]'>Released: {(album.release_date) ? date(album.release_date) : '--'}</span>
@@ -182,4 +190,4 @@ const AlbumList: React.FC = () => {
   }
 };
 
-export default AlbumList;
+export default AdminDashboardAlbums;

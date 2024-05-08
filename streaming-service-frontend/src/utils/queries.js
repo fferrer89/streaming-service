@@ -251,13 +251,98 @@ const GET_ALBUMS_BY_ARTIST = gql`
   }
 `;
 
-const GET_COUNT = gql`
-  query getCount {
+const GET_DASHBOARD_DATA = gql`
+  query getDashboardData {
+    admin: admin {
+      first_name
+      last_name
+    },
+    users: users {
+      gender
+    },
+    artists: artists {
+      gender
+    },
+    albums: albums {
+      album_type
+    },
+    songs: songs {
+      language
+    },
+    mostLikedSongs: getMostLikedSongs {
+      _id
+      title
+      writtenBy
+      release_date
+      likes
+      genre
+      cover_image_url
+    },
     getUserCount
     getArtistCount
     getAlbumCount
     getSongCount
     getPlaylistCount
+  }
+`;
+
+const GET_DASHBOARD_USERS = gql`
+  query users {
+    users {
+      _id
+      display_name
+      first_name
+      last_name
+      email
+      gender
+      date_of_birth
+      profile_image_url
+    }
+  }
+`;
+
+const GET_DASHBOARD_ARTISTS = gql`
+  query artists {
+    artists {
+      _id
+      display_name
+      first_name
+      last_name
+      email
+      gender
+      date_of_birth
+      profile_image_url
+    }
+  }
+`;
+
+const GET_DASHBOARD_SONGS = gql`
+  query songs {
+    songs {
+      _id
+      title
+      genre
+      likes
+      language
+      release_date
+      writtenBy
+      cover_image_url
+    }
+  }
+`;
+
+const GET_DASHBOARD_ALBUMS = gql`
+  query albums {
+    albums {
+      _id
+      title
+      album_type
+      total_songs
+      release_date
+      created_date
+      visibility
+      cover_image_url
+    }
   }
 `;
 
@@ -758,7 +843,11 @@ const queries = {
   GET_ALBUMS,
   GET_SONGS,
   GET_PLAYLISTS_BY_OWNER,
-  GET_COUNT,
+  GET_DASHBOARD_DATA,
+  GET_DASHBOARD_USERS,
+  GET_DASHBOARD_ARTISTS,
+  GET_DASHBOARD_ALBUMS,
+  GET_DASHBOARD_SONGS,
   REMOVE_USER,
   REMOVE_ARTIST,
   REMOVE_ALBUM,

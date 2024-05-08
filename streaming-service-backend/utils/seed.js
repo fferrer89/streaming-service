@@ -996,7 +996,7 @@ async function seed() {
     console.log(
       '------------------------  Finished Inserting sample song data  -------------------------'
     );
-     const createAdmin = await Admin.create(admin);
+    const createAdmin = await Admin.create(admin);
     // const newUsers = users.map((user) => ({
     //   ...user,
     //   profile_image_url: new mongoose.Types.ObjectId(sampleUserImageId),

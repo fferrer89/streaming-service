@@ -1,11 +1,11 @@
 // Home.tsx
 "use client";
-import React, { useEffect, useState , useMemo} from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Separator } from "@/components/ui/separator";
 import Card from "@/components/App/Feed/Card";
 import InfiniteCarousel from "@/components/App/Feed/InfiniteCarousel";
 import { useDispatch } from "react-redux";
-import { playSong , setNextSongs} from "@/utils/redux/features/song/songSlice";
+import { playSong, setNextSongs } from "@/utils/redux/features/song/songSlice";
 import { FeedQuery } from "@/utils/graphql/queries";
 import { FeedQueryResult } from "@/utils/graphql/resultTypes";
 import { getImageUrl } from "@/utils/tools/images";
@@ -17,10 +17,9 @@ import queries from "@/utils/queries";
 import { useQuery, useLazyQuery } from "@apollo/client";
 // TODO: FIX INFINITE CAROUSEL
 
-
 const Home: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
-  const apolloClient = useMemo(() => createApolloClient(token), [token]);
+  const apolloClient = createApolloClient(token);
   const dispatch = useDispatch();
   const { push } = useRouter();
   const [mostLikedSongs, setMostLikedSongs] = useState<
@@ -150,9 +149,7 @@ const Home: React.FC = () => {
                 image={getImageUrl(artist.profile_image_url)}
                 songId={artist._id}
                 onClick={() => push(`/artist/profile/${artist._id}`)}
-                
               />
-              
             ))}
             speed={0.4}
             direction="right"
