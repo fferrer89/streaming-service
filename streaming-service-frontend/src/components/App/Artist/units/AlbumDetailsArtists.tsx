@@ -72,7 +72,7 @@ const AlbumDetailsArtists: React.FC<{
       const response = await addArtistToAlbum({
         variables: { id: albumId, artistId: selectedArtistId },
       });
-
+      console.log(response);
       if (response.errors && response.errors.length > 0) {
         setIsSuccess(false);
         setM("Error Adding Artist");

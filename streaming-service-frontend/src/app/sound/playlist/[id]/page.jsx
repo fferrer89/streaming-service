@@ -8,6 +8,7 @@ import { AddSong } from "@/components/App/playlist/AddSong";
 import { useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux";
 import { playSong } from "@/utils/redux/features/song/songSlice";
+import { useEffect } from "react";
 
 export default function Playlist({ params }) {
   const dispatch = useDispatch();
@@ -22,9 +23,11 @@ export default function Playlist({ params }) {
   ] = useMutation(queries.REMOVE_SONG_FROM_PLAYLIST, {
     refetchQueries: [queries.GET_PLAYLIST],
     apolloClient,
+    fetchPolicy: "cache-and-network",
   });
   // console.log("playlists",data);
   //console.log(error);
+
   if (loading) return <div className="text-center text-lg">Loading...</div>;
   if (error)
     return (

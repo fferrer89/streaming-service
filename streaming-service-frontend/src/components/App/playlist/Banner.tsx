@@ -43,7 +43,7 @@ export const PlayListBanner: React.FC<BannerProp> = ({ playlist }) => {
     queries.TOGGLE_PLAYLIST,
     { refetchQueries: [queries.GET_PLAYLIST], client }
   );
-
+  console.log("-----------------", playlist.isOwner);
   if (error) {
     console.log(error);
   }

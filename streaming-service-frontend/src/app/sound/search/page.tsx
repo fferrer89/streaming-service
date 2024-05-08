@@ -6,7 +6,7 @@ import Artists from "@/components/App/Serach/Artists";
 import Playlists from "@/components/App/Serach/Playlists";
 import Songs from "@/components/App/Serach/Songs";
 import createApolloClient from "@/utils";
-
+import Albums from "@/components/App/Serach/Albums";
 const SEARCH_QUERIES = gql`
   query SearchQueries($searchTerm: String!) {
     getPlaylistsByTitle(searchTerm: $searchTerm) {
@@ -48,6 +48,17 @@ const SEARCH_QUERIES = gql`
       display_name
       profile_image_url
       genres
+    }
+    getAlbumsByTitle(title: $searchTerm) {
+      _id
+      cover_image_url
+      title
+      release_date
+      artists {
+        _id
+        display_name
+        profile_image_url
+      }
     }
   }
 `;
@@ -91,6 +102,17 @@ type ResultType = {
       display_name: string;
       profile_image_url: string;
     }[];
+    albums: {
+      _id: string;
+      title: string;
+      cover_image_url: string;
+      release_date: string;
+      artists: {
+        _id: string;
+        display_name: string;
+        profile_image_url: string;
+      }[];
+    }[];
   }[];
 };
 
@@ -101,6 +123,7 @@ const Search: React.FC = () => {
     artists: [],
     playlists: [],
     songs: [],
+    albums: [],
   });
   const apolloClient = createApolloClient(localStorage.getItem("token"));
 
@@ -132,9 +155,10 @@ const Search: React.FC = () => {
         artists: data.getArtistsByName,
         playlists: data.getPlaylistsByTitle,
         songs: data.getSongsByTitle,
+        albums: data.getAlbumsByTitle,
       });
     } else if (!debouncedSearchTerm) {
-      setResults({ artists: [], playlists: [], songs: [] });
+      setResults({ artists: [], playlists: [], songs: [], albums: [] });
     }
   }, [data, debouncedSearchTerm]);
 
@@ -176,6 +200,7 @@ const Search: React.FC = () => {
         <Songs songs={results.songs} />
         <Artists artists={results.artists} />
         <Playlists playlistsData={{ playlists: results.playlists }} />
+        <Albums albums={results.albums} />
       </div>
     </div>
   );
