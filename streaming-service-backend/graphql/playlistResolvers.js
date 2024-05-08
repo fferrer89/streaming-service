@@ -3,6 +3,7 @@ import Playlists from '../models/playlistModel.js';
 import Song from '../models/songModel.js';
 import User from '../models/userModel.js';
 import songsHelpers from '../utils/songsHelpers.js';
+import Artist from '../models/artistModel.js';
 
 export const playlistResolvers = {
   Query: {
@@ -57,21 +58,11 @@ export const playlistResolvers = {
       }).limit(limit);
 
       let filteredPlaylist = playlists.filter((playlist) => {
-        //will give different playlist if user is logged in;
-        if (
-          context.decoded &&
-          context.decoded.id &&
-          context.decoded.id === playlist.owner.toString()
-        ) {
-          // if user is logged in then return playlist where ower id matches;
+        if (playlist.visibility == 'PUBLIC') {
+          //if not logged in then return only public playlist
           return true;
-        } else {
-          if (playlist.visibility == 'PUBLIC') {
-            //if not logged in then return only public playlist
-            return true;
-          }
-          return false;
         }
+        return false;
       });
 
       if (filteredPlaylist.length < 1) {
@@ -105,11 +96,14 @@ export const playlistResolvers = {
         );
       }
       let userId = context.decoded.id;
+      let role = context.decoded.role;
 
-      // userId = songsHelpers.validObjectId(userId, "User Id");
-      let playlists = await Playlists.find({
-        'liked_users.userId': new Types.ObjectId(userId),
-      });
+      let query =
+        role === 'ARTIST'
+          ? { 'liked_artists.artistId': new Types.ObjectId(userId) }
+          : { 'liked_users.userId': new Types.ObjectId(userId) };
+
+      let playlists = await Playlists.find(query);
 
       let filteredPlaylist = playlists.filter((playlist) => {
         if (userId === playlist.owner.toString()) {
@@ -136,33 +130,66 @@ export const playlistResolvers = {
       try {
         let songIds = parent.songs.map((id) => new Types.ObjectId(id));
         let songs = await Song.find({ _id: { $in: songIds } });
-        console.log(songIds);
+        // console.log(songIds);
         return songs;
       } catch (error) {
         console.log(error);
       }
     },
     owner: async (parent) => {
-      console.log(parent);
+      // console.log(parent);
       try {
-        let user = await User.findById(parent.owner);
-        return user;
+        let ownerEntity = await User.findById(parent.owner);
+        let ownerType = 'User';
+        if (!ownerEntity) {
+          ownerEntity = await Artist.findById(parent.owner);
+          ownerType = 'Artist';
+        }
+        if (ownerEntity) {
+          return {
+            _id: ownerEntity._id,
+            typename: ownerType,
+            first_name: ownerEntity.first_name,
+            last_name: ownerEntity.last_name,
+            display_name: ownerEntity.display_name,
+            profile_image_url: ownerEntity.profile_image_url,
+          };
+        }
+        return null;
       } catch (error) {
         console.log(error);
+        return null;
       }
     },
     isLiked: async (parent, _, context) => {
-      let users = parent.liked_users;
-      for (let i = 0; i < users.length; i++) {
-        if (users[i].userId.toString() == context.decoded.id) {
-          return true;
+      if (context && context.decoded && context.decoded.role === 'USER') {
+        let users = parent.liked_users;
+        for (let i = 0; i < users.length; i++) {
+          if (users[i].userId.toString() == context.decoded.id) {
+            return true;
+          }
+        }
+      } else if (
+        context &&
+        context.decoded &&
+        context.decoded.role === 'ARTIST'
+      ) {
+        let artists = parent.liked_artists;
+        for (let i = 0; i < artists.length; i++) {
+          if (artists[i].artistId.toString() == context.decoded.id) {
+            return true;
+          }
         }
       }
       return false;
     },
     isOwner: async (parent, _, context) => {
       //console.log(parent.owner, context.decoded.id);
-      if ( context && context.decoded && parent.owner.toString() === context.decoded.id) {
+      if (
+        context &&
+        context.decoded &&
+        parent.owner.toString() === context.decoded.id
+      ) {
         return true;
       }
       return false;
@@ -178,6 +205,7 @@ export const playlistResolvers = {
       let queryObject = {
         ...args,
         liked_users: [],
+        liked_artists: [],
         songs: [],
         owner: new Types.ObjectId(context.decoded.id),
         likes: 0,
@@ -197,7 +225,7 @@ export const playlistResolvers = {
       let { playlistId } = args;
       let playlistExist = await Playlists.findById(playlistId);
       if (!playlistExist) songsHelpers.notFoundWrapper('Playlist not found');
-      console.log(context.decoded.id);
+      // console.log(context.decoded.id);
       if (playlistExist.owner.toString() != context.decoded.id)
         songsHelpers.unAuthorizedWrapper(
           'you are not authorised to edit this playlist'
@@ -243,7 +271,7 @@ export const playlistResolvers = {
       }
 
       try {
-        console.log(playlistExist);
+        //  console.log(playlistExist);
         playlistExist.songs.push(new Types.ObjectId(songId));
         let savedUpdatedPlaylist = await playlistExist.save();
         return savedUpdatedPlaylist;
@@ -315,28 +343,63 @@ export const playlistResolvers = {
       let playlistExist = await Playlists.findById(playlistId);
       if (!playlistExist) songsHelpers.notFoundWrapper('Playlist not found');
 
-      let toggleLike = true;
-      let likedUsers = playlistExist.liked_users;
-      for (let i = 0; i < likedUsers.length; i++) {
-        console.log(likedUsers[i]);
-        if (likedUsers[i].userId.toString() == context.decoded.id) {
-          toggleLike = false;
+      if (context.decoded.role === 'ARTIST') {
+        let likedArray = playlistExist.liked_artists;
+        let toggleLike = true;
+        for (let i = 0; i < likedArray.length; i++) {
+          //  console.log(likedArray[i]);
+          if (likedArray[i].artistId.toString() == context.decoded.id) {
+            toggleLike = false;
+            break;
+          }
+        }
+        if (toggleLike) {
+          if (playlistExist.liked_artists) {
+            playlistExist.liked_artists.push({
+              artistId: new Types.ObjectId(context.decoded.id),
+            });
+          } else {
+            playlistExist.liked_artists = [
+              {
+                artistId: new Types.ObjectId(context.decoded.id),
+              },
+            ];
+          }
+        } else {
+          playlistExist.liked_artists = playlistExist.liked_artists.filter(
+            (obj) => obj.artistId.toString() !== context.decoded.id
+          );
+        }
+      } else {
+        let likedArray = playlistExist.liked_users;
+        let toggleLike = true;
+        for (let i = 0; i < likedArray.length; i++) {
+          //  console.log(likedArray[i]);
+          if (likedArray[i].userId.toString() == context.decoded.id) {
+            toggleLike = false;
+            break;
+          }
+        }
+        if (toggleLike) {
+          if (playlistExist.liked_users) {
+            playlistExist.liked_users.push({
+              userId: new Types.ObjectId(context.decoded.id),
+            });
+          } else {
+            playlistExist.liked_users = [
+              {
+                userId: new Types.ObjectId(context.decoded.id),
+              },
+            ];
+          }
+        } else {
+          playlistExist.liked_users = playlistExist.liked_users.filter(
+            (obj) => obj.userId.toString() !== context.decoded.id
+          );
         }
       }
-      if (toggleLike) {
-        playlistExist.liked_users.push({
-          userId: new Types.ObjectId(context.decoded.id),
-        });
-        playlistExist.likes += 1;
-      } else {
-        playlistExist.liked_users = playlistExist.liked_users.filter(
-          (obj) => obj.userId.toString() != context.decoded.id
-        );
-        playlistExist.likes -= 1;
-      }
 
-      let savedPlaylist = playlistExist.save();
-
+      let savedPlaylist = await playlistExist.save();
       return savedPlaylist;
     },
   },

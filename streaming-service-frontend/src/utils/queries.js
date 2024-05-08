@@ -640,6 +640,7 @@ const GET_PLAYLIST = gql`
         language 
         genre 
         lyrics 
+        likes
         release_date 
         album {
             _id 
@@ -654,11 +655,14 @@ const GET_PLAYLIST = gql`
       }
       description
       owner {
-        first_name
+          first_name
+          display_name
       }
       created_date
       _id
       title
+      likes
+      isLiked
      
     }
   }
@@ -818,6 +822,15 @@ const GET_NEXT_SONGS = gql`
   }
 `;
 
+const TOGGLE_FOLLOW_ARTIST = gql`
+  mutation ToggleFollowArtist($id: ID!) {
+  toggleFollowArtist(_id: $id) {
+    _id
+    display_name
+  }
+}
+`;
+
 const queries = {
   REGISTER_USER,
   REGISTER_ARTIST,
@@ -862,6 +875,7 @@ const queries = {
   ADD_SONG_TO_ALBUM,
   ADD_ARTIST_TO_ALBUM,
   GET_NEXT_SONGS,
+  TOGGLE_FOLLOW_ARTIST
 };
 
 export default queries;

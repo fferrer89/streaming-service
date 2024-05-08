@@ -44,7 +44,7 @@ const AlbumDetailsSongs: React.FC<{
 
   const confirmRemoveSong = async () => {
     try {
-      console.log("Removing song with ID:", songToRemove, albumId);
+      //console.log("Removing song with ID:", songToRemove, albumId);
       const response = await removeSongFromAlbum({
         variables: { id: albumId, songId: songToRemove },
       });
@@ -53,7 +53,7 @@ const AlbumDetailsSongs: React.FC<{
         setError(`Error removing song`);
         console.error("Error removing song:", error);
       } else {
-        console.log("Song removed successfully");
+        // console.log("Song removed successfully");
         setSongToRemove("");
         setShowConfirmation(false);
       }
@@ -70,7 +70,7 @@ const AlbumDetailsSongs: React.FC<{
 
   const confirmAddSong = async () => {
     try {
-      console.log("Adding song with ID:", selectedSongId, albumId);
+      // console.log("Adding song with ID:", selectedSongId, albumId);
       const response = await addSongToAlbum({
         variables: { id: albumId, songId: selectedSongId },
       });
@@ -80,7 +80,7 @@ const AlbumDetailsSongs: React.FC<{
         setShowSuccess(true);
         setM("Error Adding Song");
       } else {
-        console.log("Song Added successfully");
+        // console.log("Song Added successfully");
         setSelectedSongId("");
         setShowAddForm(false);
         setM("Song Added successfully");
@@ -152,7 +152,7 @@ const AlbumDetailsSongs: React.FC<{
                 <div className="flex-shrink-0">
                   <img
                     className="w-8 h-8 rounded-full"
-                    src={`${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${song.cover_image_url}`}
+                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${song.cover_image_url}`}
                     alt={song.title}
                   />
                 </div>

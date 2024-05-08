@@ -198,6 +198,8 @@ type Mutation {
     toggleLikeAlbum(_id: ID!, albumId: ID!): Album
 
     uploadSongFile(file: Upload!): ID
+
+    toggleFollowArtist(_id: ID!): Artist
 }
 
 type RegisterAdminResponse {
@@ -306,13 +308,12 @@ type Song {
     lyrics: String
     release_date: Date!
 }
-
 type Playlist {
     _id: ID!
     description: String!
     title: String!
     visibility: Visibility!
-    owner: User!
+    owner: Owner
     songs: [Song]
     created_date: Date!
     likes: Int!
@@ -320,6 +321,14 @@ type Playlist {
     isOwner: Boolean
 }
 
+type Owner {
+    _id: ID!
+    typename: String!
+    first_name: String!
+    last_name: String!
+    display_name: String!
+    profile_image_url: ID
+}
 type LikedUser {
     userId: ID!
     likedDate: Date!

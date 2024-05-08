@@ -36,7 +36,7 @@ export const PlayListForm: React.FC<PlayListFormProps> = ({
   }
 
   const formSubmit = async (formData: any) => {
-    console.log(formData);
+    // console.log(formData);
     let playlistId = "";
     if (data._id) {
       playlistId = data._id;
@@ -53,9 +53,15 @@ export const PlayListForm: React.FC<PlayListFormProps> = ({
   return (
     <div className="flex flex-col justify-center items-center min-w-[400px] pb-16">
       <h2 className="text-2xl font-semibold mb-6">{formTitle}</h2>
-      <form onSubmit={handleSubmit(formSubmit)} className="flex flex-col w-full max-w-lg gap-4">
+      <form
+        onSubmit={handleSubmit(formSubmit)}
+        className="flex flex-col w-full max-w-lg gap-4"
+      >
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700"
+          >
             Title:
           </label>
           <input
@@ -81,7 +87,10 @@ export const PlayListForm: React.FC<PlayListFormProps> = ({
         </div>
 
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium text-gray-700"
+          >
             Description:
           </label>
           <textarea
@@ -106,7 +115,10 @@ export const PlayListForm: React.FC<PlayListFormProps> = ({
         </div>
 
         <div>
-          <label htmlFor="visibility" className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="visibility"
+            className="block text-sm font-medium text-gray-700"
+          >
             Visibility:
           </label>
           <select

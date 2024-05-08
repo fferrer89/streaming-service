@@ -7,10 +7,23 @@ const playlistSchema = new mongoose.Schema({
   },
   liked_users: [
     {
-      _id:false, 
+      _id: false,
       userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+      },
+      likedDate: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
+  liked_artists: [
+    {
+      _id: false,
+      artistId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Artist',
       },
       likedDate: {
         type: Date,
@@ -28,8 +41,8 @@ const playlistSchema = new mongoose.Schema({
   },
   songs: [
     {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Song',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Song',
     },
   ],
   visibility: {
@@ -43,10 +56,19 @@ const playlistSchema = new mongoose.Schema({
   likes: {
     type: Number,
     required: false,
+    get: function () {
+      const totalLikesByUsers = this.liked_users.length;
+      const totalLikesByArtists = this.liked_artists.length;
+      return totalLikesByUsers + totalLikesByArtists;
+    },
   },
   created_date: {
     type: Date,
     default: Date.now,
+  },
+  cover_image_url: {
+    type: mongoose.Schema.ObjectId,
+    required: false,
   },
 });
 

@@ -1,4 +1,3 @@
-
 import jwt from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { GraphQLError } from 'graphql';

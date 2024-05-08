@@ -2,38 +2,50 @@
 import { gql, useQuery } from "@apollo/client";
 import { FaTrash } from "react-icons/fa";
 import { PlayListBanner } from "@/components/App/playlist/Banner";
-import apolloClient from "@/utils";
+import createApolloClient from "@/utils";
 import queries from "@/utils/queries";
 import { AddSong } from "@/components/App/playlist/AddSong";
 import { useMutation } from "@apollo/client";
-import { useDispatch } from 'react-redux';
-import { playSong } from '@/utils/redux/features/song/songSlice';
+import { useDispatch } from "react-redux";
+import { playSong } from "@/utils/redux/features/song/songSlice";
 
 export default function Playlist({ params }) {
+  const apolloClient = createApolloClient(localStorage.getItem("token"));
   const dispatch = useDispatch();
-  console.log(params);
+  //console.log(params);
   const { loading, data, error } = useQuery(queries.GET_PLAYLIST, {
     variables: { id: params.id },
-    apolloClient,
+    client: apolloClient,
+    fetchPolicy: "cache-and-network",
+    onCompleted: (data) => {
+      if (data && data.getPlaylistById && data.getPlaylistById.songs) {
+        console.log("Songs list loaded successfully.");
+      }
+    },
   });
   const [
     removeSong,
     { data: mutationData, loading: mutationLoading, error: mutationError },
   ] = useMutation(queries.REMOVE_SONG_FROM_PLAYLIST, {
     refetchQueries: [queries.GET_PLAYLIST],
-    apolloClient,
+    client: apolloClient,
   });
-  console.log("playlists",data);
-  console.log(error);
+  //console.log("playlists",data);
+  //console.log(error);
   if (loading) return <div className="text-center text-lg">Loading...</div>;
-  if (error) return <div className="text-center text-lg text-red-500">Error loading playlist</div>;
+  if (error)
+    return (
+      <div className="text-center text-lg text-red-500">
+        Error loading playlist
+      </div>
+    );
 
   if (data) {
     return (
-      <div className="flex flex-col w-full  p-5 rounded-lg shadow-lg"
-        style={{backgroundColor: "rgba(255, 255, 255, 0.8)"}}
+      <div
+        className="flex flex-col w-full  p-5 rounded-lg shadow-lg"
+        style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
       >
-       
         <PlayListBanner playlist={data.getPlaylistById} />
         <div className="flex flex-col mt-8">
           <div className="flex flex-col justify-between px-4">

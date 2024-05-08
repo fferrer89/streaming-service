@@ -29,7 +29,7 @@ const AlbumItem: React.FC<AlbumProps> = ({ album }) => {
       >
         <div className="relative">
           <img
-            src={`${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${album.cover_image_url}`}
+            src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${album.cover_image_url}`}
             alt={album.title}
             className="w-[110px] rounded-[10px]"
           />

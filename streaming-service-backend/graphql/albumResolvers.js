@@ -5,7 +5,8 @@ import Song from '../models/songModel.js';
 import Artist from '../models/artistModel.js';
 import songsHelpers from '../utils/songsHelpers.js';
 import { validateMogoObjID } from '../utils/helpers.js';
-
+import SongFile from '../models/songFileModel.js';
+import User from '../models/userModel.js';
 export const albumResolvers = {
   Album: {
     artists: async (parent, _, context) => {
@@ -41,13 +42,9 @@ export const albumResolvers = {
     },
     getAlbumsByTitle: async (_, { title, limit = 10 }, contextValue) => {
       try {
-        if (!title || typeof title !== 'string' || title.trim().length < 3) {
-          songsHelpers.badUserInputWrapper(
-            'Please provide at least 3 characters for album title input'
-          );
-        }
         const albums = await Album.find({
           title: { $regex: new RegExp(title.trim(), 'i') },
+          visibility: 'PUBLIC'
         }).limit(limit);
         return albums;
       } catch (error) {
@@ -170,11 +167,15 @@ export const albumResolvers = {
             songsHelpers.notFoundWrapper(`Artist not found with ID ${a}`);
           }
         }
+        const sampleImage = await SongFile.findOne({
+          filename: 'sample_album_image',
+        }).fileId;
+
         const newAlbum = new Album({
           title,
           description,
           release_date,
-          cover_image_url,
+          cover_image_url: cover_image_url || sampleImage,
           genres,
           album_type,
           visibility,
@@ -349,6 +350,45 @@ export const albumResolvers = {
         return deletedAlbum;
       } catch (error) {
         throw new GraphQLError(`Error deleting album: ${error.message}`);
+      }
+    },
+
+    toggleLikeAlbum: async (_, { _id, albumId }, contextValue) => {
+      try {
+        validateMogoObjID(_id.trim(), 'user or artist id');
+        validateMogoObjID(albumId.trim(), 'album id');
+
+        const album = await Album.findById(albumId.trim());
+        if (!album) {
+          throw new Error('Album not found');
+        }
+
+        const isUser = await User.findById(_id.trim());
+        const isArtist = await Artist.findById(_id.trim());
+
+        if (!isUser && !isArtist) {
+          throw new Error('ID does not belong to a valid user or artist');
+        }
+
+        const likeType = isUser ? 'users' : 'artists';
+        const likeIndex = album.liked_by[likeType].findIndex(
+          (like) => like.toString() === _id.trim()
+        );
+
+        if (likeIndex === -1) {
+          // Like the album if not already liked
+          album.liked_by[likeType].push(_id.trim());
+        } else {
+          // Unlike the album if already liked
+          album.liked_by[likeType].splice(likeIndex, 1);
+        }
+
+        const savedAlbum = await album.save();
+        return savedAlbum;
+      } catch (error) {
+        throw new GraphQLError(
+          `Error toggling like on album: ${error.message}`
+        );
       }
     },
   },
