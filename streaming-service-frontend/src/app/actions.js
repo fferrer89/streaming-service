@@ -462,7 +462,7 @@ export async function updateSong(prevState, formData) {
     errors.push(e.message);
   }
   try {
-    if (song_url) {
+    if (song_url && song_url?.size > 0) {
       song_url = await httpClientReqs.uploadFile(song_url);
     } else {
       song_url = undefined;
@@ -471,7 +471,7 @@ export async function updateSong(prevState, formData) {
     errors.push(`Failed to upload song mp3 file - ${error?.message}`);
   }
   try {
-    if (cover_image_url) {
+    if (cover_image_url && cover_image_url?.size > 0) {
       cover_image_url = await httpClientReqs.uploadFile(cover_image_url);
     } else {
       cover_image_url = undefined;
