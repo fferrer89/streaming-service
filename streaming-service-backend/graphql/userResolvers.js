@@ -48,6 +48,11 @@ export const userResolvers = {
         throw new GraphQLError(`Failed to fetch user: ${error.message}`);
       }
     },
+    getUsersByName: async  (_, { name, limit }) => {
+      const users = await User.find({ name: { $regex: name, $options: 'i' } }).limit(limit || 10);
+
+    return users;
+    },
   },
   Mutation: {
     registerUser: async (_, args, context) => {

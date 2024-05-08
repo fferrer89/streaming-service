@@ -39,7 +39,7 @@ export default function Home() {
   });
 
   let stages = [
-    <Navbar/>,
+    
     <Hero/>,
     <Info/>, 
     <Support/>,

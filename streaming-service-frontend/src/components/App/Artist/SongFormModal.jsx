@@ -81,6 +81,7 @@ export default function SongFormModal({method, actionData, action, songData, set
                         </label>
                         <input type="date" id="release_date" name="release_date" required={method === 'post'}
                                defaultValue={songData?.release_date.substring(0, 10)}
+                               max={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]}
                                className="border border-gray-300 rounded-md p-2 w-full"/>
                     </div>
                     <div className="mb-4">

@@ -129,7 +129,7 @@ const AlbumDetailsSongs: React.FC<{
     );
   }
   return (
-    <div className="w-full max-w-md p-4 bg-stone-300 border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+    <div className="w-full max-w-md p-4 bg-stone-300 border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700 h-2/12">
       <div className="flex items-center justify-between mb-4">
         <h5 className="text-xl font-bold leading-none text-gray-900 dark:text-white">
           Songs
@@ -152,7 +152,7 @@ const AlbumDetailsSongs: React.FC<{
                 <div className="flex-shrink-0">
                   <img
                     className="w-8 h-8 rounded-full"
-                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${song.cover_image_url}`}
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${song.cover_image_url}`}
                     alt={song.title}
                   />
                 </div>
