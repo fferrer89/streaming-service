@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { gql } from '@apollo/client';
 import AlbumItem from '@/components/App/Serach/units/album';
@@ -7,50 +7,50 @@ import { useSelector } from 'react-redux';
 
 const GetAlbumByID = gql`
   query GetAlbumById($id: ID!) {
-  getAlbumById(_id: $id) {
-    _id
-    album_type
-    total_songs
-    cover_image_url
-    title
-    description
-    release_date
-    created_date
-    last_updated
-    genres
-    likes
-    total_duration
-    visibility
-    artists {
+    getAlbumById(_id: $id) {
       _id
-      display_name
-      profile_image_url
-    }
-    songs {
-      _id
-      song_url
+      album_type
+      total_songs
       cover_image_url
       title
-    }
-    liked_by {
-      artists
-      users
+      description
+      release_date
+      created_date
+      last_updated
+      genres
+      likes
+      total_duration
+      visibility
+      artists {
+        _id
+        display_name
+        profile_image_url
+      }
+      songs {
+        _id
+        song_url
+        cover_image_url
+        title
+      }
+      liked_by {
+        artists
+        users
+      }
     }
   }
-}
 `;
 
 const ToggleLikeAlbum = gql`
   mutation Mutation($id: ID!, $albumId: ID!) {
-  toggleLikeAlbum(_id: $id, albumId: $albumId) {
-    _id
-    liked_by {
-      artists
-      users
+    toggleLikeAlbum(_id: $id, albumId: $albumId) {
+      _id
+      liked_by {
+        artists
+        users
+      }
+      likes
     }
-    likes
   }
-}
 `;
 
 interface AlbumDetailsProps {
@@ -64,14 +64,12 @@ const AlbumDet: React.FC<AlbumDetailsProps> = ({ params }) => {
       variables: { id: params.id },
     }
   );
-  const userId = useSelector(
-    (state: { user: { userId: string | null } }) => state.user.userId
-  );
+  const userId = useSelector((state: { user: { userId: string | null } }) => state.user.userId);
   const [toggleLike] = useMutation(ToggleLikeAlbum);
 
   const handleLikeToggle = async () => {
     try {
-      await toggleLike({ variables: { id:userId, albumId: params.id } });
+      await toggleLike({ variables: { id: userId, albumId: params.id } });
     } catch (error) {
       console.error('Error toggling like on album:', error);
     }
@@ -80,8 +78,14 @@ const AlbumDet: React.FC<AlbumDetailsProps> = ({ params }) => {
   if (albumLoading) return <div className="text-center text-lg font-semibold">Loading...</div>;
   if (albumError) return <div className="text-center text-lg font-semibold text-red-500">Error loading album details</div>;
 
-  const album = albumData.getAlbumById;
-  const isLikedByCurrentUser = album.liked_by.users.some((liker: string) => liker === userId) || album.liked_by.artists.some((liker: string) => liker === userId);
+  // Ensure album data is present before accessing nested properties
+  const album = albumData?.getAlbumById;
+  if (!album) {
+    return <div className="text-center text-lg font-semibold text-red-500">Album not found</div>;
+  }
+
+  const isLikedByCurrentUser = album.liked_by.users.some((liker: string) => liker === userId) ||
+    album.liked_by.artists.some((liker: string) => liker === userId);
 
   return (
     <div className="container mx-auto my-5 p-5 rounded-lg shadow-lg bg-stone-400">
@@ -97,7 +101,10 @@ const AlbumDet: React.FC<AlbumDetailsProps> = ({ params }) => {
           <h3 className="mt-2 text-lg font-semibold text-gray-800 text-center break-words">
             {album.title}
           </h3>
-          <button onClick={handleLikeToggle} className={`mt-4 px-4 py-2 ${isLikedByCurrentUser ? 'bg-red-500' : 'bg-blue-500'} text-white rounded hover:${isLikedByCurrentUser ? 'bg-red-600' : 'bg-blue-600'}`}>
+          <button
+            onClick={handleLikeToggle}
+            className={`mt-4 px-4 py-2 ${isLikedByCurrentUser ? 'bg-red-500' : 'bg-blue-500'} text-white rounded hover:${isLikedByCurrentUser ? 'bg-red-600' : 'bg-blue-600'}`}
+          >
             {isLikedByCurrentUser ? 'Unlike' : 'Like'}
           </button>
         </div>
@@ -124,7 +131,7 @@ const AlbumDet: React.FC<AlbumDetailsProps> = ({ params }) => {
                 </div>
                 <div className="grid grid-cols-2">
                   <div className="px-4 py-2 font-semibold">Artists</div>
-                  <div className="px-4 py-2">{album.artists.map((artist: { display_name: string }) => artist.display_name).join(", ")}</div>
+                  <div className="px-4 py-2">{album.artists.map((artist: { display_name: string }) => artist.display_name).join(', ')}</div>
                 </div>
               </div>
             </div>

@@ -30,7 +30,7 @@ const Playlists: React.FC = () => {
   const userType = useSelector((state: RootState) => state.user.userType);
   const dispatch = useDispatch();
 
-  const token = localStorage.getItem("token");
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const apolloClient = token ? createApolloClient(token) : null;
 
   const {

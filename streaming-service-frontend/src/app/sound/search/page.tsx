@@ -126,7 +126,7 @@ const Search: React.FC = () => {
     songs: [],
     albums: [],
   });
-  const apolloClient = createApolloClient(localStorage.getItem("token"));
+  const apolloClient = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
 
   const { data, loading, error } = useQuery(SEARCH_QUERIES, {
     client: apolloClient,
