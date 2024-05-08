@@ -23,7 +23,7 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { authenticateToken } from './utils/helpers.js';
 import morgan from 'morgan';
 import cors from 'cors';
-const redisClient = redis.createClient();
+const redisClient = redis.createClient(process.env.REDIS_URL);
 
 const attachRedisClient = (req, res, next) => {
   req.redisClient = redisClient;
@@ -91,7 +91,7 @@ const server = new ApolloServer({
 });
 
 const env = process.env.NODE_ENV || 'development';
-const mongoUrl = environment[env].mongoUrl;
+const mongoUrl = process.env.MONGO_URL;
 
 try {
   const connection = await mongoose.connect(mongoUrl, {
