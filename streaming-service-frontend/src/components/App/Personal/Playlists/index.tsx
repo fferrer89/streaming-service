@@ -15,7 +15,8 @@ import { openModal } from "@/utils/redux/features/modal/modalSlice";
 import Link from "next/link";
 
 export type GetPlaylistsByOwnerResult = {
-  getPlaylistsByOwner: GetUserPlaylist[];
+  getPlaylistsByOwner: GetUserPlaylist[]; // Ensure this matches the actual structure returned by the server
+};
 
 const Playlists: React.FC = () => {
   const [playlists, setPlaylists] = useState<GetUserPlaylist[]>([]);
