@@ -55,7 +55,7 @@ let artistGenderData = [];
 let albumTypeData = [];
 let songLanguageData = [];
 
-const COLORS = ['#0EA5E9', '#22C55E', '#EF4444'];
+const COLORS = ['#0EA5E9', '#22C55E', '#EF4444', '#EAb308'];
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }: CustomLabel) => {
@@ -199,11 +199,17 @@ const AdminDashboard: React.FC = () => {
     ];
 
     let songEnglishCount = 0;
+    let songHindiCount = 0;
+    let songArabicCount = 0;
     let songOtherCount = 0;
     data.songs.forEach((song: Song) => {
       if (song.language) {
         if (song.language.toLowerCase() === 'english') {
           songEnglishCount++;
+        } else if (song.language.toLowerCase() === 'hindi') {
+          songHindiCount++;
+        } else if (song.language.toLowerCase() === 'arabic') {
+          songArabicCount++;
         } else {
           songOtherCount++;
         }
@@ -212,6 +218,8 @@ const AdminDashboard: React.FC = () => {
 
     songLanguageData = [
       { name: 'English', value: songEnglishCount },
+      { name: 'Hindi', value: songHindiCount },
+      { name: 'Arabic', value: songArabicCount },
       { name: 'Other', value: songOtherCount }
     ];
 
@@ -284,8 +292,8 @@ const AdminDashboard: React.FC = () => {
               </ResponsiveContainer>
             </div>
             <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
-              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>User Profile</span>
+              <div className='flex flex-col p-4 w-[22rem] h-[22rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold text-center'>Gender Distribution Among Users</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -294,7 +302,7 @@ const AdminDashboard: React.FC = () => {
                       cy='50%'
                       labelLine={false}
                       label={renderCustomizedLabel}
-                      outerRadius={100}
+                      outerRadius={90}
                       fill='#8884d8'
                       dataKey='value'
                     >
@@ -306,8 +314,8 @@ const AdminDashboard: React.FC = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>Artist Profile</span>
+              <div className='flex flex-col p-4 w-[22rem] h-[22rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold text-center'>Gender Distribution Among Artist</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -316,7 +324,7 @@ const AdminDashboard: React.FC = () => {
                       cy='50%'
                       labelLine={false}
                       label={renderCustomizedLabel}
-                      outerRadius={100}
+                      outerRadius={90}
                       fill='#8884d8'
                       dataKey='value'
                     >
@@ -330,8 +338,8 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
             <div className='flex flex-col items-center sm:flex-row sm:gap-x-4 gap-y-4 justify-evenly'>
-              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>Album Type</span>
+              <div className='flex flex-col p-4 w-[22rem] h-[22rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold text-center'>Album Types Distribution</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -340,7 +348,7 @@ const AdminDashboard: React.FC = () => {
                       cy='50%'
                       labelLine={false}
                       label={renderCustomizedLabel}
-                      outerRadius={100}
+                      outerRadius={90}
                       fill='#8884d8'
                       dataKey='value'
                     >
@@ -352,8 +360,8 @@ const AdminDashboard: React.FC = () => {
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className='flex flex-col p-4 w-[20rem] h-[20rem] rounded-sm bg-[#22333B]'>
-                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold'>Songs Language</span>
+              <div className='flex flex-col p-4 w-[22rem] h-[22rem] rounded-sm bg-[#22333B]'>
+                <span className='text-lg pt-4 mb-2 text-[#C6AC8E] font-bold text-center'>Song Language Diversity</span>
                 <ResponsiveContainer width='100%' height='100%'>
                   <PieChart width={400} height={400}>
                     <Pie
@@ -362,12 +370,12 @@ const AdminDashboard: React.FC = () => {
                       cy='50%'
                       labelLine={false}
                       label={renderCustomizedLabel}
-                      outerRadius={100}
+                      outerRadius={90}
                       fill='#8884d8'
                       dataKey='value'
                     >
                       {songLanguageData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={['#EAb308', '#EF4444'][index % 2]} />
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Legend />

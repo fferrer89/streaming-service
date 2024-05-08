@@ -23,9 +23,9 @@ interface Song {
 interface Songs {
   _id: string;
   title: string;
+  likes: string;
   genre: string;
   language: string;
-  likes: string;
   release_date: string;
   writtenBy: string;
   cover_image_url: string;
@@ -33,7 +33,7 @@ interface Songs {
 
 const PAGE_SIZE = 10;
 
-const SongList: React.FC = () => {
+const AdminDashboardSongs: React.FC = () => {
   const router = useRouter();
   const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const [openModal, setOpenModal] = useState(false);
@@ -177,4 +177,4 @@ const SongList: React.FC = () => {
   }
 }
 
-export default SongList;
+export default AdminDashboardSongs;

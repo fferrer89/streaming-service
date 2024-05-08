@@ -27,19 +27,19 @@ interface Artists {
   last_name: string;
   email: string;
   gender: string;
-  profile_image_url: string;
   date_of_birth: string;
+  profile_image_url: string;
 }
 
 const PAGE_SIZE = 10;
 
-const ArtistList: React.FC = () => {
+const AdminDashboardArtists: React.FC = () => {
   const router = useRouter();
   const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const [openModal, setOpenModal] = useState(false);
   const [artistId, setArtistId] = useState('');
   const [artistName, setArtistName] = useState('');
-  const { data, loading, error } = useQuery(queries.GET_ARTISTS, { fetchPolicy: 'cache-and-network' });
+  const { data, loading, error } = useQuery(queries.GET_DASHBOARD_ARTISTS, { fetchPolicy: 'cache-and-network' });
   const [currentPage, setCurrentPage] = useState(1);
 
   const [removeArtist] = useMutation(queries.REMOVE_ARTIST, {
@@ -64,7 +64,7 @@ const ArtistList: React.FC = () => {
         }
       });
     },
-    refetchQueries: [{ query: queries.GET_ARTISTS }]
+    refetchQueries: [{ query: queries.GET_DASHBOARD_ARTISTS }]
   });
 
   useEffect(() => {
@@ -173,4 +173,4 @@ const ArtistList: React.FC = () => {
   }
 }
 
-export default ArtistList;
+export default AdminDashboardArtists;

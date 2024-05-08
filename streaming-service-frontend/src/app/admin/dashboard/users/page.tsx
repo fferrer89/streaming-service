@@ -27,19 +27,19 @@ interface Users {
   last_name: string;
   email: string;
   gender: string;
-  profile_image_url: string;
   date_of_birth: string;
+  profile_image_url: string;
 }
 
 const PAGE_SIZE = 10;
 
-const UserList: React.FC = () => {
+const AdminDashboardUsers: React.FC = () => {
   const router = useRouter();
   const { loggedIn, userType } = useSelector((state: RootState) => state.user);
   const [openModal, setOpenModal] = useState(false);
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
-  const { data, loading, error } = useQuery(queries.GET_USERS, { fetchPolicy: 'cache-and-network' });
+  const { data, loading, error } = useQuery(queries.GET_DASHBOARD_USERS, { fetchPolicy: 'cache-and-network' });
   const [currentPage, setCurrentPage] = useState(1);
 
   const [removeUser] = useMutation(queries.REMOVE_USER, {
@@ -64,7 +64,7 @@ const UserList: React.FC = () => {
         }
       });
     },
-    refetchQueries: [{ query: queries.GET_USERS }]
+    refetchQueries: [{ query: queries.GET_DASHBOARD_USERS }]
   });
 
   useEffect(() => {
@@ -173,4 +173,4 @@ const UserList: React.FC = () => {
   }
 }
 
-export default UserList;
+export default AdminDashboardUsers;
