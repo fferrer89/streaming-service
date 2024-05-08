@@ -4,7 +4,7 @@ import Album from '../models/albumModel.js';
 import User from '../models/userModel.js';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
-
+import SongFile from '../models/songFileModel.js';
 export const artistResolvers = {
   Artist: {
     //working fully
@@ -180,7 +180,7 @@ export const artistResolvers = {
   },
   Mutation: {
     //working fully
-    registerArtist: async (_, args) => {
+    registerArtist: async (_, args, context) => {
       try {
         //No need to do manual validations, mongoose will handle everything, you just have to define proper schema for the model in mongoose
 
@@ -213,8 +213,7 @@ export const artistResolvers = {
           'ARTIST',
           savedArtist.first_name
         );
-
-        await context.redisClient.del('artists');
+        if (context) await context.redisClient.del('artists');
 
         return { artist: savedArtist, token };
       } catch (error) {
@@ -306,52 +305,51 @@ export const artistResolvers = {
         throw new GraphQLError(`Error deleting artist: ${error.message}`);
       }
     },
-  toggleFollowArtist: async (_, args, context) => {
-    if (!context.decoded || !context.decoded.id)
-      songHelper.unAuthorizedWrapper('Please login to follow this artist');
+    toggleFollowArtist: async (_, args, context) => {
+      if (!context.decoded || !context.decoded.id)
+        songHelper.unAuthorizedWrapper('Please login to follow this artist');
 
-    let { _id } = args;
-    let artistExist = await Artist.findById(_id);
-    if (!artistExist) songHelper.notFoundWrapper('Artist not found');
+      let { _id } = args;
+      let artistExist = await Artist.findById(_id);
+      if (!artistExist) songHelper.notFoundWrapper('Artist not found');
 
-    let followersArray;
-    if (context.decoded.role === 'ARTIST') {
-      followersArray = artistExist.followers.artists;
-    } else if (context.decoded.role === 'USER') {
-      followersArray = artistExist.followers.users;
-    } else {
-      songHelper.unAuthorizedWrapper('Invalid role for following an artist');
-    }
-
-    let toggleFollow = true;
-    for (let i = 0; i < followersArray.length; i++) {
-      if (followersArray[i].toString() === context.decoded.id) {
-        toggleFollow = false;
-        break;
-      }
-    }
-
-    if (toggleFollow) {
+      let followersArray;
       if (context.decoded.role === 'ARTIST') {
-        artistExist.followers.artists.push(context.decoded.id);
+        followersArray = artistExist.followers.artists;
       } else if (context.decoded.role === 'USER') {
-        artistExist.followers.users.push(context.decoded.id);
+        followersArray = artistExist.followers.users;
+      } else {
+        songHelper.unAuthorizedWrapper('Invalid role for following an artist');
       }
-    } else {
-      if (context.decoded.role === 'ARTIST') {
-        artistExist.followers.artists = artistExist.followers.artists.filter(
-          (followerId) => followerId.toString() !== context.decoded.id
-        );
-      } else if (context.decoded.role === 'USER') {
-        artistExist.followers.users = artistExist.followers.users.filter(
-          (followerId) => followerId.toString() !== context.decoded.id
-        );
-      }
-    }
 
-    let updatedArtist = await artistExist.save();
-    return updatedArtist;
-  },
+      let toggleFollow = true;
+      for (let i = 0; i < followersArray.length; i++) {
+        if (followersArray[i].toString() === context.decoded.id) {
+          toggleFollow = false;
+          break;
+        }
+      }
+
+      if (toggleFollow) {
+        if (context.decoded.role === 'ARTIST') {
+          artistExist.followers.artists.push(context.decoded.id);
+        } else if (context.decoded.role === 'USER') {
+          artistExist.followers.users.push(context.decoded.id);
+        }
+      } else {
+        if (context.decoded.role === 'ARTIST') {
+          artistExist.followers.artists = artistExist.followers.artists.filter(
+            (followerId) => followerId.toString() !== context.decoded.id
+          );
+        } else if (context.decoded.role === 'USER') {
+          artistExist.followers.users = artistExist.followers.users.filter(
+            (followerId) => followerId.toString() !== context.decoded.id
+          );
+        }
+      }
+
+      let updatedArtist = await artistExist.save();
+      return updatedArtist;
+    },
   },
 };
-

@@ -2,6 +2,7 @@ import User from '../models/userModel.js';
 import { GraphQLError } from 'graphql';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
+import SongFile from '../models/songFileModel.js';
 
 export const userResolvers = {
   Query: {
