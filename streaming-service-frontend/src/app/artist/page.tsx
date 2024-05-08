@@ -41,7 +41,8 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
+    
+    setToken(typeof window !== "undefined" ? localStorage.getItem("token") : null);
   }, []);
 
   useEffect(() => {

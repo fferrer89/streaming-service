@@ -87,7 +87,16 @@ const AlbumDet: React.FC<AlbumDetailsProps> = ({ params }) => {
       </div>
     );
 
-  const album = albumData.getAlbumById;
+  // Ensure album data is present before accessing nested properties
+  const album = albumData?.getAlbumById;
+  if (!album) {
+    return (
+      <div className="text-center text-lg font-semibold text-red-500">
+        Album not found
+      </div>
+    );
+  }
+
   const isLikedByCurrentUser =
     album.liked_by.users.some((liker: string) => liker === userId) ||
     album.liked_by.artists.some((liker: string) => liker === userId);

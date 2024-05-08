@@ -9,7 +9,7 @@ import {
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
 
-let userToken = localStorage.getItem("token");
+let userToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 const authLink = setContext((_, { headers }) => {
   return {
     headers: {
