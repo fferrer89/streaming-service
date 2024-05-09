@@ -1162,33 +1162,33 @@ async function seed() {
       '------------------------  Inserting custom data with song files  -------------------------'
     );
     for (let data of customData) {
-      let cArtist = await Artist.create({
-        ...data.artist,
-        profile_image_url: new mongoose.Types.ObjectId(sampleArtistImageId),
-      });
+      // let cArtist = await Artist.create({
+      //   ...data.artist,
+      //   profile_image_url: new mongoose.Types.ObjectId(sampleArtistImageId),
+      // });
 
-      data.album.cover_image_url = await uploadRandomImage();
+      // data.album.cover_image_url = await uploadRandomImage();
 
-      let cAlbum = await Album.create(data.album);
-      cAlbum.artists = [{ artistId: cArtist._id }];
-      const imageId = await uploadSong(
-        `./utils/songData/${data.album.title}`,
-        data.album.title,
-        'download.jpeg'
-      );
-      await SongFile.create({
-        filename: `${data.album.title}`,
-        mimetype: 'image/jpeg',
-        uploadDate: new Date(),
-        fileId: imageId,
-      });
-      cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
+      // let cAlbum = await Album.create(data.album);
+      // cAlbum.artists = [{ artistId: cArtist._id }];
+      // const imageId = await uploadSong(
+      //   `./utils/songData/${data.album.title}`,
+      //   data.album.title,
+      //   'download.jpeg'
+      // );
+      // await SongFile.create({
+      //   filename: `${data.album.title}`,
+      //   mimetype: 'image/jpeg',
+      //   uploadDate: new Date(),
+      //   fileId: imageId,
+      // });
+      // cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
 
       for (let song of data.songs) {
-        let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
-        console.log(`Song found at path path : ${songPath}`);
+        // let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
+        //console.log(`Song found at path path : ${songPath}`);
         const songId = await uploadSong(
-          `./utils/songData/${cAlbum.title}`,
+          `./utils/songData/${data.album.title}`,
           data.album.title,
           `${song.title}.mp3`
         );
@@ -1198,13 +1198,13 @@ async function seed() {
           uploadDate: new Date(),
           fileId: songId,
         });
-        song.artists = [cArtist._id];
-        song.album = cAlbum._id;
-        song.song_url = songId;
-        song.cover_image_url = new mongoose.Types.ObjectId(imageId);
-        let cSong = await Song.create(song);
-        cAlbum.songs.push({ songId: cSong._id });
-        await cAlbum.save();
+        // song.artists = [cArtist._id];
+        // song.album = cAlbum._id;
+        // song.song_url = songId;
+        // song.cover_image_url = new mongoose.Types.ObjectId(imageId);
+        // let cSong = await Song.create(song);
+        // cAlbum.songs.push({ songId: cSong._id });
+        // await cAlbum.save();
       }
     }
     console.log(

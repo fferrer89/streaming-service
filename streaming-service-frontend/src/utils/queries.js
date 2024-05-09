@@ -7,7 +7,6 @@ const REGISTER_USER = gql`
     $displayName: String!
     $email: String!
     $password: String!
-    $profileImageUrl: String!
   ) {
     registerUser(
       first_name: $firstName
@@ -15,7 +14,6 @@ const REGISTER_USER = gql`
       display_name: $displayName
       email: $email
       password: $password
-      profile_image_url: $profileImageUrl
     ) {
       user {
         _id
@@ -31,7 +29,6 @@ const REGISTER_ARTIST = gql`
     $displayName: String!
     $email: String!
     $password: String!
-    $profileImageUrl: String!
     $genres: [MusicGenre!]!
   ) {
     registerArtist(
@@ -40,7 +37,6 @@ const REGISTER_ARTIST = gql`
       display_name: $displayName
       email: $email
       password: $password
-      profile_image_url: $profileImageUrl
       genres: $genres
     ) {
       artist {
@@ -256,19 +252,19 @@ const GET_DASHBOARD_DATA = gql`
     admin: admin {
       first_name
       last_name
-    },
+    }
     users: users {
       gender
-    },
+    }
     artists: artists {
       gender
-    },
+    }
     albums: albums {
       album_type
-    },
+    }
     songs: songs {
       language
-    },
+    }
     mostLikedSongs: getMostLikedSongs {
       _id
       title
@@ -277,7 +273,7 @@ const GET_DASHBOARD_DATA = gql`
       likes
       genre
       cover_image_url
-    },
+    }
     getUserCount
     getArtistCount
     getAlbumCount
@@ -631,39 +627,38 @@ const GET_PLAYLIST = gql`
       visibility
       isOwner
       songs {
-        _id 
-        title 
-        duration 
-        song_url 
-        writtenBy 
-        producers 
-        language 
-        genre 
-        lyrics 
+        _id
+        title
+        duration
+        song_url
+        writtenBy
+        producers
+        language
+        genre
+        lyrics
         likes
-        release_date 
+        release_date
         album {
-            _id 
-            title 
-            cover_image_url 
-        } 
+          _id
+          title
+          cover_image_url
+        }
         artists {
-            _id 
-            display_name 
-            profile_image_url 
-        } 
+          _id
+          display_name
+          profile_image_url
+        }
       }
       description
       owner {
-          first_name
-          display_name
+        first_name
+        display_name
       }
       created_date
       _id
       title
       likes
       isLiked
-     
     }
   }
 `;
@@ -824,11 +819,11 @@ const GET_NEXT_SONGS = gql`
 
 const TOGGLE_FOLLOW_ARTIST = gql`
   mutation ToggleFollowArtist($id: ID!) {
-  toggleFollowArtist(_id: $id) {
-    _id
-    display_name
+    toggleFollowArtist(_id: $id) {
+      _id
+      display_name
+    }
   }
-}
 `;
 
 const queries = {
@@ -875,7 +870,7 @@ const queries = {
   ADD_SONG_TO_ALBUM,
   ADD_ARTIST_TO_ALBUM,
   GET_NEXT_SONGS,
-  TOGGLE_FOLLOW_ARTIST
+  TOGGLE_FOLLOW_ARTIST,
 };
 
 export default queries;

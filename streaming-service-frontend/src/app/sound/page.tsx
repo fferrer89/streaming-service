@@ -5,13 +5,15 @@ import { Separator } from "@/components/ui/separator";
 import Card from "@/components/App/Feed/Card";
 import InfiniteCarousel from "@/components/App/Feed/InfiniteCarousel";
 import { useDispatch } from "react-redux";
-import { playSong } from "@/utils/redux/features/song/songSlice";
+import { playSong, setNextSongs } from "@/utils/redux/features/song/songSlice";
 import createApolloClient from "@/utils";
 import { FeedQuery } from "@/utils/graphql/queries";
 import { FeedQueryResult } from "@/utils/graphql/resultTypes";
 import { getImageUrl } from "@/utils/tools/images";
 import { useRouter } from "next/navigation";
 import SkeletonLoader from "@/components/App/SkeletonLoader";
+import { useLazyQuery } from "@apollo/client";
+import queries from "@/utils/queries";
 
 // TODO: FIX INFINITE CAROUSEL
 
@@ -37,6 +39,16 @@ const Home: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
 
+  const [getNextSongs, { data: nextSongsData }] = useLazyQuery(
+    queries.GET_NEXT_SONGS
+  );
+
+  useEffect(() => {
+    if (nextSongsData && nextSongsData.getNextSongs) {
+      dispatch(setNextSongs(nextSongsData.getNextSongs));
+    }
+  }, [nextSongsData]);
+
   useEffect(() => {
     const fetchMostLikedSongsAndArtists = async () => {
       try {
@@ -59,6 +71,7 @@ const Home: React.FC = () => {
   }, []);
 
   const handleSongClick = (songId: string) => {
+    getNextSongs({ variables: { clickedSongId: songId } });
     const clickedSong = mostLikedSongs.find((song) => song._id === songId);
     if (clickedSong) {
       dispatch(playSong({ song: clickedSong, currentTime: 0 }));
@@ -128,7 +141,7 @@ const Home: React.FC = () => {
                 key={artist._id}
                 image={getImageUrl(artist.profile_image_url)}
                 songId={artist._id}
-                onClick={() => push(`/artist/profile/${artist._id}`)}
+                onClick={() => push(`/sound/profile/${artist._id}`)}
               />
             ))}
             speed={0.4}

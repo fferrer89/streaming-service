@@ -37,14 +37,23 @@ const Playlists: React.FC = () => {
     loading: queryLoading,
     error: queryError,
     data,
+    refetch,
   } = useQuery<GetPlaylistsByOwnerResult, GetUserPlaylistsVariables>(
     GetUserPlaylists,
     {
       variables: { userId: userId as string },
       client: apolloClient as any,
       skip: !apolloClient || !userId,
+      fetchPolicy: "cache-and-network",
+      refetchOnWindowFocus: true,
+      
     }
+    
   );
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   useEffect(() => {
     if (!queryLoading && !queryError && data) {
