@@ -1,33 +1,27 @@
-"use client";
-import { Provider } from "react-redux";
-import { store } from "@/utils/redux/store";
 import "./globals.css";
-import { ApolloWrapper } from "./ApolloWrapper";
-import Head from "next/head";
-import { useEffect } from "react";
 
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+    title: {
+        template: 'Sounds 54',
+        default: 'Sounds 54',
+        absolute: 'Sounds 54',
+    },
+    icons: {
+        icon: '/icon.png'
+    }
+}
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  useEffect(() => {
-    document.title = "Sounds 54";
-    const link = document.createElement("link");
-    link.rel = "icon";
-    link.href = "/icons/favicon.png";
-    document.head.appendChild(link);
-  }, []);
 
   return (
     <html lang="en">
-      <Head>
-        <title>My page title</title>
-      </Head>
       <body>
-        <ApolloWrapper>
-          <Provider store={store}>{children}</Provider>
-        </ApolloWrapper>
+      {children}
       </body>
     </html>
   );
