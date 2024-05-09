@@ -354,20 +354,22 @@ const CreateAlbumModal: React.FC<{
                 ))}
             </select>
           </div>
-          {createAlbumFormState && createAlbumFormState?.errorMessages && (
-            <div
-              className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
-              role="alert"
-            >
-              {createAlbumFormState?.errorMessages?.map((msg, index) => {
-                return (
-                  <p className="error" key={index}>
-                    {msg}
-                  </p>
-                );
-              })}
-            </div>
-          )}
+          {createAlbumFormState &&
+            createAlbumFormState?.errorMessages &&
+            createAlbumFormState?.errorMessages.length > 0 && (
+              <div
+                className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
+                role="alert"
+              >
+                {createAlbumFormState?.errorMessages?.map((msg, index) => {
+                  return (
+                    <p className="error" key={index}>
+                      {msg}
+                    </p>
+                  );
+                })}
+              </div>
+            )}
           {error && (
             <div
               className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"

@@ -132,7 +132,7 @@ const AlbumDetailsArtists: React.FC<{
       />
     );
   }
-  //console.log(artistData);
+  console.log(artistData);
   return (
     <div className="w-full max-w-md p-4 bg-stone-300 border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
       <div className="flex items-center justify-between mb-4">
