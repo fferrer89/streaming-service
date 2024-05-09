@@ -38,7 +38,7 @@ interface BannerProp {
 
 export const PlayListBanner: React.FC<BannerProp> = ({ playlist }) => {
   const [likeToggle, setLikeToggle] = useState<boolean>(playlist.isLiked);
-  const client = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const client = createApolloClient( localStorage.getItem("token")  );
   const [likePlayList, { data: toggleData, loading, error }] = useMutation(
     queries.TOGGLE_PLAYLIST,
     { refetchQueries: [queries.GET_PLAYLIST], client }

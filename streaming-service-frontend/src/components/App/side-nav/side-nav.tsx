@@ -4,6 +4,7 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import Image from 'next/image';
 import { useQuery } from '@apollo/client';
+import createApolloClient from '@/utils';
 import { gql } from '@apollo/client';
 import { useSelector } from 'react-redux';
 import { getImageUrl } from '@/utils/tools/images';
@@ -22,9 +23,12 @@ const SideNav: React.FC = () => {
     const userId = useSelector((state: { user: { userId: string | null } }) => state.user.userId);
     const userType = useSelector((state: { user: { userType: 'user' | 'artist' | 'admin' | null } }) => state.user.userType);
 
+    const client = createApolloClient(localStorage.getItem('token'));
+
     const { data, loading, error } = useQuery(GET_USER_PROFILE_IMAGE, {
         variables: { userId },
         skip: !userId,
+        client: client
     });
 
     const [homeRoute, setHomeRoute] = useState('/sound');
@@ -32,6 +36,7 @@ const SideNav: React.FC = () => {
     const [profileImageUrl, setProfileImageUrl] = useState<string>('/img/ellipse.png');
 
     useEffect(() => {
+        console.log("sidbar: ", data);
         const fetchImageUrl = async () => {
             if (data?.getUserById?.profile_image_url) {
                 const resolvedUrl = await getImageUrl(data.getUserById.profile_image_url);

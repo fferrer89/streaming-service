@@ -16,7 +16,7 @@ import SkeletonLoader from "@/components/App/SkeletonLoader";
 // TODO: FIX INFINITE CAROUSEL
 
 const Home: React.FC = () => {
-  const apolloClient = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const apolloClient = createApolloClient(  localStorage.getItem("token") );
   const dispatch = useDispatch();
   const { push } = useRouter();
   const [mostLikedSongs, setMostLikedSongs] = useState<

@@ -11,7 +11,7 @@ import { playSong } from "@/utils/redux/features/song/songSlice";
 
 export default function Playlist({ params }) {
 
-  const apolloClient = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const apolloClient = createApolloClient(  localStorage.getItem("token")  );
   const dispatch = useDispatch();
   //console.log(params);
   const { loading, data, error } = useQuery(queries.GET_PLAYLIST, {

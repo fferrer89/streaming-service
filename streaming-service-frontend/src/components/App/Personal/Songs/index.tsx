@@ -19,7 +19,7 @@ const Songs: React.FC = () => {
   const [songs, setSongs] = useState<UserLikedSong[]>([]);
   const userId = useSelector((state: RootState) => state.user.userId);
   const userType = useSelector((state: RootState) => state.user.userType);
-  const apolloClient = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const apolloClient = createApolloClient( localStorage.getItem("token") );
   const { loading, error, data } = useQuery(GetUserLikedSongs, {
     variables: { userId },
     client: apolloClient,

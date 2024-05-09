@@ -14,7 +14,7 @@ const AddPlayListForm: React.FC<{
   data: any;
 }> = ({ onSubmitMessage, setOnSubmitMessage, data }) => {
 
-  const apolloClient = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const apolloClient = createApolloClient( localStorage.getItem("token")  );
   const [createPlayList, { error }] = useMutation(queries.CREATE_PLAYLIST, {
     refetchQueries: [queries.GET_PLAYLIST],
     client: apolloClient,
