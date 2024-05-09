@@ -1,21 +1,25 @@
 // Home.tsx
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Separator } from "@/components/ui/separator";
 import Card from "@/components/App/Feed/Card";
 import InfiniteCarousel from "@/components/App/Feed/InfiniteCarousel";
 import { useDispatch } from "react-redux";
-import { playSong } from "@/utils/redux/features/song/songSlice";
-import apolloClient from "@/utils";
+import { playSong, setNextSongs } from "@/utils/redux/features/song/songSlice";
 import { FeedQuery } from "@/utils/graphql/queries";
 import { FeedQueryResult } from "@/utils/graphql/resultTypes";
 import { getImageUrl } from "@/utils/tools/images";
 import { useRouter } from "next/navigation";
 import SkeletonLoader from "@/components/App/SkeletonLoader";
+import createApolloClient from "@/utils";
+import queries from "@/utils/queries";
 
+import { useQuery, useLazyQuery } from "@apollo/client";
 // TODO: FIX INFINITE CAROUSEL
 
 const Home: React.FC = () => {
+  const [token, setToken] = useState<string | null>(null);
+  const apolloClient = createApolloClient(token);
   const dispatch = useDispatch();
   const { push } = useRouter();
   const [mostLikedSongs, setMostLikedSongs] = useState<
@@ -37,27 +41,45 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMostLikedSongsAndArtists = async () => {
-      try {
-        const { data } = await apolloClient.query({
-          query: FeedQuery,
-        });
-        setMostLikedSongs(data.getMostLikedSongs.slice(0, 10));
-        setMostFollowedArtists(data.getMostFollowedArtists.slice(0, 10));
-        setNewlyReleasedAlbums(data.getNewlyReleasedAlbums.slice(0, 10));
-        setMostLikedAlbums(data.getMostLikedAlbums.slice(0, 10));
-        setNewlyReleasedSongs(data.getNewlyReleasedSongs.slice(0, 10));
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMostLikedSongsAndArtists();
+    
+    setToken(typeof window !== "undefined" ? localStorage.getItem("token") : null);
   }, []);
 
+  useEffect(() => {
+    if (token && apolloClient) {
+      const fetchMostLikedSongsAndArtists = async () => {
+        try {
+          const { data } = await apolloClient.query({
+            query: FeedQuery,
+          });
+          setMostLikedSongs(data.getMostLikedSongs.slice(0, 10));
+          setMostFollowedArtists(data.getMostFollowedArtists.slice(0, 10));
+          setNewlyReleasedAlbums(data.getNewlyReleasedAlbums.slice(0, 10));
+          setMostLikedAlbums(data.getMostLikedAlbums.slice(0, 10));
+          setNewlyReleasedSongs(data.getNewlyReleasedSongs.slice(0, 10));
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchMostLikedSongsAndArtists();
+    }
+  }, [token, apolloClient]);
+
+  const [getNextSongs, { data: nextSongsData }] = useLazyQuery(
+    queries.GET_NEXT_SONGS
+  );
+
+  useEffect(() => {
+    if (nextSongsData && nextSongsData.getNextSongs) {
+      dispatch(setNextSongs(nextSongsData.getNextSongs));
+    }
+  }, [nextSongsData]);
+
   const handleSongClick = (songId: string) => {
+    getNextSongs({ variables: { clickedSongId: songId } });
     const clickedSong = mostLikedSongs.find((song) => song._id === songId);
     if (clickedSong) {
       dispatch(playSong({ song: clickedSong, currentTime: 0 }));
@@ -88,7 +110,9 @@ const Home: React.FC = () => {
     >
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">SOUNDS FOR YOU</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            SOUNDS FOR YOU
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -110,7 +134,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">ARTISTS OF THE WEEK</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            ARTISTS OF THE WEEK
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -133,7 +159,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">ALBUMS OF THE WEEK</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            ALBUMS OF THE WEEK
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -146,6 +174,7 @@ const Home: React.FC = () => {
                 key={album._id}
                 image={getImageUrl(album.cover_image_url)}
                 songId={album._id}
+                onClick={() => push(`/artist/album/${album._id}`)}
               />
             ))}
             speed={0.4}
@@ -155,7 +184,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">NEW ALBUMS</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            NEW ALBUMS
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -168,6 +199,7 @@ const Home: React.FC = () => {
                 key={album._id}
                 image={getImageUrl(album.cover_image_url)}
                 songId={album._id}
+                onClick={() => push(`/artist/album/${album._id}`)}
               />
             ))}
             speed={0.4}
@@ -177,7 +209,9 @@ const Home: React.FC = () => {
       </div>
       <div className="flex flex-col items-center justify-center w-full h-auto">
         <div className="w-full flex">
-          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">NEW SONGS</h1>
+          <h1 className="text-2xl italic text-center px-5 py-4 font-thin">
+            NEW SONGS
+          </h1>
         </div>
         <Separator className="w-[97%]" />
         {loading ? (
@@ -202,4 +236,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-

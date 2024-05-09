@@ -1,13 +1,14 @@
 "use server";
 import validation from "../utils/validations";
 import queries from "../utils/queries";
-import apolloClient from "@/utils";
+import getApolloClient from "@/utils";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { useMutation } from "@apollo/client";
 
 import httpClientReqs from "@/utils/http-client-reqs";
-export async function createAlbum(prevState, formData) {
+export async function createAlbum(prevState, formData, token) {
+  const apolloClient = getApolloClient(token);
   let title,
     release_date,
     album_type,
@@ -50,7 +51,6 @@ export async function createAlbum(prevState, formData) {
   }
   try {
     genres = validation.checkStringArray(genres, "genres");
-    //genres = [genres];
   } catch (e) {
     errors.push(e);
   }
@@ -61,19 +61,16 @@ export async function createAlbum(prevState, formData) {
   }
   try {
     artists = validation.checkIDArray(artists, "artists");
-    // artists = [artistId];
   } catch (e) {
     errors.push(e);
   }
   try {
     songs = validation.checkIDArray(songs, "songs");
-    // artists = [artistId];
   } catch (e) {
     errors.push(e);
   }
   try {
     cover_image_url = validation.checkId(cover_image_url, "cover_image_url");
-    // artists = [artistId];
   } catch (e) {
     errors.push(e);
   }
@@ -94,7 +91,6 @@ export async function createAlbum(prevState, formData) {
           songs,
           cover_image_url,
         },
-        // https://www.apollographql.com/docs/react/data/mutations/#updating-local-data
       });
       return { album: data?.addAlbum };
     } catch (e) {
@@ -102,7 +98,8 @@ export async function createAlbum(prevState, formData) {
     }
   }
 }
-export async function updateAlbum(prevState, formData) {
+export async function updateAlbum(prevState, formData, token) {
+  const apolloClient = getApolloClient(token);
   let title,
     release_date,
     album_type,
@@ -237,7 +234,8 @@ export async function updateAlbum(prevState, formData) {
     }
   }
 }
-export async function deleteAlbum(albumId) {
+export async function deleteAlbum(albumId, token) {
+  const apolloClient = getApolloClient(token);
   let errors = [];
   try {
     albumId = validation.checkId(albumId, "albumId");
@@ -275,7 +273,8 @@ export async function deleteAlbum(albumId) {
     }
   }
 }
-export async function createSong(prevState, formData) {
+export async function createSong(prevState, formData, token) {
+  const apolloClient = getApolloClient(token);
   let title,
     duration,
     song_url,
@@ -405,7 +404,17 @@ export async function createSong(prevState, formData) {
     }
   }
 }
-export async function updateSong(prevState, formData) {
+export async function updateSong(
+  prevState,
+  formData,
+  token,
+  inputCoverImageUrl,
+  inputSongUrl
+) {
+  // console.log("inputCoverImageUrl", inputCoverImageUrl);
+  // console.log("inputSongUrl", inputSongUrl);
+  // console.log("formData", formData);
+  const apolloClient = getApolloClient(token);
   let songId,
     title,
     duration,
@@ -423,15 +432,15 @@ export async function updateSong(prevState, formData) {
   songId = formData.get("songId");
   title = formData.get("title");
   duration = formData.get("duration");
-  song_url = formData.get("song_url"); // ID
-  cover_image_url = formData.get("cover_image_url"); // ID
+  song_url = formData.get("song_url") ? formData.get("song_url") : inputSongUrl; // Use inputSongUrl if song_url is not provided
+  cover_image_url = formData.get("cover_image_url")
+    ? formData.get("cover_image_url")
+    : inputCoverImageUrl; // Use inputCoverImageUrl if cover_image_url is not provided
   writtenBy = formData.get("writtenBy");
   producers = formData.get("producers"); // [String]
   genre = formData.get("genre"); // MusicGenre
   release_date = formData.get("release_date");
-  // artists = formData.get("artists"); // [ID]
   artistId = formData.get("artistId");
-  // album = formData.get('album'); // ID
   lyrics = formData.get("lyrics");
 
   try {
@@ -517,13 +526,6 @@ export async function updateSong(prevState, formData) {
   } catch (e) {
     errors.push(e.message);
   }
-  // try {
-  //   if (artists) {
-  //     artists = validation.checkIdArray(artists, "artists");
-  //   }
-  // } catch (e) {
-  //   errors.push(e);
-  // }
   if (errors.length > 0) {
     return { errorMessages: errors };
   } else {
@@ -549,7 +551,8 @@ export async function updateSong(prevState, formData) {
     }
   }
 }
-export async function deleteSong(songId) {
+export async function deleteSong(songId, token) {
+  const apolloClient = getApolloClient(token);
   let errors = [];
   try {
     songId = validation.checkId(songId, "songId");

@@ -4,7 +4,7 @@ import Album from '../models/albumModel.js';
 import User from '../models/userModel.js';
 import { generateToken, validateMogoObjID } from '../utils/helpers.js';
 import songHelper from '../utils/songsHelpers.js';
-
+import SongFile from '../models/songFileModel.js';
 export const artistResolvers = {
   Artist: {
     //working fully
@@ -180,7 +180,7 @@ export const artistResolvers = {
   },
   Mutation: {
     //working fully
-    registerArtist: async (_, args) => {
+    registerArtist: async (_, args, context) => {
       try {
         //No need to do manual validations, mongoose will handle everything, you just have to define proper schema for the model in mongoose
 
@@ -188,13 +188,17 @@ export const artistResolvers = {
         if (existingArtist) {
           throw new GraphQLError(`Artist already exists with this email.`);
         }
+        const sampleImage = await SongFile.findOne({
+          filename: 'sample_artist_image',
+        }).fileId;
+
         const newArtist = new Artist({
           first_name: args.first_name,
           last_name: args.last_name,
           display_name: args.display_name,
           email: args.email,
           password: args.password,
-          profile_image_url: args.profile_image_url,
+          profile_image_url: args.profile_image_url || sampleImage,
           genres: args.genres,
         });
         const validationErrors = newArtist.validateSync();
@@ -209,8 +213,7 @@ export const artistResolvers = {
           'ARTIST',
           savedArtist.first_name
         );
-
-        await context.redisClient.del('artists');
+        if (context) await context.redisClient.del('artists');
 
         return { artist: savedArtist, token };
       } catch (error) {
@@ -238,7 +241,7 @@ export const artistResolvers = {
           songHelper.unAuthorizedWrapper('Invalid email or password.');
         }
 
-        const token = generateToken(artist._id, 'artist', artist.first_name);
+        const token = generateToken(artist._id, 'ARTIST', artist.first_name);
         return { artist, token };
       } catch (error) {
         throw error;
@@ -301,6 +304,52 @@ export const artistResolvers = {
       } catch (error) {
         throw new GraphQLError(`Error deleting artist: ${error.message}`);
       }
+    },
+    toggleFollowArtist: async (_, args, context) => {
+      if (!context.decoded || !context.decoded.id)
+        songHelper.unAuthorizedWrapper('Please login to follow this artist');
+
+      let { _id } = args;
+      let artistExist = await Artist.findById(_id);
+      if (!artistExist) songHelper.notFoundWrapper('Artist not found');
+
+      let followersArray;
+      if (context.decoded.role === 'ARTIST') {
+        followersArray = artistExist.followers.artists;
+      } else if (context.decoded.role === 'USER') {
+        followersArray = artistExist.followers.users;
+      } else {
+        songHelper.unAuthorizedWrapper('Invalid role for following an artist');
+      }
+
+      let toggleFollow = true;
+      for (let i = 0; i < followersArray.length; i++) {
+        if (followersArray[i].toString() === context.decoded.id) {
+          toggleFollow = false;
+          break;
+        }
+      }
+
+      if (toggleFollow) {
+        if (context.decoded.role === 'ARTIST') {
+          artistExist.followers.artists.push(context.decoded.id);
+        } else if (context.decoded.role === 'USER') {
+          artistExist.followers.users.push(context.decoded.id);
+        }
+      } else {
+        if (context.decoded.role === 'ARTIST') {
+          artistExist.followers.artists = artistExist.followers.artists.filter(
+            (followerId) => followerId.toString() !== context.decoded.id
+          );
+        } else if (context.decoded.role === 'USER') {
+          artistExist.followers.users = artistExist.followers.users.filter(
+            (followerId) => followerId.toString() !== context.decoded.id
+          );
+        }
+      }
+
+      let updatedArtist = await artistExist.save();
+      return updatedArtist;
     },
   },
 };

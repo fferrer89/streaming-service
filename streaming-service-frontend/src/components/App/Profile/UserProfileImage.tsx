@@ -7,8 +7,13 @@ interface UserProfileImageProps {
   size: number;
 }
 
-const UserProfileImage: React.FC<UserProfileImageProps> = ({ image_url, size }) => {
-  const imageUrl = image_url ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${image_url}` : "/img/ellipse.png";
+const UserProfileImage: React.FC<UserProfileImageProps> = ({
+  image_url,
+  size,
+}) => {
+  const imageUrl = image_url
+    ? `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${image_url}`
+    : "/img/ellipse.png";
   return (
     <Image
       src={imageUrl}

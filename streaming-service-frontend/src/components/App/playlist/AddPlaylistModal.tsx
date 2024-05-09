@@ -3,16 +3,18 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import queries from "../../../utils/queries";
-import { PlayListForm } from "./PlaylistForm";
+import  PlayListForm  from "./PlaylistForm";
 import { PlayListModal } from "./PlaylistModal";
 import { FaPlus } from "react-icons/fa6";
-import apolloClient from "@/utils";
+import createApolloClient from "@/utils";
 
 const AddPlayListForm: React.FC<{
   onSubmitMessage: string;
   setOnSubmitMessage: React.Dispatch<React.SetStateAction<string>>;
   data: any;
 }> = ({ onSubmitMessage, setOnSubmitMessage, data }) => {
+
+  const apolloClient = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
   const [createPlayList, { error }] = useMutation(queries.CREATE_PLAYLIST, {
     refetchQueries: [queries.GET_PLAYLIST],
     client: apolloClient,

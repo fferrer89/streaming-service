@@ -8,10 +8,10 @@ export type FeedQueryResult = {
     lyrics: string;
     producers: string[];
     release_date: string;
-    album: { 
-      _id: string; 
-      title: string; 
-      cover_image_url: string; 
+    album: {
+      _id: string;
+      title: string;
+      cover_image_url: string;
     };
     song_url: string;
     title: string;
@@ -78,10 +78,10 @@ export type FeedQueryResult = {
     lyrics: string;
     producers: string[];
     release_date: string;
-    album: { 
-      _id: string; 
-      title: string; 
-      cover_image_url: string; 
+    album: {
+      _id: string;
+      title: string;
+      cover_image_url: string;
     };
     song_url: string;
     title: string;
@@ -93,63 +93,59 @@ export type FeedQueryResult = {
       profile_image_url: string;
     }[];
   }[];
-  
 };
 
-
-export type UserLikedSong =  {
+export type UserLikedSong = {
+  _id: string;
+  title: string;
+  duration: number;
+  song_url: string;
+  writtenBy: string;
+  producers: string[];
+  language: string;
+  genre: string;
+  lyrics: string;
+  release_date: string;
+  album: {
     _id: string;
     title: string;
-    duration: number;
-    song_url: string;
-    writtenBy: string;
-    producers: string[];
-    language: string;
-    genre: string;
-    lyrics: string;
-    release_date: Date;
-    album: {
-        _id: string;
-        title: string;
-        cover_image_url: string;
-    };
-    artists: {
-        _id: string;
-        display_name: string;
-        profile_image_url: string;
-    }[];
-}
-export type  SongsByArtistID = {
+    cover_image_url: string;
+  };
+  artists: {
+    _id: string;
+    display_name: string;
+    profile_image_url: string;
+  }[];
+};
+export type SongsByArtistID = {
+  _id: string;
+  title: string;
+  duration: number;
+  song_url: string;
+  writtenBy: string;
+  producers: string[];
+  language: string;
+  genre: string;
+  lyrics: string;
+  release_date: string;
+  album: {
     _id: string;
     title: string;
-    duration: number;
-    song_url: string;
-    writtenBy: string;
-    producers: string[];
-    language: string;
-    genre: string;
-    lyrics: string;
-    release_date: string;
-    album: {
-        _id: string;
-        title: string;
-        cover_image_url: string;
-    };
-    artists: {
-        _id: string;
-        display_name: string;
-        profile_image_url: string;
-    }[];
-}
-
+    cover_image_url: string;
+  };
+  artists: {
+    _id: string;
+    display_name: string;
+    profile_image_url: string;
+  }[];
+};
 
 export type GetUserPlaylist = {
-    _id: string;
-    description: string;
-    title: string;
-}
+  _id: string;
+  description: string;
+  title: string;
+};
 
 export type GetUserPlaylistsVariables = {
-    userId: string;
-}
-  
+  userId: string;
+};

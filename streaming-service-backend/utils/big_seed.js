@@ -14,7 +14,7 @@ import axios from 'axios';
 import { Readable } from 'stream';
 import bcrypt from 'bcryptjs';
 
-const usersToBeSeeded = 60;
+const usersToBeSeeded = 50;
 const artistsToBeSeeded = 2;
 // albums number will be random from 1 to 6
 const albumsToBeSeeded = Math.floor(Math.random() * 6) + 1;
@@ -275,6 +275,9 @@ function shuffleArray(array) {
 
 async function generatePlaylist(userId) {
   try {
+    const sampleProfileImage = await SongFile.findOne({
+      filename: 'sample_song_image',
+    }).fileId;
     const numPlaylists = Math.floor(Math.random() * 3) + 2;
 
     const playlists = [];
@@ -286,6 +289,7 @@ async function generatePlaylist(userId) {
         visibility: faker.helpers.arrayElement(['PUBLIC', 'PRIVATE']),
         likes: Math.floor(Math.random() * 100),
         created_date: new Date(),
+        cover_image_url: new mongoose.Types.ObjectId(sampleProfileImage),
       };
 
       const randomSong = await Song.aggregate([{ $sample: { size: 1 } }]);
@@ -331,7 +335,7 @@ async function populateListeningHistory() {
     console.error('Error populating listening history:', error);
   }
 }
-
+const createdSongIDArray = await Song.distinct('_id');
 async function populateUserDatawithRemainingFields() {
   try {
     const users = await User.find();
@@ -348,13 +352,15 @@ async function populateUserDatawithRemainingFields() {
 
       await user.save();
     }
-
     for (let user of users) {
-      const shuffledSongs = shuffleArray(songIdArray);
+      const shuffledSongs = shuffleArray(createdSongIDArray);
       const selectedSongs = shuffledSongs.slice(0, numSongsToSelect);
 
       for (let songId of selectedSongs) {
-        user.liked_songs.push({ songId });
+        user.liked_songs.push({
+          songId: songId,
+          liked_date: new Date(),
+        });
       }
 
       await user.save();

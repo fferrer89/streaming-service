@@ -43,16 +43,16 @@ const AlbumDetailsArtists: React.FC<{
   };
   const confirmRemoveArtist = async () => {
     try {
-      console.log("Removing artist with ID:", artistToRemove, albumId);
+      //console.log("Removing artist with ID:", artistToRemove, albumId);
       const response = await removeArtistFromAlbum({
         variables: { id: albumId, artistId: artistToRemove },
       });
 
       if (response.errors && response.errors.length > 0) {
         setError(`Error removing artist`);
-        console.error("Error removing artist:", error);
+        //console.error("Error removing artist:", error);
       } else {
-        console.log("Artist removed successfully");
+        //console.log("Artist removed successfully");
         setArtistToRemove("");
         setShowConfirmation(false);
       }
@@ -68,18 +68,18 @@ const AlbumDetailsArtists: React.FC<{
 
   const confirmAddArtist = async () => {
     try {
-      console.log("Adding artist with ID:", selectedArtistId, albumId);
+      // console.log("Adding artist with ID:", selectedArtistId, albumId);
       const response = await addArtistToAlbum({
         variables: { id: albumId, artistId: selectedArtistId },
       });
-
+      console.log(response);
       if (response.errors && response.errors.length > 0) {
         setIsSuccess(false);
         setM("Error Adding Artist");
         setShowAddForm(false);
         setShowSuccess(true);
       } else {
-        console.log("Artist Added successfully");
+        //console.log("Artist Added successfully");
         setSelectedArtistId("");
         setShowAddForm(false);
         setM("Artist Added successfully");
@@ -127,7 +127,7 @@ const AlbumDetailsArtists: React.FC<{
       />
     );
   }
-  console.log(artistData);
+  //console.log(artistData);
   return (
     <div className="w-full max-w-md p-4 bg-stone-300 border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
       <div className="flex items-center justify-between mb-4">

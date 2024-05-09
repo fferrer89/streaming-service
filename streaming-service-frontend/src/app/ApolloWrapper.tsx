@@ -9,19 +9,19 @@ import {
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
 
-let userToken = localStorage.getItem("token");
+let userToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      authorization: userToken,
+      authorization: userToken ? userToken : "",
     },
   };
 });
 function makeClient() {
   const httpLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_BACKEND_GRAPHQL_URL,
-    fetchOptions: { cache: "no-store" },
+    //fetchOptions: { cache: "no-store" },
   });
 
   return new NextSSRApolloClient({

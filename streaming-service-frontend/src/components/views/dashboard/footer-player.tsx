@@ -1,18 +1,19 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../../../utils/redux/store";
+import { RootState } from "@/utils/redux/store";
 import "@madzadev/audio-player/dist/index.css";
 import {
   playSong,
   pauseSong,
   stopSong,
   setNextSongs,
-} from "../../../utils/redux/features/song/songSlice";
+} from "@/utils/redux/features/song/songSlice";
 import NextSongsList from "./NextSongsList";
-import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { motion } from "framer-motion";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
+
 const SPlayer: React.FC = () => {
   const dispatch = useDispatch();
   const {
@@ -22,7 +23,6 @@ const SPlayer: React.FC = () => {
     nextSongs,
   } = useSelector((state: RootState) => state.song);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const progressX = useMotionValue(0);
 
   useEffect(() => {
     if (currentSong) {
@@ -46,7 +46,6 @@ const SPlayer: React.FC = () => {
       if (currentIndex !== -1 && currentIndex < nextSongs.length - 1) {
         const nextSong = nextSongs[currentIndex + 1];
         dispatch(playSong({ song: nextSong, currentTime: 0 }));
-        //dispatch(setNextSongs(nextSongs.slice(currentIndex + 1)));
       } else {
         dispatch(stopSong());
       }
@@ -54,20 +53,21 @@ const SPlayer: React.FC = () => {
       dispatch(stopSong());
     }
   };
+
   const handlePreviousSong = () => {
     if (nextSongs.length > 0 && currentSong) {
       const currentIndex = nextSongs.findIndex(
         (song) => song._id === currentSong._id
       );
-      if (currentIndex >= 0) {
+      if (currentIndex > 0) {
         const previousSong = nextSongs[currentIndex - 1];
         dispatch(playSong({ song: previousSong, currentTime: 0 }));
-        //dispatch(setNextSongs(nextSongs.slice(0, currentIndex)));
       }
     } else {
       dispatch(stopSong());
     }
   };
+
   if (!currentSong) {
     return null;
   }
@@ -85,10 +85,7 @@ const SPlayer: React.FC = () => {
       variants={footerVariants}
     >
       <div className="h-auto max-h-56 overflow-y-scroll">
-        <NextSongsList
-          nextSongs={nextSongs}
-          currentSongId={currentSong ? currentSong._id : null}
-        />
+        <NextSongsList nextSongs={nextSongs} currentSong={currentSong} />
       </div>
       <AudioPlayer
         autoPlay

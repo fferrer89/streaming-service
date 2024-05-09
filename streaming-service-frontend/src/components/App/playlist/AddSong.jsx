@@ -6,7 +6,7 @@ import { useMutation } from "@apollo/client";
 import queries from "@/utils/queries";
 import { PlayListModal } from "./PlaylistModal";
 import { useQuery } from "../../../../node_modules/@apollo/client/index";
-import { client } from "@/utils/playlistHelper";
+import createApolloClient from "@/utils";
 import { FaCheckCircle } from "react-icons/fa";
 import { IoMdAddCircleOutline } from "react-icons/io";
 
@@ -32,7 +32,8 @@ export const FloatingAddButton = () => {
 };
 
 const AddSongForm = ({ data: playlistData }) => {
-  console.log(playlistData);
+  const client = createApolloClient(typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  // console.log(playlistData);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [results, setResults] = useState([]);
@@ -106,9 +107,10 @@ const AddSongForm = ({ data: playlistData }) => {
         style={{ overflow: "scroll", width: "100%" }}
       >
         {data &&
-          data.getSongsByTitle.map((song) => {
+          data.getSongsByTitle.map((song, index) => {
             return (
               <div
+                key={index}
                 className="flex flex-row justify-between border"
                 style={{
                   alignSelf: "flex-start",
@@ -121,9 +123,10 @@ const AddSongForm = ({ data: playlistData }) => {
                   <p className="text-md">{song.title}</p>
                   <div className="flex flex-row ">
                     {song.artists &&
-                      song.artists.map((artist) => {
+                      song.artists.map((artist, index) => {
                         return (
                           <span
+                            key={index}
                             className="text-xs"
                             style={{ marginLeft: "0.3rem" }}
                           >

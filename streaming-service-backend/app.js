@@ -15,15 +15,22 @@ import { artistResolvers } from './graphql/artistResolvers.js';
 import { albumResolvers } from './graphql/albumResolvers.js';
 import { songResolvers } from './graphql/songResolvers.js';
 import { playlistResolvers } from './graphql/playlistResolvers.js';
-import redis from 'redis';
+import { Redis } from '@upstash/redis';
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
 import express from 'express';
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { authenticateToken } from './utils/helpers.js';
 import morgan from 'morgan';
+
 import cors from 'cors';
-const redisClient = redis.createClient();
+// const redisClient = new Redis(process.env.REDIS_URL);
+// redisClient.set('animal', 'cat');
+
+const redisClient = new Redis({
+  url: process.env.REDIS_URL,
+  token: process.env.REDIS_TOKEN,
+});
 
 const attachRedisClient = (req, res, next) => {
   req.redisClient = redisClient;
@@ -46,11 +53,7 @@ const server = new ApolloServer({
         `[GRAPHQL] -- Operation = ${req.body.operationName} -- Status = ${res.statusCode}`
       );
     }
-    // will bypass authentication middelware for login, register and playground
     if (
-      // Uncomment this part to disable authentication on all queries and mutations
-      req.body.operationName.toLowerCase() !== 'mutation' &&
-      req.body.operationName.toLowerCase() !== 'query' &&
       req.body.operationName !== 'IntrospectionQuery' &&
       req.body.operationName !== 'registerUser' &&
       req.body.operationName !== 'registerArtist' &&
@@ -59,7 +62,7 @@ const server = new ApolloServer({
       req.body.operationName !== 'loginAdmin'
     ) {
       const token = req.headers.authorization || '';
-      return { redisClient };
+      //return { redisClient };
       try {
         var decoded = jwt.verify(token, process.env.JWT_SECRET);
         if (decoded.exp <= Math.floor(Date.now() / 1000)) {
@@ -91,19 +94,19 @@ const server = new ApolloServer({
 });
 
 const env = process.env.NODE_ENV || 'development';
-const mongoUrl = environment[env].mongoUrl;
+const mongoUrl = process.env.MONGO_URL;
 
 try {
   const connection = await mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
   });
 
-  await redisClient
-    .connect()
-    .then(() => {})
-    .catch((error) => {
-      throw new Error(`Redis Client failed to connect`);
-    });
+  // await redisClient
+  //   .connect()
+  //   .then(() => {})
+  //   .catch((error) => {
+  //     throw new Error(`Redis Client failed to connect`);
+  //   });
   if (connection) {
     await server.start();
 

@@ -1,6 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface Song {
+export interface Song {
   _id: string;
   title: string;
   duration: number;
@@ -11,6 +11,7 @@ interface Song {
   genre: string;
   lyrics: string;
   release_date: string;
+  likes?: number;
   album: {
     _id: string;
     title: string;
@@ -38,17 +39,11 @@ const initialState: SongState = {
 };
 
 const songSlice = createSlice({
-  name: "song",
+  name: 'song',
   initialState,
   reducers: {
-    playSong(
-      state,
-      action: PayloadAction<{ song: Song; currentTime: number }>
-    ) {
-      if (
-        state.currentSong &&
-        state.currentSong._id === action.payload.song._id
-      ) {
+    playSong(state, action: PayloadAction<{ song: Song; currentTime: number }>) {
+      if (state.currentSong && state.currentSong._id === action.payload.song._id) {
         state.isPlaying = true;
       } else {
         state.currentSong = action.payload.song;
@@ -72,6 +67,9 @@ const songSlice = createSlice({
     setNextSongs(state, action: PayloadAction<Song[]>) {
       state.nextSongs = action.payload;
     },
+    updateCurrentSong(state, action: PayloadAction<Song>) {
+      state.currentSong = { ...state.currentSong, ...action.payload };
+    },
   },
 });
 
@@ -81,5 +79,7 @@ export const {
   stopSong,
   updateCurrentTime,
   setNextSongs,
+  updateCurrentSong,
 } = songSlice.actions;
+
 export default songSlice.reducer;

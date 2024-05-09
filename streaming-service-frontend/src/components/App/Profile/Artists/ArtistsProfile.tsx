@@ -1,48 +1,87 @@
-// ArtistProfile.tsx
-"use client";
-import React from "react";
-import { useQuery } from "@apollo/client";
-import {   GetSongsByArtistID } from "@/utils/graphql/queries";
-import queries from "@/utils/queries";
-import ArtistProfileImage from "@/components/App/Artist/ArtistProfileImage";
-import { SongsByArtistID } from "@/utils/graphql/resultTypes";
- 
-import Songs from "@/components/App/Serach/Songs";
+'use client';
+import React from 'react';
+import { useQuery, useMutation } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { useSelector } from 'react-redux';
+import queries from '@/utils/queries';
+import { GetSongsByArtistID } from '@/utils/graphql/queries';
+import Songs from '@/components/App/Serach/Songs';
+import Albums from '@/components/App/Serach/Albums';
+import ArtistProfileImage from '@/components/App/Artist/ArtistProfileImage';
 
 interface ArtistProfileProps {
   params: { id: string };
 }
 
+const GetAlbumsByArtistID = gql`
+  query Query($artistId: ID!) {
+    getAlbumsByArtist(artistId: $artistId) {
+      _id
+      album_type
+      cover_image_url
+      title
+      release_date
+      artists {
+        _id
+        display_name
+        profile_image_url
+      }
+    }
+  }
+`;
+
 const ArtistProfile: React.FC<ArtistProfileProps> = ({ params }) => {
+  const userId = useSelector((state: { user: { userId: string | null } }) => state.user.userId);
+  
+  const userType = typeof window !== "undefined" ? localStorage.getItem('userType') : null;
   const { data: artistData, loading: artistLoading, error: artistError } = useQuery(queries.GET_ARTIST_BY_ID, {
     variables: { id: params.id },
   });
 
-  const { data: songsData, loading: songsLoading, error: songsError } = useQuery<{ getSongsByArtistID: SongsByArtistID[] }>(
+  const { data: songsData, loading: songsLoading, error: songsError } = useQuery<{ getSongsByArtistID: any[] }>(
     GetSongsByArtistID,
     {
       variables: { artistId: params.id },
     }
   );
 
-  if (artistLoading || songsLoading) return <div>Loading...</div>;
-  if (artistError || songsError) return <div>Error loading data</div>;
+  const { data: albumsData, loading: albumsLoading, error: albumsError } = useQuery<{ getAlbumsByArtist: any[] }>(
+    GetAlbumsByArtistID,
+    {
+      variables: { artistId: params.id },
+    }
+  );
+
+  const [toggleFollowArtist] = useMutation(queries.TOGGLE_FOLLOW_ARTIST, {
+    variables: { id: params.id },
+    refetchQueries: [{ query: queries.GET_ARTIST_BY_ID, variables: { id: params.id } }],
+  });
+
+  const handleFollow = () => {
+    toggleFollowArtist();
+  };
+
+  if (artistLoading || songsLoading || albumsLoading) return <div>Loading...</div>;
+  if (artistError || songsError || albumsError) return <div>Error loading data</div>;
 
   const artist = artistData.getArtistById;
- 
+  const isCurrentUser = userId === artist._id;
 
-  const date = new Date(artist.created_date);
-  const formattedDate = date.toLocaleString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  let isFollowing = false;
+  if (userType === 'user') {
+    isFollowing = artist.followers.users.some((user: { _id: string }) => user._id === userId);
+  } else if (userType === 'artist') {
+    isFollowing = artist.followers.artists.some((artist: { _id: string }) => artist._id === userId);
+  }
+
+  const formattedDate = new Date(artist.created_date).toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 
   return (
-    <div
-      className="container mx-auto my-5 p-5 rounded-lg h-fit"
-       
-    >
+    <div className="container mx-auto my-5 p-5 rounded-lg h-fit">
       <div className="md:flex no-wrap md:-mx-2">
         <div className="w-full md:w-3/12 md:mx-2">
           <div className="p-3 border-t-4 border-green-400 bg-stone-300">
@@ -70,6 +109,16 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ params }) => {
                 <span>Member since</span>
                 <span className="ml-auto">{formattedDate}</span>
               </li>
+              {!isCurrentUser && (
+                <li className="flex items-center py-3">
+                  <button
+                    className="ml-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleFollow}
+                  >
+                    {isFollowing ? 'Unfollow' : 'Follow'}
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         </div>
@@ -85,9 +134,9 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ params }) => {
                   stroke="currentColor"
                 >
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
@@ -110,16 +159,19 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ params }) => {
                 </div>
                 <div className="grid grid-cols-2">
                   <div className="px-4 py-2 font-semibold">Genres</div>
-                  <div className="px-4 py-2">{artist.genres.join(", ")}</div>
+                  <div className="px-4 py-2">{artist.genres.join(', ')}</div>
                 </div>
               </div>
             </div>
           </div>
-          <div className= "grid grid-cols-1 gap-4 w-full place-items-center">
+          <div className="grid grid-cols-1 gap-4 w-full place-items-center">
             <Songs songs={songsData?.getSongsByArtistID || []} />
           </div>
+          <div className="grid grid-cols-1 gap-4 w-full place-items-center">
+            <Albums albums={albumsData?.getAlbumsByArtist || []} />
+          </div>
         </div>
-      </div> 
+      </div>
     </div>
   );
 };

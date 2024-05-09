@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useMutation } from "@apollo/client";
-import { EDIT_ARTIST_MUTATION } from "@/graphql/mutations";
 import queries from "@/utils/queries";
 import ArtistProfileImage from "./ArtistProfileImage";
 
@@ -13,7 +12,7 @@ const ArtistProfile: React.FC<{ artistData: any }> = ({ artistData }) => {
     day: "numeric",
   };
 
-  const formattedDate = date.toLocaleString("en-US", options);
+  const formattedDate = date.toLocaleString("en-US");
 
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -54,10 +53,7 @@ const ArtistProfile: React.FC<{ artistData: any }> = ({ artistData }) => {
   const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${artistData.getArtistById.profile_image_url}`;
 
   return (
-    <div
-      className="container mx-auto my-5 p-5 rounded-lg"
-       
-    >
+    <div className="container mx-auto my-5 p-5 rounded-lg">
       <div className="md:flex no-wrap md:-mx-2">
         <div className="w-full md:w-3/12 md:mx-2 ">
           <div className="p-3 border-t-4 border-green-400 bg-stone-300">
@@ -118,7 +114,7 @@ const ArtistProfile: React.FC<{ artistData: any }> = ({ artistData }) => {
               <span>Followers</span>
             </div>
             <div className="grid grid-cols-3">
-              {artistData.getArtistById.followers.artists.map((artist) => (
+              {artistData.getArtistById.followers.artists.map((artist: any) => (
                 <div
                   key={artist._id}
                   className="flex items-center justify-center my-2 ml-8"

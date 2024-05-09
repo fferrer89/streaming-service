@@ -11,16 +11,16 @@ interface UserState {
 }
 
 const getInitialState = (): UserState => {
-  const loggedIn = localStorage.getItem('loggedIn') === 'true';
-  const userData = JSON.parse(localStorage.getItem('userData') || 'null');
-  const token = localStorage.getItem('token') || null;
-  const expirationTime = Number(localStorage.getItem('expirationTime')) || null;
-  const userType = localStorage.getItem('userType') as
+  const loggedIn = typeof window !== "undefined" ? localStorage.getItem('loggedIn') === 'true' : false;
+  const userData = typeof window !== "undefined" ? JSON.parse(localStorage.getItem('userData') || 'null') : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem('token') : null;
+  const expirationTime = typeof window !== "undefined" ? Number(localStorage.getItem('expirationTime')) : null;
+  const userType = typeof window !== "undefined" ? localStorage.getItem('userType') as
     | 'user'
     | 'artist'
     | 'admin'
-    | null;
-  const userId = localStorage.getItem('userId') || null;
+    | null : null;
+  const userId = typeof window !== "undefined" ? localStorage.getItem('userId') : null;
 
   if (expirationTime && expirationTime < Date.now()) {
     localStorage.removeItem('loggedIn');

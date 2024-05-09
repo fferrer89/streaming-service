@@ -3,13 +3,49 @@ import { useMutation, gql } from "@apollo/client";
 import { Separator } from "@/components/ui/separator";
 import AlbumDetailsSongs from "./units/AlbumDetailsSongs";
 import AlbumDetailsArtists from "./units/AlbumDetailsArtists";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const REMOVE_ALBUM_MUTATION = gql`
   mutation RemoveAlbum($id: ID!) {
     removeAlbum(_id: $id) {
       _id
       title
+    }
+  }
+`;
+
+const UPDATE_ALBUM_MUTATION = gql`
+  mutation Mutation(
+    $id: ID!
+    $albumType: AlbumType
+    $title: String
+    $description: String
+    $releaseDate: Date
+    $genres: [MusicGenre!]
+    $visibility: Visibility
+  ) {
+    editAlbum(
+      _id: $id
+      album_type: $albumType
+      title: $title
+      description: $description
+      release_date: $releaseDate
+      genres: $genres
+      visibility: $visibility
+    ) {
+      _id
+      album_type
+      total_songs
+      cover_image_url
+      title
+      description
+      release_date
+      created_date
+      last_updated
+      genres
+      likes
+      total_duration
+      visibility
     }
   }
 `;
@@ -35,14 +71,28 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   } = albumData.getAlbumById;
   const router = useRouter();
   const date = new Date(release_date);
-  const options = {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
+  // const options = {
+  //   year: "numeric",
+  //   month: "long",
+  //   day: "numeric",
+  // };
 
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [removeAlbum, { loading, error }] = useMutation(REMOVE_ALBUM_MUTATION);
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({
+    album_type,
+    genres,
+    visibility,
+    title,
+    description,
+    release_date: date.toLocaleDateString("en-CA"),
+  });
+  const [removeAlbum, { loading: removing, error: removeError }] = useMutation(
+    REMOVE_ALBUM_MUTATION
+  );
+  const [updateAlbum, { loading: updating, error: updateError }] = useMutation(
+    UPDATE_ALBUM_MUTATION
+  );
 
   const handleRemoveAlbum = () => {
     setShowConfirmation(true);
@@ -58,9 +108,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
         variables: { id: _id },
       });
       if (response.data.removeAlbum) {
-        console.log("Album removed successfully:", response.data.removeAlbum.title);
-        refetch();
-        router.push('/artist/albums');
+        router.push("/artist/albums");
       }
     } catch (err) {
       console.error("Error removing album:", err);
@@ -68,7 +116,37 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
     setShowConfirmation(false);
   };
 
-  const formattedDate = date.toLocaleString("en-US", options);
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+  };
+
+  const handleEditChange = (e: any) => {
+    const { name, value } = e.target;
+    setEditData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const saveChanges = async () => {
+    try {
+      const response = await updateAlbum({
+        variables: {
+          id: _id,
+          ...editData,
+          genres: editData.genres.split(",").map((genre: any) => genre.trim()),
+          release_date: new Date(editData.release_date).toLocaleDateString(),
+        },
+      });
+
+      if (response.data.editAlbum) {
+        // console.log("Album updated successfully:", response.data.editAlbum.title);
+        refetch();
+        toggleEditMode();
+      }
+    } catch (err) {
+      console.error("Error updating album:", err);
+    }
+  };
+
+  const formattedDate = date.toLocaleString("en-US");
   const imageUrl = `${process.env.NEXT_PUBLIC_BACKEND_EXPRESS_URL}/file/download/${cover_image_url}`;
 
   return (
@@ -86,6 +164,12 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
         >
           Delete This Album
         </button>
+        <button
+          onClick={toggleEditMode}
+          className="bg-blue-300 hover:bg-blue-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow ml-2"
+        >
+          {editMode ? "Cancel Edit" : "Edit Album"}
+        </button>
       </div>
 
       <Separator className="w-[95%]" />
@@ -95,11 +179,13 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
           <div className="bg-gray-200 p-4 rounded-lg shadow-lg text-black">
             <p>Are you sure you want to remove this Album?</p>
             <div className="mt-4 flex justify-end">
-              {error && <div className="text-red-500">{error.message}</div>}
+              {removeError && (
+                <div className="text-red-500">{removeError.message}</div>
+              )}
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded-md mr-2 hover:bg-red-600"
                 onClick={confirmRemoveAlbum}
-                disabled={loading}
+                disabled={removing}
               >
                 Confirm
               </button>
@@ -114,34 +200,143 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
         </div>
       )}
 
-      <div className="w-full py-5 px-3 overflow-x-auto flex flex-row items-start">
-        <div className="ml-4 flex flex-col justify-start">
-          <div className="p-4">
-            <h2 className="text-xl font-bold mb-2">{title}</h2>
-            <p className="text-sm text-gray-600 mb-2">{description}</p>
-            <p className="text-sm text-gray-600 mb-2">
-              Album Type: {album_type}
-            </p>
-            <p className="text-sm text-gray-600 mb-2">
-              Release Date: {formattedDate}
-            </p>
-            <p className="text-sm text-gray-600 mb-2">
-              Visibility: {visibility}
-            </p>
-            <p className="text-sm text-gray-600 mb-2">
-              Genres: {genres.join(", ")}
-            </p>
-            <p className="text-sm text-gray-600 mb-2">
-              Total Songs: {total_songs}
-            </p>
-            <p className="text-sm text-gray-600 mb-2">Total Likes: {likes}</p>
+      {editMode ? (
+        <div className="w-full py-5 px-3 overflow-x-auto flex flex-row items-start text-dark">
+          <div className="ml-4 flex flex-col justify-start">
+            <div className="p-4 text-dark">
+              <label
+                htmlFor="title"
+                className="block text-gray-700 font-semibold mb-2"
+              >
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={editData.title}
+                onChange={handleEditChange}
+                className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+              />
+
+              <label
+                htmlFor="description"
+                className="block text-gray-700 font-semibold mb-2"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={editData.description}
+                onChange={handleEditChange}
+                rows={4}
+                className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+              />
+
+              <label
+                htmlFor="album_type"
+                className="block text-gray-700 font-semibold mb-2"
+              >
+                Album Type
+              </label>
+              <input
+                type="text"
+                id="album_type"
+                name="album_type"
+                value={editData.album_type}
+                onChange={handleEditChange}
+                className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+              />
+
+              <label
+                htmlFor="release_date"
+                className="block text-gray-700 font-semibold mb-2"
+              >
+                Release Date
+              </label>
+              <input
+                type="date"
+                id="release_date"
+                name="release_date"
+                value={editData.release_date}
+                onChange={handleEditChange}
+                className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+              />
+
+              <label
+                htmlFor="visibility"
+                className="block text-gray-700 font-semibold mb-2"
+              >
+                Visibility
+              </label>
+              <input
+                type="text"
+                id="visibility"
+                name="visibility"
+                value={editData.visibility}
+                onChange={handleEditChange}
+                className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+              />
+
+              <label
+                htmlFor="genres"
+                className="block text-gray-700 font-semibold mb-2"
+              >
+                Genres
+              </label>
+              <input
+                type="text"
+                id="genres"
+                name="genres"
+                value={editData.genres}
+                onChange={handleEditChange}
+                className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+              />
+
+              <button
+                onClick={saveChanges}
+                disabled={updating}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+          <div className="ml-20 flex flex-col justify-start">
+            <img className="w-full max-w-md" src={imageUrl} alt={title} />
           </div>
         </div>
+      ) : (
+        <div className="w-full py-5 px-3 overflow-x-auto flex flex-row items-start">
+          <div className="ml-4 flex flex-col justify-start">
+            <div className="p-4">
+              <h2 className="text-xl font-bold mb-2">{title}</h2>
+              <p className="text-sm text-gray-600 mb-2">{description}</p>
+              <p className="text-sm text-gray-600 mb-2">
+                Album Type: {album_type}
+              </p>
+              <p className="text-sm text-gray-600 mb-2">
+                Release Date: {formattedDate}
+              </p>
+              <p className="text-sm text-gray-600 mb-2">
+                Visibility: {visibility}
+              </p>
+              <p className="text-sm text-gray-600 mb-2">
+                Genres: {genres.join(", ")}
+              </p>
+              <p className="text-sm text-gray-600 mb-2">
+                Total Songs: {total_songs}
+              </p>
+              <p className="text-sm text-gray-600 mb-2">Total Likes: {likes}</p>
+            </div>
+          </div>
 
-        <div className="ml-20 flex flex-col justify-start">
-          <img className="w-full max-w-md" src={imageUrl} alt={title} />
+          <div className="ml-20 flex flex-col justify-start">
+            <img className="w-full max-w-md" src={imageUrl} alt={title} />
+          </div>
         </div>
-      </div>
+      )}
       <div className="flex flex-row gap-8 ml-8">
         <AlbumDetailsSongs songs={songs} refetch={refetch} albumId={_id} />
         <AlbumDetailsArtists
