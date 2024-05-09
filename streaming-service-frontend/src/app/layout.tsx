@@ -1,14 +1,10 @@
+'use client';
+import { Provider } from 'react-redux';
+import { store } from '@/utils/redux/store';
 import "./globals.css";
-import { Metadata } from 'next'
+import { ApolloWrapper } from "./ApolloWrapper";
 
 
-export const metadata: Metadata = {
-    title: {
-        template: 'Sound 54',
-        default: 'Sound 54',
-        absolute: 'Sound 54',
-    },
-}
 
 export default function RootLayout({
   children,
@@ -17,8 +13,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body >
+      <body > 
+      <ApolloWrapper>
+        <Provider store={store}>
           {children}
+        </Provider>
+        </ApolloWrapper>
        </body>
     </html>
   );
