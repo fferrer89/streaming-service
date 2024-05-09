@@ -44,7 +44,6 @@ const AlbumDetailsSongs: React.FC<{
 
   const confirmRemoveSong = async () => {
     try {
-      //console.log("Removing song with ID:", songToRemove, albumId);
       const response = await removeSongFromAlbum({
         variables: { id: albumId, songId: songToRemove },
       });
@@ -53,7 +52,6 @@ const AlbumDetailsSongs: React.FC<{
         setError(`Error removing song`);
         console.error("Error removing song:", error);
       } else {
-        // console.log("Song removed successfully");
         setSongToRemove("");
         setShowConfirmation(false);
       }
@@ -63,24 +61,28 @@ const AlbumDetailsSongs: React.FC<{
       setSongToRemove("");
       setShowConfirmation(false);
       setM("Song Removed successfully");
-      setIsSuccess(false);
+      setIsSuccess(true);
       setShowSuccess(true);
     }
   };
 
   const confirmAddSong = async () => {
     try {
-      // console.log("Adding song with ID:", selectedSongId, albumId);
       const response = await addSongToAlbum({
         variables: { id: albumId, songId: selectedSongId },
       });
 
-      if (response.errors && response.errors.length > 0) {
+      if (response.data && response.data.addSongToAlbum) {
+        setSelectedSongId("");
+        setShowAddForm(false);
+        setM("Song Added successfully");
+        setIsSuccess(true);
+        setShowSuccess(true);
+      } else if (response.errors && response.errors.length > 0) {
+        setError("Error Adding Song");
         setIsSuccess(false);
         setShowSuccess(true);
-        setM("Error Adding Song");
       } else {
-        // console.log("Song Added successfully");
         setSelectedSongId("");
         setShowAddForm(false);
         setM("Song Added successfully");
@@ -90,8 +92,8 @@ const AlbumDetailsSongs: React.FC<{
       refetch();
     } catch (error) {
       console.error("Error Adding song:", error);
+      setError("Error Adding Song");
       setIsSuccess(false);
-      setM("Error Adding Song");
       setShowAddForm(false);
       setShowSuccess(true);
     }
@@ -108,6 +110,9 @@ const AlbumDetailsSongs: React.FC<{
 
   const closeSuccess = () => {
     setShowSuccess(false);
+    if (isSuccess) {
+      refetch(); // Refetch artist details to update UI after successful operation
+    }
   };
 
   useEffect(() => {
@@ -208,15 +213,20 @@ const AlbumDetailsSongs: React.FC<{
       {songData && showAddForm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-200 p-4 rounded-lg shadow-lg text-black">
-            <p>Select an Song to add:</p>
+            <p>Select a Song to add:</p>
             <select value={selectedSongId} onChange={handleSongChange}>
               {songData.getSongsByArtistID
-                .filter((song: any) => song.album === null)
+                .filter((song: any) => song.album === null && !songs.some((s: any) => s._id === song._id))
                 .map((song: any) => (
                   <option key={song._id} value={song._id}>
                     {song.title}
                   </option>
                 ))}
+              {songData.getSongsByArtistID
+                .filter((song: any) => song.album === null && !songs.some((s: any) => s._id === song._id))
+                .length === 0 && (
+                <option disabled>No songs available</option>
+              )}
             </select>
             <div className="mt-4 flex justify-end">
               <button

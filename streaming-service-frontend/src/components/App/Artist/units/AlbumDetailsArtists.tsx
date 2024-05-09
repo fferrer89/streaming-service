@@ -73,17 +73,22 @@ const AlbumDetailsArtists: React.FC<{
         variables: { id: albumId, artistId: selectedArtistId },
       });
       console.log(response);
-      if (response.errors && response.errors.length > 0) {
-        setIsSuccess(false);
-        setM("Error Adding Artist");
-        setShowAddForm(false);
-        setShowSuccess(true);
-      } else {
+      if (response.data && response.data.addArtistToAlbum) {
         //console.log("Artist Added successfully");
         setSelectedArtistId("");
         setShowAddForm(false);
         setM("Artist Added successfully");
         setIsSuccess(true);
+        setShowSuccess(true);
+      } else if (response.errors && response.errors.length > 0) {
+        setIsSuccess(false);
+        setM("Error Adding Artist");
+        setShowAddForm(false);
+        setShowSuccess(true);
+      } else {
+        setIsSuccess(false);
+        setM("Unexpected error occurred");
+        setShowAddForm(false);
         setShowSuccess(true);
       }
       refetch();
@@ -127,7 +132,7 @@ const AlbumDetailsArtists: React.FC<{
       />
     );
   }
-  //console.log(artistData);
+  console.log(artistData);
   return (
     <div className="w-full max-w-md p-4 bg-stone-300 border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
       <div className="flex items-center justify-between mb-4">

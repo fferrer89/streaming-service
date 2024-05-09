@@ -25,6 +25,10 @@ const ArtistAlbum: React.FC<{ params: { id: string } }> = ({ params }) => {
   if (loading) {
     return <div>Loading</div>;
   }
+
+  if (!artist) {
+    return <div>Loading</div>;
+  }
   return (
     <div
       className="w-full h-full bg-cover bg-center overflow-x-hidden no-scrollbar"

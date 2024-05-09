@@ -14,8 +14,8 @@ import axios from 'axios';
 import { Readable } from 'stream';
 import bcrypt from 'bcryptjs';
 
-const usersToBeSeeded = 50;
-const artistsToBeSeeded = 2;
+const usersToBeSeeded = 500;
+const artistsToBeSeeded = 50;
 // albums number will be random from 1 to 6
 const albumsToBeSeeded = Math.floor(Math.random() * 6) + 1;
 // songs number will be random from 1 to 5

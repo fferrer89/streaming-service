@@ -139,110 +139,118 @@ const AdminDashboard: React.FC = () => {
   };
 
   if (data) {
-    const countData = data
-      ? [
-        { name: "Users", count: data.getUserCount, fill: "#0EA5E9" },
-        { name: "Artists", count: data.getArtistCount, fill: "#F97316" },
-        { name: "Albums", count: data.getAlbumCount, fill: "#22C55E" },
-        { name: "Songs", count: data.getSongCount, fill: "#EAB308" },
-        { name: "Playlists", count: data.getPlaylistCount, fill: "#EF4444" },
-      ]
-      : [];
-    const userGenderData = data
-      ? [
-        {
-          name: "Female",
-          value: data.users.filter(
-            (user: User) => user.gender.toLowerCase() === "female"
-          ).length,
-        },
-        {
-          name: "Male",
-          value: data.users.filter(
-            (user: User) => user.gender.toLowerCase() === "male"
-          ).length,
-        },
-        {
-          name: "Other",
-          value: data.users.filter(
-            (user: User) =>
-              user.gender.toLowerCase() !== "female" &&
-              user.gender.toLowerCase() !== "male"
-          ).length,
-        },
-      ]
-      : [];
-    const artistGenderData = data
-      ? [
-        {
-          name: "Female",
-          value: data.artists.filter(
-            (artist: Artist) => artist.gender.toLowerCase() === "female"
-          ).length,
-        },
-        {
-          name: "Male",
-          value: data.artists.filter(
-            (artist: Artist) => artist.gender.toLowerCase() === "male"
-          ).length,
-        },
-        {
-          name: "Other",
-          value: data.artists.filter(
-            (artist: Artist) =>
-              artist.gender.toLowerCase() !== "female" &&
-              artist.gender.toLowerCase() !== "male"
-          ).length,
-        },
-      ]
-      : [];
-    const albumTypeData = data
-      ? [
-        {
-          name: "Album",
-          value: data.albums.filter(
-            (album: Album) => album.album_type.toLowerCase() === "album"
-          ).length,
-        },
-        {
-          name: "Single",
-          value: data.albums.filter(
-            (album: Album) => album.album_type.toLowerCase() !== "album"
-          ).length,
-        },
-      ]
-      : [];
-    const songLanguageData = data
-      ? [
-        {
-          name: "English",
-          value: data.songs.filter(
-            (song: Song) => song.language.toLowerCase() === "english"
-          ).length,
-        },
-        {
-          name: "Hindi",
-          value: data.songs.filter(
-            (song: Song) => song.language.toLowerCase() === "hindi"
-          ).length,
-        },
-        {
-          name: "Arabic",
-          value: data.songs.filter(
-            (song: Song) => song.language.toLowerCase() === "arabic"
-          ).length,
-        },
-        {
-          name: "Other",
-          value: data.songs.filter(
-            (song: Song) =>
-              !["english", "hindi", "arabic"].includes(
-                song.language.toLowerCase()
-              )
-          ).length,
-        },
-      ]
-      : [];
+    countData = [
+      {
+        name: "Users",
+        count: data.getUserCount,
+        fill: "#0EA5E9",
+      },
+      {
+        name: "Artists",
+        count: data.getArtistCount,
+        fill: "#f97316",
+      },
+      {
+        name: "Albums",
+        count: data.getAlbumCount,
+        fill: "#22C55E",
+      },
+      {
+        name: "Songs",
+        count: data.getSongCount,
+        fill: "#EAb308",
+      },
+      {
+        name: "Playlists",
+        count: data.getPlaylistCount,
+        fill: "#EF4444",
+      },
+    ];
+
+    let userFemaleCount = 0;
+    let userMaleCount = 0;
+    let userOtherCount = 0;
+    data.users.forEach((user: User) => {
+      if (user.gender) {
+        if (user.gender.toLowerCase() === "female") {
+          userFemaleCount++;
+        } else if (user.gender.toLowerCase() === "male") {
+          userMaleCount++;
+        } else {
+          userOtherCount++;
+        }
+      }
+    });
+
+    userGenderData = [
+      { name: "Female", value: userFemaleCount },
+      { name: "Male", value: userMaleCount },
+      { name: "Other", value: userOtherCount },
+    ];
+
+    let artistFemaleCount = 0;
+    let artistMaleCount = 0;
+    let artistOtherCount = 0;
+    data.artists.forEach((artist: Artist) => {
+      if (artist.gender) {
+        if (artist.gender.toLowerCase() === "female") {
+          artistFemaleCount++;
+        } else if (artist.gender.toLowerCase() === "male") {
+          artistMaleCount++;
+        } else {
+          artistOtherCount++;
+        }
+      }
+    });
+
+    artistGenderData = [
+      { name: "Female", value: artistFemaleCount },
+      { name: "Male", value: artistMaleCount },
+      { name: "Other", value: artistOtherCount },
+    ];
+
+    let albumAlbumCount = 0;
+    let albumSingleCount = 0;
+    data.albums.forEach((album: Album) => {
+      if (album.album_type) {
+        if (album.album_type.toLowerCase() === "album") {
+          albumAlbumCount++;
+        } else {
+          albumSingleCount++;
+        }
+      }
+    });
+
+    albumTypeData = [
+      { name: "Album", value: albumAlbumCount },
+      { name: "Single", value: albumSingleCount },
+    ];
+
+    let songEnglishCount = 0;
+    let songHindiCount = 0;
+    let songArabicCount = 0;
+    let songOtherCount = 0;
+    data.songs.forEach((song: Song) => {
+      if (song.language) {
+        if (song.language.toLowerCase() === "english") {
+          songEnglishCount++;
+        } else if (song.language.toLowerCase() === "hindi") {
+          songHindiCount++;
+        } else if (song.language.toLowerCase() === "arabic") {
+          songArabicCount++;
+        } else {
+          songOtherCount++;
+        }
+      }
+    });
+
+    songLanguageData = [
+      { name: "English", value: songEnglishCount },
+      { name: "Hindi", value: songHindiCount },
+      { name: "Arabic", value: songArabicCount },
+      { name: "Other", value: songOtherCount },
+    ];
+
     return (
       <>
         <main className="flex flex-col sm:flex-row bg-[#C6AC8E] min-h-screen w-screen overflow-hidden">

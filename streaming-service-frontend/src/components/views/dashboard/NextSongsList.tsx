@@ -166,6 +166,7 @@ const NextSongsList: React.FC<NextSongsListProps> = ({ nextSongs, currentSong })
           <div className="bg-stone-700 p-4 rounded" onClick={(e) => e.stopPropagation()}>
             <h3>Add to Playlist</h3>
             <select onChange={handleSelectPlaylist} value={selectedPlaylistId} className="bg-stone-700 mb-4">
+              <option value="">Select</option>
               {playlistsData?.getPlaylistsByOwner.map((playlist) => (
                 <option key={playlist._id} value={playlist._id}>
                   {playlist.title}

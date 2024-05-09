@@ -20,6 +20,7 @@ const AddPlayListForm: React.FC<{
     client: apolloClient,
     onCompleted: () => {
       setOnSubmitMessage("Successfully Created");
+      window.location.reload();
     },
   });
 
