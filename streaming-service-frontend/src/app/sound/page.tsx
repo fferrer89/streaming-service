@@ -5,18 +5,22 @@ import { Separator } from "@/components/ui/separator";
 import Card from "@/components/App/Feed/Card";
 import InfiniteCarousel from "@/components/App/Feed/InfiniteCarousel";
 import { useDispatch } from "react-redux";
-import { playSong } from "@/utils/redux/features/song/songSlice";
+import { playSong, setNextSongs } from "@/utils/redux/features/song/songSlice";
 import createApolloClient from "@/utils";
 import { FeedQuery } from "@/utils/graphql/queries";
 import { FeedQueryResult } from "@/utils/graphql/resultTypes";
 import { getImageUrl } from "@/utils/tools/images";
 import { useRouter } from "next/navigation";
 import SkeletonLoader from "@/components/App/SkeletonLoader";
-
+import { useSelector } from "react-redux";
+import { RootState } from "@/utils/redux/store";
+import { useLazyQuery } from "@apollo/client";
+import queries from "@/utils/queries";
 // TODO: FIX INFINITE CAROUSEL
 
 const Home: React.FC = () => {
-  const apolloClient = createApolloClient(localStorage.getItem("tken"));
+  const { token } = useSelector((state: RootState) => state.user);
+  const apolloClient = createApolloClient(token);
   const dispatch = useDispatch();
   const { push } = useRouter();
   const [mostLikedSongs, setMostLikedSongs] = useState<
@@ -58,8 +62,19 @@ const Home: React.FC = () => {
     fetchMostLikedSongsAndArtists();
   }, []);
 
+  const [getNextSongs, { data: nextSongsData }] = useLazyQuery(
+    queries.GET_NEXT_SONGS
+  );
+
+  useEffect(() => {
+    if (nextSongsData && nextSongsData.getNextSongs) {
+      dispatch(setNextSongs(nextSongsData.getNextSongs));
+    }
+  }, [nextSongsData]);
+
   const handleSongClick = (songId: string) => {
-    const clickedSong = mostLikedSongs.find((song) => song._id === songId);
+    getNextSongs({ variables: { clickedSongId: songId } });
+    const clickedSong = mostLikedSongs.find((song) => song._id === songId) || newlyReleasedSongs.find((song) => song._id === songId);;
     if (clickedSong) {
       dispatch(playSong({ song: clickedSong, currentTime: 0 }));
     }
@@ -128,7 +143,7 @@ const Home: React.FC = () => {
                 key={artist._id}
                 image={getImageUrl(artist.profile_image_url)}
                 songId={artist._id}
-                onClick={() => push(`/artist/profile/${artist._id}`)}
+                onClick={() => push(`/sound/artistProfile/${artist._id}`)}
               />
             ))}
             speed={0.4}
@@ -199,7 +214,7 @@ const Home: React.FC = () => {
           <InfiniteCarousel
             items={newlyReleasedSongs.map((song) => (
               <Card
-                onClick={() => handleSongClick(song._id)}
+              onClick={() => handleSongClick(song._id)}
                 key={song._id}
                 image={getImageUrl(song.cover_image_url)}
                 songId={song._id}

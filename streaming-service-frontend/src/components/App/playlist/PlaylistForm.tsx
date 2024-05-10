@@ -1,4 +1,5 @@
 // PlayListForm.tsx
+// @ts-nocheck
 "use client";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -82,7 +83,7 @@ export const PlayListForm: React.FC<PlayListFormProps> = ({
             })}
           />
           {errors && errors.title && (
-            <p className="text-red-600 mt-2">{errors.title.message}</p>
+            <p className="text-red-600 mt-2">{errors.title.message as string}</p>
           )}
         </div>
 

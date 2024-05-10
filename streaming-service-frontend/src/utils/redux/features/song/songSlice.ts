@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Song {
+export interface Song {
   _id: string;
   title: string;
   duration: number;

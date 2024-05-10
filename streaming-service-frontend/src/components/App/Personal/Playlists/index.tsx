@@ -15,7 +15,7 @@ import { openModal } from "@/utils/redux/features/modal/modalSlice";
 import Link from "next/link";
 
 export type GetPlaylistsByOwnerResult = {
-  getPlaylistsByOwner: GetUserPlaylist[]; // Ensure this matches the actual structure returned by the server
+  getPlaylistsByOwner: GetUserPlaylist[];
 };
 
 const Playlists: React.FC = () => {
@@ -24,39 +24,39 @@ const Playlists: React.FC = () => {
   const [error, setError] = useState<string>("");
 
 
-  
-
   const userId = useSelector((state: RootState) => state.user.userId);
   const userType = useSelector((state: RootState) => state.user.userType);
   const dispatch = useDispatch();
 
-  const token = localStorage.getItem("token");
-  const apolloClient = token ? createApolloClient(token) : null;
+  const { token } = useSelector((state: RootState) => state.user);
+  const apolloClient = createApolloClient(token);
 
   const {
     loading: queryLoading,
     error: queryError,
     data,
+    refetch
   } = useQuery<GetPlaylistsByOwnerResult, GetUserPlaylistsVariables>(
     GetUserPlaylists,
     {
       variables: { userId: userId as string },
       client: apolloClient as any,
       skip: !apolloClient || !userId,
+      fetchPolicy: "cache-and-network", 
     }
   );
 
   useEffect(() => {
-    if (!queryLoading && !queryError && data) {
+    if ( !queryLoading && !queryError && data) {
       setPlaylists(data.getPlaylistsByOwner);
       setLoading(false);
     } else if (queryError) {
       setError("Error fetching playlists");
       setLoading(false);
     }
-    
   }, [queryLoading, queryError, data, userId]);
 
+  
   const handleOpenModal = () => {
     dispatch(openModal("AddPlaylistModal"));
   };

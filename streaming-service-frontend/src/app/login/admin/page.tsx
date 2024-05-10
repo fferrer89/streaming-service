@@ -8,6 +8,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { login } from '@/utils/redux/features/user/userSlice';
+import Cookies from 'js-cookie';
 
 interface FormData {
   email: string;
@@ -27,6 +28,8 @@ const AdminLogin: React.FC = () => {
       setAdminError(false);
       (document.getElementById('login') as HTMLFormElement)?.reset();
       dispatch(login({ user: admin, token, expiresIn: 3600, userType: 'admin' }));
+      Cookies.set('token', token, { expires: 7, secure: true });
+      Cookies.set('userType', 'artist', { expires: 7, secure: true });
       router.push('/admin/dashboard');
     },
     onError(error) {

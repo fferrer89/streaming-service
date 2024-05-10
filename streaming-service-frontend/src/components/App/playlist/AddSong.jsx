@@ -32,7 +32,8 @@ export const FloatingAddButton = () => {
 };
 
 const AddSongForm = ({ data: playlistData }) => {
-  const client = createApolloClient(localStorage.getItem("token"));
+  const { token } = useSelector((state) => state.user);
+  const apolloClient = createApolloClient(token);
   // console.log(playlistData);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");

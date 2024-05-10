@@ -315,13 +315,13 @@ export const playlistResolvers = {
     },
 
     removePlaylist: async (_, args, context) => {
-      if (!context.decoded && !context.decoded.id)
+      if (!context || !context.decoded || !context.decoded.id)
         songsHelpers.unAuthorizedWrapper('Please login to remove playlist');
 
       let { playlistId } = args;
       let playlistExist = await Playlists.findById(playlistId);
       if (!playlistExist) songsHelpers.notFoundWrapper('Playlist not found');
-      if (playlistId.owner.toString() != context.decoded.id)
+      if (playlistExist.owner.toString() != context.decoded.id)
         songsHelpers.unAuthorizedWrapper(
           'you are not authorised to remove this playlist'
         );

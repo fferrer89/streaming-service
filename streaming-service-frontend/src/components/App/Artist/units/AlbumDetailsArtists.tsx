@@ -27,6 +27,7 @@ const AlbumDetailsArtists: React.FC<{
     loading: artistLoading,
     error: artistsError,
     data: artistData,
+    refetch: artistRefetch
   } = useQuery(queries.GET_ARTISTS);
 
   const handleRemoveArtist = (songId: string) => {
@@ -35,6 +36,8 @@ const AlbumDetailsArtists: React.FC<{
   };
 
   const handleAddArtist = () => {
+    setSelectedArtistId("");
+    artistRefetch()
     setShowAddForm(true);
   };
 
@@ -43,18 +46,17 @@ const AlbumDetailsArtists: React.FC<{
   };
   const confirmRemoveArtist = async () => {
     try {
-      //console.log("Removing artist with ID:", artistToRemove, albumId);
       const response = await removeArtistFromAlbum({
         variables: { id: albumId, artistId: artistToRemove },
       });
 
       if (response.errors && response.errors.length > 0) {
         setError(`Error removing artist`);
-        //console.error("Error removing artist:", error);
       } else {
-        //console.log("Artist removed successfully");
         setArtistToRemove("");
         setShowConfirmation(false);
+        setM("Removing Artist");
+        setShowSuccess(true);
       }
       refetch();
     } catch (error) {
@@ -67,8 +69,11 @@ const AlbumDetailsArtists: React.FC<{
   };
 
   const confirmAddArtist = async () => {
+    if (!selectedArtistId) {
+      console.error("No song selected");
+      return;
+    }
     try {
-      // console.log("Adding artist with ID:", selectedArtistId, albumId);
       const response = await addArtistToAlbum({
         variables: { id: albumId, artistId: selectedArtistId },
       });
@@ -79,7 +84,6 @@ const AlbumDetailsArtists: React.FC<{
         setShowAddForm(false);
         setShowSuccess(true);
       } else {
-        //console.log("Artist Added successfully");
         setSelectedArtistId("");
         setShowAddForm(false);
         setM("Artist Added successfully");
@@ -112,6 +116,8 @@ const AlbumDetailsArtists: React.FC<{
   useEffect(() => {
     if (artistData && artistData.artists.length > 0) {
       setSelectedArtistId(artistData.artists[0]._id);
+    } else {
+      setSelectedArtistId("");
     }
   }, [artistData]);
 
@@ -127,7 +133,6 @@ const AlbumDetailsArtists: React.FC<{
       />
     );
   }
-  //console.log(artistData);
   return (
     <div className="w-full max-w-md p-4 bg-stone-300 border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
       <div className="flex items-center justify-between mb-4">
@@ -211,6 +216,7 @@ const AlbumDetailsArtists: React.FC<{
           <div className="bg-gray-200 p-4 rounded-lg shadow-lg text-black">
             <p>Select an artist to add:</p>
             <select value={selectedArtistId} onChange={handleArtistChange}>
+              <option value="">Select artist</option> 
               {artistData.artists
                 .filter(
                   (artist: any) =>

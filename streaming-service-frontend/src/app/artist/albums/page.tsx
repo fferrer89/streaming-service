@@ -67,7 +67,7 @@ const ArtistAlbums: React.FC = () => {
         Create New Album
       </button>
       <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
-        <Albums albums={artistAlbums.getAlbumsByArtist} />
+        <Albums albums={artistAlbums && artistAlbums.getAlbumsByArtist} />
       </div>
     </div>
   );

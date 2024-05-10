@@ -30,12 +30,14 @@ const artistSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please enter your display name'],
     trim: true,
-    // validate: [
-    //   validator.isAlphanumeric,
-    //   'Please enter a valid display name,display name can only contain letters and numbers',
-    // ],
-    minLength: [2, 'Last name must be at least 2 characters long'],
-    maxLength: [20, 'Last name must be less than 20 characters long'],
+    validate: {
+      validator: function(value) {
+        return /^[a-zA-Z0-9 ]*$/.test(value);
+      },
+      message: 'Please enter a valid display name, display name can only contain letters, numbers, and spaces',
+    },
+    minLength: [2, 'Display name must be at least 2 characters long'],
+    maxLength: [20, 'Display name must be less than 20 characters long'],
   },
   email: {
     type: String,

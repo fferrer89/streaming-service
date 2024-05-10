@@ -196,7 +196,6 @@ export const EDIT_USER_MUTATION = gql`
     $lastName: String
     $displayName: String
     $email: String
-    $profileImageUrl: String
   ) {
     editUser(
       userId: $userId
@@ -204,7 +203,6 @@ export const EDIT_USER_MUTATION = gql`
       last_name: $lastName
       display_name: $displayName
       email: $email
-      profile_image_url: $profileImageUrl
     ) {
       _id
       created_date

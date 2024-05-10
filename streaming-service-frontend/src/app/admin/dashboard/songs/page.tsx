@@ -163,7 +163,7 @@ const AdminDashboardSongs: React.FC = () => {
                   >
                     {song.cover_image_url ? (
                       <Image
-                        src={`http://localhost:4000/file/download/${song.cover_image_url}`}
+                        src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${song.cover_image_url}`}
                         alt="Song Cover"
                         width={100}
                         height={100}

@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import AlbumDetailsSongs from "./units/AlbumDetailsSongs";
 import AlbumDetailsArtists from "./units/AlbumDetailsArtists";
 import { useRouter } from "next/navigation";
+import { MusicGenres } from "@/utils/helpers";
 
 const REMOVE_ALBUM_MUTATION = gql`
   mutation RemoveAlbum($id: ID!) {
@@ -15,21 +16,21 @@ const REMOVE_ALBUM_MUTATION = gql`
 `;
 
 const UPDATE_ALBUM_MUTATION = gql`
-  mutation Mutation(
+  mutation UpdateAlbum(
     $id: ID!
-    $albumType: AlbumType
+    $album_type: AlbumType
     $title: String
     $description: String
-    $releaseDate: Date
+    $release_date: Date
     $genres: [MusicGenre!]
     $visibility: Visibility
   ) {
     editAlbum(
       _id: $id
-      album_type: $albumType
+      album_type: $album_type
       title: $title
       description: $description
-      release_date: $releaseDate
+      release_date: $release_date
       genres: $genres
       visibility: $visibility
     ) {
@@ -49,7 +50,6 @@ const UPDATE_ALBUM_MUTATION = gql`
     }
   }
 `;
-
 const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   albumData,
   refetch,
@@ -71,17 +71,12 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   } = albumData.getAlbumById;
   const router = useRouter();
   const date = new Date(release_date);
-  // const options = {
-  //   year: "numeric",
-  //   month: "long",
-  //   day: "numeric",
-  // };
 
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({
     album_type,
-    genres,
+    genres: genres.map(genre => genre.value),
     visibility,
     title,
     description,
@@ -93,6 +88,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
   const [updateAlbum, { loading: updating, error: updateError }] = useMutation(
     UPDATE_ALBUM_MUTATION
   );
+  const [editError, setEditError] = useState("");
 
   const handleRemoveAlbum = () => {
     setShowConfirmation(true);
@@ -118,28 +114,44 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
+    setEditError("");
   };
-
   const handleEditChange = (e: any) => {
     const { name, value } = e.target;
-    setEditData((prev) => ({ ...prev, [name]: value }));
+    if (name === "genres") {
+      // Handle multiple select for genres
+      const selectedOptions = Array.from(e.target.selectedOptions, (option: HTMLOptionElement) => option.value);
+      setEditData(prev => ({ ...prev, genres: selectedOptions }));
+    } else {
+      setEditData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  const saveChanges = async () => {
+  const handleSaveChanges = async () => {
+    const { album_type, title, description, release_date, visibility, genres } = editData;
+    console.log(album_type); 
+    console.log(genres);
+    if (!genres || genres.length === 0) {
+      setEditError("At least one genre must be selected.");
+      return;
+    }
+    if (!album_type || !title || !description || !release_date || !visibility) {
+      setEditError("All fields must be filled out.");
+      return;
+    }
+
     try {
       const response = await updateAlbum({
         variables: {
           id: _id,
           ...editData,
-          genres: editData.genres.split(",").map((genre: any) => genre.trim()),
-          release_date: new Date(editData.release_date).toLocaleDateString(),
+          releaseDate: new Date(editData.release_date).toISOString(),
+          genres: genres.filter(g => g) // Simplified filtering to remove falsy values
         },
       });
-
       if (response.data.editAlbum) {
-        // console.log("Album updated successfully:", response.data.editAlbum.title);
         refetch();
-        toggleEditMode();
+        setEditMode(false);
       }
     } catch (err) {
       console.error("Error updating album:", err);
@@ -204,6 +216,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
         <div className="w-full py-5 px-3 overflow-x-auto flex flex-row items-start text-dark">
           <div className="ml-4 flex flex-col justify-start">
             <div className="p-4 text-dark">
+              {editError && <div className="text-red-500 mb-2">{editError}</div>}
               <label
                 htmlFor="title"
                 className="block text-gray-700 font-semibold mb-2"
@@ -217,6 +230,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
                 value={editData.title}
                 onChange={handleEditChange}
                 className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+                required
               />
 
               <label
@@ -232,6 +246,7 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
                 onChange={handleEditChange}
                 rows={4}
                 className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+                required
               />
 
               <label
@@ -240,14 +255,19 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
               >
                 Album Type
               </label>
-              <input
-                type="text"
+              <select
                 id="album_type"
                 name="album_type"
                 value={editData.album_type}
                 onChange={handleEditChange}
                 className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
-              />
+                required
+              >
+                <option value="ALBUM">Album</option>
+                <option value="SINGLE">Single</option>
+                <option value="COMPILATION">Compilation</option>
+                <option value="APPEARS_ON">Appears On</option>
+              </select>
 
               <label
                 htmlFor="release_date"
@@ -262,22 +282,26 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
                 value={editData.release_date}
                 onChange={handleEditChange}
                 className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
+                max={new Date().toISOString().split("T")[0]}
+                required
               />
-
               <label
                 htmlFor="visibility"
                 className="block text-gray-700 font-semibold mb-2"
               >
                 Visibility
               </label>
-              <input
-                type="text"
+              <select
                 id="visibility"
                 name="visibility"
                 value={editData.visibility}
                 onChange={handleEditChange}
                 className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
-              />
+                required
+              >
+                <option value="PUBLIC">Public</option>
+                <option value="PRIVATE">Private</option>
+              </select>
 
               <label
                 htmlFor="genres"
@@ -285,18 +309,24 @@ const AlbumDetails: React.FC<{ albumData: any; refetch: any }> = ({
               >
                 Genres
               </label>
-              <input
-                type="text"
+              <select
                 id="genres"
                 name="genres"
                 value={editData.genres}
                 onChange={handleEditChange}
                 className="border border-gray-300 rounded-md p-2 w-full mb-2 text-black"
-              />
+                multiple
+                required
+              >
+               {MusicGenres.map((genre) => (
+                <option key={genre} value={genre} selected={editData.genres.includes(genre)}>
+                  {genre}
+                </option>
+              ))}
+              </select>
 
               <button
-                onClick={saveChanges}
-                disabled={updating}
+                onClick={handleSaveChanges}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
               >
                 Save Changes

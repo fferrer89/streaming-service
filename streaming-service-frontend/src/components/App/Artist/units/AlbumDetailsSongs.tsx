@@ -8,7 +8,7 @@ const AlbumDetailsSongs: React.FC<{
   songs: any;
   refetch: any;
   albumId: any;
-}> = ({ songs, refetch, albumId }) => {
+}> = ({ songs, refetch : albumRefetch, albumId }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [songToRemove, setSongToRemove] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
@@ -26,8 +26,10 @@ const AlbumDetailsSongs: React.FC<{
     loading: songsLoading,
     error: songsError,
     data: songData,
+    refetch
   } = useQuery(queries.GET_SONGS_BY_ARTIST, {
     variables: { artistId: artistId },
+    fetchPolicy: "cache-and-network"
   });
 
   const handleRemoveSong = (songId: string) => {
@@ -35,7 +37,9 @@ const AlbumDetailsSongs: React.FC<{
     setShowConfirmation(true);
   };
   const handleAddSong = () => {
+    setSelectedSongId("");
     setShowAddForm(true);
+    refetch()
   };
 
   const handleSongChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -56,8 +60,12 @@ const AlbumDetailsSongs: React.FC<{
         // console.log("Song removed successfully");
         setSongToRemove("");
         setShowConfirmation(false);
+        setM("Song Added successfully");
+      setIsSuccess(true);
+      setShowSuccess(true);
       }
-      refetch();
+      albumRefetch()
+      
     } catch (error) {
       console.error("Error removing song:", error);
       setSongToRemove("");
@@ -69,13 +77,20 @@ const AlbumDetailsSongs: React.FC<{
   };
 
   const confirmAddSong = async () => {
+    if (!selectedSongId) {
+      console.error("No song selected");
+      // setM("No song selected");
+      // setIsSuccess(false);
+      // setShowSuccess(true);
+      return;
+    }
     try {
-      // console.log("Adding song with ID:", selectedSongId, albumId);
       const response = await addSongToAlbum({
         variables: { id: albumId, songId: selectedSongId },
       });
 
       if (response.errors && response.errors.length > 0) {
+        setSelectedSongId("");
         setIsSuccess(false);
         setShowSuccess(true);
         setM("Error Adding Song");
@@ -87,13 +102,16 @@ const AlbumDetailsSongs: React.FC<{
         setIsSuccess(true);
         setShowSuccess(true);
       }
-      refetch();
+      albumRefetch()
+     
     } catch (error) {
       console.error("Error Adding song:", error);
+      setSelectedSongId("");
       setIsSuccess(false);
       setM("Error Adding Song");
       setShowAddForm(false);
       setShowSuccess(true);
+      
     }
   };
 
@@ -113,6 +131,8 @@ const AlbumDetailsSongs: React.FC<{
   useEffect(() => {
     if (songData && songData.getSongsByArtistID.length > 0) {
       setSelectedSongId(songData.getSongsByArtistID[0]._id);
+    } else {
+      setSelectedSongId(""); 
     }
   }, [songData]);
 
@@ -208,8 +228,9 @@ const AlbumDetailsSongs: React.FC<{
       {songData && showAddForm && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-200 p-4 rounded-lg shadow-lg text-black">
-            <p>Select an Song to add:</p>
-            <select value={selectedSongId} onChange={handleSongChange}>
+            <p>Select a Song to add:</p>
+            <select value={selectedSongId} onChange={handleSongChange} disabled={!songData.getSongsByArtistID.length}>
+              <option value="">Select song</option>
               {songData.getSongsByArtistID
                 .filter((song: any) => song.album === null)
                 .map((song: any) => (

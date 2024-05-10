@@ -1,4 +1,5 @@
 "use client";
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { gql } from "@apollo/client";
@@ -7,6 +8,8 @@ import Playlists from "@/components/App/Serach/Playlists";
 import Songs from "@/components/App/Serach/Songs";
 import createApolloClient from "@/utils";
 import Albums from "@/components/App/Serach/Albums";
+import { useSelector } from "react-redux";
+import { RootState } from "@/utils/redux/store";
 
 const SEARCH_QUERIES = gql`
   query SearchQueries($searchTerm: String!) {
@@ -127,7 +130,8 @@ const Search: React.FC = () => {
     songs: [],
     albums: [],
   });
-  const apolloClient = createApolloClient(localStorage.getItem("token"));
+  const { token } = useSelector((state: RootState) => state.user);
+  const apolloClient = createApolloClient(token);
 
   const { data, loading, error } = useQuery(SEARCH_QUERIES, {
     client: apolloClient,

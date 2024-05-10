@@ -1,4 +1,5 @@
 // ArtistProfile.tsx
+//@ts-nocheck
 "use client";
 import React, { useContext } from "react";
 import { useQuery, useMutation } from "@apollo/client";
@@ -9,12 +10,15 @@ import { SongsByArtistID } from "@/utils/graphql/resultTypes";
 import { gql } from "@apollo/client";
 import Songs from "@/components/App/Serach/Songs";
 import Albums from "@/components/App/Serach/Albums";
+import { RootState } from "@/utils/redux/store";
+import { useSelector } from "react-redux";
+
 interface ArtistProfileProps {
   params: { id: string };
 }
 
 const ArtistProfile: React.FC<ArtistProfileProps> = ({ params }) => {
-  const userId = localStorage.getItem("userId");
+  const userId = useSelector((state: RootState) => state.user.userId);
   const { data: artistData, loading: artistLoading, error: artistError } = useQuery(queries.GET_ARTIST_BY_ID, {
     variables: { id: params.id },
   });
@@ -52,13 +56,13 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ params }) => {
     variables: { id: params.id },
     refetchQueries: [{ query: queries.GET_ARTIST_BY_ID, variables: { id: params.id } }],
   });
-
+  const userType = useSelector((state: RootState) => state.user.userType);
   if (artistLoading || songsLoading) return <div>Loading...</div>;
   if (artistError || songsError) return <div>Error loading data</div>;
 
-  const artist = artistData.getArtistById;
-  const isCurrentUser = userId === artist._id;
-  const userType = localStorage.getItem("userType");
+  const artist = artistData && artistData.getArtistById;
+  const isCurrentUser = userId === artist && artist._id;
+ 
   let isFollowing = false;
   if (userType === 'user') {
     isFollowing = artist.followers.users.some((user: { id: string }) => user._id === userId);
@@ -76,6 +80,7 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ params }) => {
     month: "long",
     day: "numeric",
   });
+
 
   return (
     <div className="container mx-auto my-5 p-5 rounded-lg h-fit">

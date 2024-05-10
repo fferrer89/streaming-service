@@ -7,8 +7,9 @@ import React from "react";
 import createApolloClient from "@/utils";
 import queries from "../../../utils/queries";
 import { EditPlaylistModal } from "./EditPlaylistModal";
-
+import { useSelector } from "react-redux";
 import { FloatingAddButton } from "./AddSong";
+import { RootState } from "@/utils/redux/store";
 
 interface BannerProp {
   playlist: {
@@ -38,10 +39,11 @@ interface BannerProp {
 
 export const PlayListBanner: React.FC<BannerProp> = ({ playlist }) => {
   const [likeToggle, setLikeToggle] = useState<boolean>(playlist.isLiked);
-  const client = createApolloClient(localStorage.getItem("token"));
+  const { token } = useSelector((state: RootState) => state.user);
+  const apolloClient = createApolloClient(token);
   const [likePlayList, { data: toggleData, loading, error }] = useMutation(
     queries.TOGGLE_PLAYLIST,
-    { refetchQueries: [queries.GET_PLAYLIST], client }
+    { refetchQueries: [queries.GET_PLAYLIST], client: apolloClient }
   );
   console.log("-----------------", playlist.isOwner);
   if (error) {

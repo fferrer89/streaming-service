@@ -102,9 +102,6 @@ const AdminDashboardArtists: React.FC = () => {
     );
   }
 
-  if (error) {
-    return <div>Error: {error?.message}</div>
-  }
 
   const handleModal = (artistId: string, artistName: string) => {
     setArtistId(artistId);
@@ -140,7 +137,7 @@ const AdminDashboardArtists: React.FC = () => {
                 (paginatedArtists.map((artist: Artists) => (
                   <div key={artist._id} className='flex flex-col sm:w-56 items-center justify-center text-center px-3 py-6 rounded-md bg-[#22333B]'>
                     {(artist.profile_image_url) ?
-                      <Image src={`http://localhost:4000/file/download/${artist.profile_image_url}`} alt='Artist Profile' width={100} height={100} className='mb-4 rounded-full' /> :
+                      <Image src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${artist.profile_image_url}`} alt='Artist Profile' width={100} height={100} className='mb-4 rounded-full' /> :
                       <FaUser className='w-[100px] h-[100px] mb-4 rounded-full' />
                     }
                     <h5 className='mb-2 text-xl font-medium text-[#C6AC8E] w-full break-words'>{artist.display_name}</h5>

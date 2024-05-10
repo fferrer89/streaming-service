@@ -18,6 +18,7 @@ const ArtistAlbum: React.FC<{ params: any }> = ({ params }) => {
   } = useQuery(queries.GET_ALBUM_BY_ID, {
     variables: { id: params?.id },
     fetchPolicy: "cache-and-network",
+    
   });
   if (loading) {
     return <div>Loading</div>;
@@ -28,7 +29,7 @@ const ArtistAlbum: React.FC<{ params: any }> = ({ params }) => {
       style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
     >
       <div className="w-full h-full items-start overflow-y-scroll p-4 space-y-4">
-        <AlbumDetails albumData={album} refetch={params.refetch} />
+        <AlbumDetails albumData={album} refetch={refetch} />
       </div>
     </div>
   );

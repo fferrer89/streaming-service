@@ -12,7 +12,7 @@ import {
 import NextSongsList from "./NextSongsList";
 import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
 import AudioPlayer from "react-h5-audio-player";
-import "react-h5-audio-player/lib/styles.css";
+import "react-h5-audio-player/lib/styles.css"; 
 const SPlayer: React.FC = () => {
   const dispatch = useDispatch();
   const {
@@ -23,6 +23,7 @@ const SPlayer: React.FC = () => {
   } = useSelector((state: RootState) => state.song);
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressX = useMotionValue(0);
+
 
   useEffect(() => {
     if (currentSong) {
@@ -37,6 +38,7 @@ const SPlayer: React.FC = () => {
       }
     }
   }, [currentSong, isPlaying]);
+
 
   const handleNextSong = () => {
     if (nextSongs.length > 0 && currentSong) {

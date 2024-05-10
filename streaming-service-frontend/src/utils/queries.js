@@ -7,7 +7,6 @@ const REGISTER_USER = gql`
     $displayName: String!
     $email: String!
     $password: String!
-    $profileImageUrl: String!
   ) {
     registerUser(
       first_name: $firstName
@@ -15,7 +14,6 @@ const REGISTER_USER = gql`
       display_name: $displayName
       email: $email
       password: $password
-      profile_image_url: $profileImageUrl
     ) {
       user {
         _id
@@ -31,7 +29,6 @@ const REGISTER_ARTIST = gql`
     $displayName: String!
     $email: String!
     $password: String!
-    $profileImageUrl: String!
     $genres: [MusicGenre!]!
   ) {
     registerArtist(
@@ -40,7 +37,6 @@ const REGISTER_ARTIST = gql`
       display_name: $displayName
       email: $email
       password: $password
-      profile_image_url: $profileImageUrl
       genres: $genres
     ) {
       artist {
@@ -477,6 +473,7 @@ const GET_ALBUM_BY_ID = gql`
       artists {
         _id
         display_name
+        profile_image_url
       }
       cover_image_url
       created_date

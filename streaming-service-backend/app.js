@@ -23,7 +23,8 @@ import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs';
 import { authenticateToken } from './utils/helpers.js';
 import morgan from 'morgan';
 import cors from 'cors';
-const redisClient = redis.createClient(process.env.REDIS_URL);
+const redisClient = redis.createClient();
+
 
 const attachRedisClient = (req, res, next) => {
   req.redisClient = redisClient;
@@ -104,6 +105,7 @@ try {
     .catch((error) => {
       throw new Error(`Redis Client failed to connect`);
     });
+    redisClient.flushDb();
   if (connection) {
     await server.start();
 

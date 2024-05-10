@@ -8,7 +8,6 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
-import { register_re } from '@/utils/redux/features/user/userSlice';
 import { PiMusicNotesFill } from "react-icons/pi";
 
 interface FormData {
@@ -40,7 +39,7 @@ const Signup: React.FC = () => {
       const { user, token } = data.registerUser;
       setUserError(false);
       (document.getElementById('register') as HTMLFormElement)?.reset();
-      dispatch(register_re({ user, token, expiresIn: 3600, userType: 'user' }));
+      //dispatch(register_re({ user, token, expiresIn: 3600, userType: 'user' }));
       router.push('/login');
     },
     onError(error) {
@@ -53,7 +52,7 @@ const Signup: React.FC = () => {
       const { artist, token } = data.registerArtist;
       setArtistError(false);
       (document.getElementById('register') as HTMLFormElement)?.reset();
-      dispatch(register_re({ user: artist, token, expiresIn: 3600, userType: 'artist' }));
+      //dispatch(register_re({ user: artist, token, expiresIn: 3600, userType: 'artist' }));
       router.push('/login');
     },
     onError(error) {
@@ -132,9 +131,9 @@ const Signup: React.FC = () => {
           <h1 className='text-3xl font-bold'>Sign up</h1>
           <div className='text-xl font-bold mt-4'>
             <span>Join today and dive into the world of music</span>
-            <PiMusicNotesFill className='inline ml-4 text-red-500 animate-bounce' />
+            {/* <PiMusicNotesFill className='inline ml-4 text-red-500 animate-bounce' />
             <PiMusicNotesFill className='inline ml-4 text-red-500 animate-bounce delay-75' />
-            <PiMusicNotesFill className='inline ml-4 text-red-500 animate-bounce delay-200' />
+            <PiMusicNotesFill className='inline ml-4 text-red-500 animate-bounce delay-200' /> */}
           </div>
           <div className='flex flex-col items-center mt-10 lg:w-full'>
             <form
@@ -212,7 +211,7 @@ const Signup: React.FC = () => {
                   {...register('displayName', {
                     required: 'Display name is required',
                     pattern: {
-                      value: /^[a-zA-Z0-9]*$/,
+                      value: /^[a-zA-Z0-9 ]*$/                      ,
                       message: 'Must contain only letters and numbers',
                     },
                     minLength: {

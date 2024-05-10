@@ -9,7 +9,10 @@ import {
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
 
-let userToken = localStorage.getItem("token");
+import { useSelector } from 'react-redux';
+
+import Cookies from 'js-cookie';
+const userToken = Cookies.get('token');
 const authLink = setContext((_, { headers }) => {
   return {
     headers: {

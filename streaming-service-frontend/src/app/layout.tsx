@@ -1,6 +1,7 @@
 "use client";
 import { Provider } from "react-redux";
-import { store } from "@/utils/redux/store";
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from '@/utils/redux/store';
 import "./globals.css";
 import { ApolloWrapper } from "./ApolloWrapper";
 import Head from "next/head";
@@ -26,7 +27,11 @@ export default function RootLayout({
       </Head>
       <body>
         <ApolloWrapper>
-          <Provider store={store}>{children}</Provider>
+          <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+              {children}
+            </PersistGate>
+          </Provider>
         </ApolloWrapper>
       </body>
     </html>

@@ -13,11 +13,13 @@ import { useRouter } from "next/navigation";
 import SkeletonLoader from "@/components/App/SkeletonLoader";
 import createApolloClient from "@/utils";
 import queries from "@/utils/queries";
-
+import { useSelector } from "react-redux";
+import { RootState } from "@/utils/redux/store";
 import { useQuery, useLazyQuery } from "@apollo/client";
 // TODO: FIX INFINITE CAROUSEL
 
 const Home: React.FC = () => {
+  const reduxToken = useSelector((state: RootState) => state.user.token);
   const [token, setToken] = useState<string | null>(null);
   const apolloClient = createApolloClient(token);
   const dispatch = useDispatch();
@@ -40,8 +42,9 @@ const Home: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
 
+  
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
+    setToken(reduxToken);
   }, []);
 
   useEffect(() => {
@@ -56,6 +59,7 @@ const Home: React.FC = () => {
           setNewlyReleasedAlbums(data.getNewlyReleasedAlbums.slice(0, 10));
           setMostLikedAlbums(data.getMostLikedAlbums.slice(0, 10));
           setNewlyReleasedSongs(data.getNewlyReleasedSongs.slice(0, 10));
+          setLoading(false);
         } catch (error) {
           console.error("Error fetching data:", error);
         } finally {
@@ -79,7 +83,7 @@ const Home: React.FC = () => {
 
   const handleSongClick = (songId: string) => {
     getNextSongs({ variables: { clickedSongId: songId } });
-    const clickedSong = mostLikedSongs.find((song) => song._id === songId);
+    const clickedSong = mostLikedSongs.find((song) => song._id === songId) || newlyReleasedSongs.find((song) => song._id === songId);
     if (clickedSong) {
       dispatch(playSong({ song: clickedSong, currentTime: 0 }));
     }

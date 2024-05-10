@@ -1,9 +1,9 @@
 import React from 'react';
 import Reveal from '@/utils/effects/Reveal';
-import { useRouter } from "next/navigation";// Import useRouter from next/router
+import { useRouter } from "next/navigation";
 
 const Info: React.FC = () => {
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter(); 
 
   return (
     <div className="bg-[#C6AC8E]  h-screen w-screen flex-col items-center justify-center relative ">

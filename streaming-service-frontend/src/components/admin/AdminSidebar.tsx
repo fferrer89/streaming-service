@@ -8,6 +8,7 @@ import { PiMusicNotesFill } from 'react-icons/pi';
 import { usePathname } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/utils/redux/features/user/userSlice';
+import Cookies from 'js-cookie';
 
 const AdminSideBar: React.FC = () => {
   const pathname = usePathname();
@@ -15,6 +16,8 @@ const AdminSideBar: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logout());
+    Cookies.remove('token');
+    Cookies.remove('userType');
   };
 
   return (

@@ -1,32 +1,38 @@
 "use client";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useMutation } from "@apollo/client";
 import { FaTrash } from "react-icons/fa";
 import { PlayListBanner } from "@/components/App/playlist/Banner";
-import apolloClient from "@/utils";
+import createApolloClient from "@/utils";
 import queries from "@/utils/queries";
 import { AddSong } from "@/components/App/playlist/AddSong";
-import { useMutation } from "@apollo/client";
 import { useDispatch } from "react-redux";
 import { playSong } from "@/utils/redux/features/song/songSlice";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 
 export default function Playlist({ params }) {
+  const { token } = useSelector((state) => state.user);
+  const apolloClient = createApolloClient(token);
   const dispatch = useDispatch();
-  //console.log(params);
+  const router = useRouter();
   const { loading, data, error } = useQuery(queries.GET_PLAYLIST, {
     variables: { id: params.id },
-    apolloClient,
+    client: apolloClient,
   });
   const [
     removeSong,
     { data: mutationData, loading: mutationLoading, error: mutationError },
   ] = useMutation(queries.REMOVE_SONG_FROM_PLAYLIST, {
-    refetchQueries: [queries.GET_PLAYLIST],
-    apolloClient,
-    fetchPolicy: "cache-and-network",
+    refetchQueries: [{ query: queries.GET_PLAYLIST, variables: { id: params.id } }],
+    client: apolloClient,
   });
-  // console.log("playlists",data);
-  //console.log(error);
+
+  const [deletePlaylist] = useMutation(queries.REMOVE_PLAYLIST, {
+    variables: { playlistId: params.id },
+    onCompleted: () => window.location.href = '/sound',
+    client: apolloClient,
+  });
 
   if (loading) return <div className="text-center text-lg">Loading...</div>;
   if (error)
@@ -43,6 +49,14 @@ export default function Playlist({ params }) {
         style={{ backgroundColor: "rgba(255, 255, 255, 0.8)" }}
       >
         <PlayListBanner playlist={data.getPlaylistById} />
+        {data.getPlaylistById.isOwner && (
+          <button
+            onClick={() => deletePlaylist()}
+            className="self-end p-2 mb-2 text-white bg-red-500 rounded-full hover:bg-red-700 transition-colors duration-300"
+          >
+            Delete Playlist
+          </button>
+        )}
         <div className="flex flex-col mt-8">
           <div className="flex flex-col justify-between px-4">
             <div className="flex flex-row justify-between pb-10">
@@ -71,7 +85,7 @@ export default function Playlist({ params }) {
                               playlistId: data.getPlaylistById._id,
                               songId: song._id,
                             },
-                          });
+                          }).catch(err => console.error("Error removing song:", err));
                         }}
                         className="ml-4 p-2 rounded-full hover:bg-red-500 hover:text-white transition-colors duration-300"
                       >

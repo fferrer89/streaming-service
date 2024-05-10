@@ -120,7 +120,7 @@ export const songResolvers = {
 
       let songs = await Songs.find({ artists: { $eq: artistId } });
       if (songs.length == 0) {
-        songHelper.notFoundWrapper('Songs not found by this Artist id');
+        return [];
       } else {
         // await context.redisClient.json.set(cacheKey, '$', songs);
         // await context.redisClient.EXPIRE(cacheKey, 300);
@@ -567,13 +567,13 @@ export const songResolvers = {
           'song_songsByArtist:*'
         );
 
-        // Combine all keys to delete into a single array
+       
         const allKeysToDelete = relatedCacheKeys.concat(
           keysToDelete,
           keysToDelete2
         );
 
-        // Use Promise.all to ensure all deletions complete before proceeding
+       
         await Promise.all(
           allKeysToDelete.map((key) => context.redisClient.DEL(key))
         );

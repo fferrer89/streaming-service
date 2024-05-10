@@ -1,4 +1,5 @@
 'use client'
+//@ts-nocheck
 import React from 'react';
 import { getImageUrl } from '@/utils/tools/images';
 import { usePathname } from 'next/navigation';
@@ -19,7 +20,7 @@ interface PlaylistProps {
 const PlaylistItem: React.FC<PlaylistProps> = ({ _id, title, description, visibility, owner }) => {
   const imageUrl =  "/img/placeholder-album.png";
   const pathname = usePathname();
-  const firstPathSegment = pathname.split('/')[1];
+  const firstPathSegment = pathname && pathname.split('/')[1];
 
   return (
     <Link href={`/${firstPathSegment}/playlist/${_id}`} className="m-2 p-2 rounded-lg shadow-md hover:scale-105 transition-transform flex flex-col items-center">

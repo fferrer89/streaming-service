@@ -9,7 +9,7 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/utils/redux/store';
 import { login } from '@/utils/redux/features/user/userSlice';
-
+import Cookies from 'js-cookie';
 interface FormData {
   email: string;
   password: string;
@@ -32,6 +32,8 @@ const Login: React.FC = () => {
       setUserError(false);
       (document.getElementById('login') as HTMLFormElement)?.reset();
       dispatch(login({ user, token, expiresIn: 3600, userType: 'user' }));
+      Cookies.set('token', token, { expires: 7, secure: true });
+      Cookies.set('userType', 'user', { expires: 7, secure: true });
       router.push('/sound');
     },
     onError(error: any) {
@@ -46,6 +48,8 @@ const Login: React.FC = () => {
       setArtistError(false);
       (document.getElementById('login') as HTMLFormElement)?.reset();
       dispatch(login({ user: artist, token, expiresIn: 3600, userType: 'artist' }));
+      Cookies.set('token', token, { expires: 7, secure: true });
+      Cookies.set('userType', 'artist', { expires: 7, secure: true });
       router.push('/artist');
     },
     onError(error: any) {

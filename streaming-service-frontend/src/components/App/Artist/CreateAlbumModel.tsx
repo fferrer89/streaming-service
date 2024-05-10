@@ -10,7 +10,7 @@ import { useQuery } from "@apollo/client";
 import { useSelector } from "react-redux";
 
 const initialState = {
-  album: null,
+  messages: [],
   errorMessages: [],
 };
 
@@ -95,14 +95,18 @@ const CreateAlbumModal: React.FC<{
   };
 
   const handleSubmit = async () => {
-    try {
-      albumData.artists.push(artistId);
-      // @ts-ignore
-      createAlbumFormAction(albumData);
-    } catch (error) {
-      console.error("Error creating new album:", error);
-      setError("Error creating new album, server responded error");
-      return;
+    if (Object.values(albumData).every(value => value !== null && value !== '')) {
+      try {
+        albumData.artists.push(artistId);
+        // @ts-ignore
+        createAlbumFormAction(albumData);
+      } catch (error) {
+        console.error("Error creating new album:", error);
+        setError("Error creating new album, server responded error");
+        return;
+      }
+    } else {
+      setError("Please fill all the fields before submitting.");
     }
   };
 
@@ -164,6 +168,25 @@ const CreateAlbumModal: React.FC<{
     return <div>Error Loading Artist List</div>;
   }
   // console.log(artistsData);
+  if(songsData && songsData.getSongsByArtistID && songsData.getSongsByArtistID.length === 0){
+    return (<div className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center">
+    <div className="absolute inset-0 bg-black opacity-50"></div>
+    <div className="relative bg-stone-400 rounded-lg shadow-md w-6/12 p-4 overflow-y-auto h-4/5">
+      <div className="p-1 text-black overflow-y-auto h-6/12">
+        <div className="mb-4">
+          <h2 className="text-2xl font-semibold mb-4">No Songs Available</h2>
+          <p>You need to have songs without albums to create a new album.</p>
+        </div>
+        <button
+          onClick={() => setShowModal(false)}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none mr-2"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>);
+  }
   return (
     <div className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center">
       <div className="absolute inset-0 bg-black opacity-50"></div>
@@ -186,6 +209,7 @@ const CreateAlbumModal: React.FC<{
               value={albumData.album_type}
               onChange={handleInputChange}
               className="border border-gray-300 rounded-md p-2 w-full"
+              required
             >
               <option value="ALBUM">ALBUM</option>
               <option value="SINGLE">SINGLE</option>
@@ -208,6 +232,7 @@ const CreateAlbumModal: React.FC<{
               value={albumData.title}
               onChange={handleInputChange}
               className="border border-gray-300 rounded-md p-2 w-full"
+              required
             />
           </div>
 
@@ -225,6 +250,7 @@ const CreateAlbumModal: React.FC<{
               onChange={handleInputChange}
               rows="4"
               className="border border-gray-300 rounded-md p-2 w-full"
+              required
             ></textarea>
           </div>
           <div className="mb-4">
@@ -248,6 +274,7 @@ const CreateAlbumModal: React.FC<{
                   .toISOString()
                   .split("T")[0]
               }
+              required
             />
           </div>
           <div className="mb-4">
@@ -264,6 +291,7 @@ const CreateAlbumModal: React.FC<{
               onChange={handleGenreChange}
               className="border border-gray-300 rounded-md p-2 w-full"
               multiple
+              required
             >
               {MusicGenres.map((genre) => (
                 <option key={genre} value={genre}>
@@ -285,6 +313,7 @@ const CreateAlbumModal: React.FC<{
               value={albumData.visibility}
               onChange={handleInputChange}
               className="border border-gray-300 rounded-md p-2 w-full"
+              required
             >
               <option value="PUBLIC">PUBLIC</option>
               <option value="PRIVATE">PRIVATE</option>
@@ -304,6 +333,7 @@ const CreateAlbumModal: React.FC<{
               onChange={handleFileChange}
               className="border border-gray-300 rounded-md p-2 w-full"
               accept="image/*"
+              required
             />
           </div>
           <div className="mb-4">
@@ -320,8 +350,9 @@ const CreateAlbumModal: React.FC<{
               onChange={handleSongChange}
               className="border border-gray-300 rounded-md p-2 w-full"
               multiple
+              required
             >
-              {songsData.getSongsByArtistID
+              {songsData && songsData.getSongsByArtistID
                 .filter((song) => song.album === null)
                 .map((song) => (
                   <option key={song._id} value={song._id}>
@@ -344,6 +375,7 @@ const CreateAlbumModal: React.FC<{
               onChange={handleSongChange}
               className="border border-gray-300 rounded-md p-2 w-full"
               multiple
+              required
             >
               {artistsData.artists
                 .filter((artist) => artist._id !== artistId)
@@ -354,7 +386,7 @@ const CreateAlbumModal: React.FC<{
                 ))}
             </select>
           </div>
-          {createAlbumFormState && createAlbumFormState?.errorMessages && (
+          {createAlbumFormState && createAlbumFormState?.errorMessages && createAlbumFormState.length>0 && (
             <div
               className="bg-orange-100 border-l-4 border-orange-500 text-orange-700 p-4"
               role="alert"
@@ -396,3 +428,4 @@ const CreateAlbumModal: React.FC<{
 };
 
 export default CreateAlbumModal;
+

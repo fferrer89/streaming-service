@@ -19,7 +19,8 @@ const Songs: React.FC = () => {
   const [songs, setSongs] = useState<UserLikedSong[]>([]);
   const userId = useSelector((state: RootState) => state.user.userId);
   const userType = useSelector((state: RootState) => state.user.userType);
-  const apolloClient = createApolloClient(localStorage.getItem("token"));
+  const { token } = useSelector((state: RootState) => state.user);
+  const apolloClient = createApolloClient(token);
   const { loading, error, data } = useQuery(GetUserLikedSongs, {
     variables: { userId },
     client: apolloClient,
@@ -63,7 +64,7 @@ const Songs: React.FC = () => {
             >
               <img
                 src={
-                  song.album.cover_image_url
+                  song && song.album && song.album.cover_image_url
                     ? getImageUrl(song.album.cover_image_url)
                     : "/img/music_note.jpeg"
                 }

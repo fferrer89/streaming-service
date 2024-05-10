@@ -13,20 +13,22 @@ import fs from 'fs';
 import axios from 'axios';
 import { Readable } from 'stream';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+dotenv.config({ path: './.env' });
 
 const usersToBeSeeded = 50;
-const artistsToBeSeeded = 2;
+const artistsToBeSeeded = 10;
 // albums number will be random from 1 to 6
 const albumsToBeSeeded = Math.floor(Math.random() * 6) + 1;
 // songs number will be random from 1 to 5
 const numberOfSongs = Math.floor(Math.random() * 5) + 1;
 //threre will 1-3 songs for each artist without linked to any albums
 const numberOfSongsWithoutAlbums = Math.floor(Math.random() * 3) + 1;
-const numUsersToSelect = Math.floor(Math.random() * usersToBeSeeded - 1);
+const numUsersToSelect = Math.floor(Math.random() * (usersToBeSeeded - 1)) + 1;
 const numSongsToSelect = Math.floor(
   Math.random() * (numberOfSongs * artistsToBeSeeded * albumsToBeSeeded) - 1
 );
-await mongoose.connect('mongodb://localhost:27017/streaming-service', {
+await mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -242,6 +244,7 @@ async function generateCustomData() {
           genre: faker.helpers.arrayElement(MusicGenres),
           release_date: faker.date.past(),
           cover_image_url: songImagePath,
+          likes: numUsersToSelect ? numUsersToSelect : 10,
         };
 
         album.songs.push(song);
@@ -480,7 +483,8 @@ async function seed() {
           song.album = cAlbum._id;
           song.song_url = faker.helpers.arrayElement(songIdArray);
           song.cover_image_url = new mongoose.Types.ObjectId(fakeSongImageID);
-          song.likes = numUsersToSelect;
+          console.log(numUsersToSelect);
+          song.likes = numUsersToSelect ? numUsersToSelect : 10;
           let cSong = await Song.create(song);
           cAlbum.songs.push({ songId: cSong._id });
           await cAlbum.save();

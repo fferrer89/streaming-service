@@ -102,9 +102,9 @@ const AdminDashboardUsers: React.FC = () => {
     );
   }
 
-  if (error) {
-    return <div>Error: {error?.message}</div>
-  }
+  // if (error) {
+  //   return <div>Error: {error?.message}</div>
+  // }
 
   const handleModal = (userId: string, userName: string) => {
     setUserId(userId);
@@ -140,7 +140,7 @@ const AdminDashboardUsers: React.FC = () => {
                 (paginatedUsers.map((user: Users) => (
                   <div key={user._id} className='flex flex-col sm:w-56 items-center justify-center text-center px-3 py-6 rounded-md bg-[#22333B]'>
                     {(user.profile_image_url) ?
-                      <Image src={`http://localhost:4000/file/download/${user.profile_image_url}`} alt='User Profile' width={100} height={100} className='mb-4 rounded-full' /> :
+                      <Image src={`${process.env.NEXT_PUBLIC_API_BASE_URL}/file/download/${user.profile_image_url}`} alt='User Profile' width={100} height={100} className='mb-4 rounded-full' /> :
                       <FaUserAlt className='w-[100px] h-[100px] mb-4 rounded-full' />
                     }
                     <h5 className='mb-2 text-xl font-medium text-[#C6AC8E] w-full break-words'>{user.display_name}</h5>

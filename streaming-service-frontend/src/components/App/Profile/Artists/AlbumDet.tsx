@@ -80,7 +80,7 @@ const AlbumDet: React.FC<AlbumDetailsProps> = ({ params }) => {
   if (albumLoading) return <div className="text-center text-lg font-semibold">Loading...</div>;
   if (albumError) return <div className="text-center text-lg font-semibold text-red-500">Error loading album details</div>;
 
-  const album = albumData.getAlbumById;
+  const album = albumData && albumData.getAlbumById;
   const isLikedByCurrentUser = album.liked_by.users.some((liker: string) => liker === userId) || album.liked_by.artists.some((liker: string) => liker === userId);
 
   return (

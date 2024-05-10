@@ -14,12 +14,12 @@ import fs from 'fs';
 import { Readable } from 'stream';
 import { MusicGenres } from './helpers.js';
 import axios from 'axios';
-
+import dotenv from 'dotenv';
+dotenv.config({ path: './.env' });
 import SongFile from '../models/songFileModel.js';
 
 await mongoose.connect(
-  'mongodb://localhost:27017/streaming-service',
-  //'mongodb+srv://user554:BHVTeZOx80QQM7jY@cluster0.bui7i1e.mongodb.net/streaming-service',
+  process.env.MONGO_URL,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -1162,15 +1162,15 @@ async function seed() {
       '------------------------  Inserting custom data with song files  -------------------------'
     );
     for (let data of customData) {
-      let cArtist = await Artist.create({
-        ...data.artist,
-        profile_image_url: new mongoose.Types.ObjectId(sampleArtistImageId),
-      });
+      // let cArtist = await Artist.create({
+      //   ...data.artist,
+      //   profile_image_url: new mongoose.Types.ObjectId(sampleArtistImageId),
+      // });
 
       data.album.cover_image_url = await uploadRandomImage();
 
-      let cAlbum = await Album.create(data.album);
-      cAlbum.artists = [{ artistId: cArtist._id }];
+     // let cAlbum = await Album.create(data.album);
+     // cAlbum.artists = [{ artistId: cArtist._id }];
       const imageId = await uploadSong(
         `./utils/songData/${data.album.title}`,
         data.album.title,
@@ -1182,14 +1182,14 @@ async function seed() {
         uploadDate: new Date(),
         fileId: imageId,
       });
-      cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
+     // cAlbum.cover_image_url = new mongoose.Types.ObjectId(imageId);
 
       for (let song of data.songs) {
-        let songPath = `./songData/${cAlbum.title}/${song.title}.mp3`;
+        let songPath = `./songData/${song.title}/${song.title}.mp3`;
         console.log(`Song found at path path : ${songPath}`);
         const songId = await uploadSong(
-          `./utils/songData/${cAlbum.title}`,
-          data.album.title,
+          `./utils/songData/${data.album.title}`,
+          song.title,
           `${song.title}.mp3`
         );
         await SongFile.create({
@@ -1198,13 +1198,13 @@ async function seed() {
           uploadDate: new Date(),
           fileId: songId,
         });
-        song.artists = [cArtist._id];
-        song.album = cAlbum._id;
-        song.song_url = songId;
-        song.cover_image_url = new mongoose.Types.ObjectId(imageId);
-        let cSong = await Song.create(song);
-        cAlbum.songs.push({ songId: cSong._id });
-        await cAlbum.save();
+        // song.artists = [cArtist._id];
+        // song.album = cAlbum._id;
+        // song.song_url = songId;
+        // song.cover_image_url = new mongoose.Types.ObjectId(imageId);
+        // let cSong = await Song.create(song);
+        // cAlbum.songs.push({ songId: cSong._id });
+        // await cAlbum.save();
       }
     }
     console.log(
